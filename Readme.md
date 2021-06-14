@@ -1,7 +1,7 @@
 # Личный проект «TaskForce»
 
 * Студент: [Ксения Марковская](https://up.htmlacademy.ru/yii/1/user/607871).
-* Наставник: `Неизвестно`.
+* Наставник: [Evgeny Savich](https://htmlacademy.ru/profile/id68926).
 
 ---
 
