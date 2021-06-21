@@ -1,5 +1,7 @@
 <?php
 
+namespace App;
+
 class Task
 {
     const STATUS_NEW = 'new';
