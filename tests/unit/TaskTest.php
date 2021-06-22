@@ -27,7 +27,7 @@ class TaskTest extends \Codeception\Test\Unit
             'finished' => 'Выполнено',
         ];
 
-        $actual = \App\Task::getStatusMapping();
+        $actual = \App\business\Task::getStatusMapping();
 
         $this->assertEquals($expected, $actual);
     }
@@ -41,7 +41,7 @@ class TaskTest extends \Codeception\Test\Unit
             'refuse' => 'Отказаться',
         ];
 
-        $actual = \App\Task::getActionMapping();
+        $actual = \App\business\Task::getActionMapping();
 
         $this->assertEquals($expected, $actual);
     }
@@ -57,7 +57,7 @@ class TaskTest extends \Codeception\Test\Unit
         ];
 
         foreach ($map as $action => $status) {
-            $actual = \App\Task::getStatusByAction($action);
+            $actual = \App\business\Task::getStatusByAction($action);
             $this->assertEquals($status, $actual);
         }
     }
@@ -71,7 +71,7 @@ class TaskTest extends \Codeception\Test\Unit
         ];
 
         foreach ($map as $status => $action) {
-            $actual = \App\Task::getPossibleActions($status);
+            $actual = \App\business\Task::getPossibleActions($status);
             $this->assertEquals($map[$status], $actual);
         }
 
