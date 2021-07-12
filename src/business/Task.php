@@ -2,6 +2,11 @@
 
 namespace App\business;
 
+use App\core\action\CancelAction;
+use App\core\action\DoneAction;
+use App\core\action\RefuseAction;
+use App\core\action\VolunteerAction;
+
 class Task
 {
     const STATUS_NEW = 'new';
@@ -9,12 +14,6 @@ class Task
     const STATUS_IN_PROGRESS = 'in progress';
     const STATUS_FINISHED = 'finished';
     const STATUS_FAILED = 'failed';
-
-    const ACTION_CANCEL = 'cancel';
-    const ACTION_DONE = 'done';
-    const ACTION_VOLUNTEER = 'volunteer';
-    const ACTION_REFUSE = 'refuse';
-
 
     protected $clientId;
     protected $executorId;
@@ -41,36 +40,35 @@ class Task
         ];
     }
 
-    public static function getActionMapping(): array
-    {
-        return [
-            self::ACTION_VOLUNTEER => 'Откликнуться',
-            self::ACTION_CANCEL => 'Отменить',
-            self::ACTION_DONE => 'Выполнено',
-            self::ACTION_REFUSE => 'Отказаться',
-        ];
-    }
-
     public static function getStatusByAction(string $action): ?string
     {
         $actionStatusMap = [
-            self::ACTION_CANCEL => self::STATUS_CANCELED,
-            self::ACTION_DONE => self::STATUS_FINISHED,
-            self::ACTION_REFUSE => self::STATUS_FAILED,
-            self::ACTION_VOLUNTEER => self::STATUS_IN_PROGRESS,
+            (new CancelAction())->getAvailableAction() => self::STATUS_CANCELED,
+            (new DoneAction())->getAvailableAction() => self::STATUS_FINISHED,
+            (new RefuseAction())->getAvailableAction() => self::STATUS_FAILED,
+            (new VolunteerAction())->getAvailableAction() => self::STATUS_IN_PROGRESS,
         ];
 
         return $actionStatusMap[$action] ?? null;
     }
 
-    public static function getPossibleActions(string $status): ?array
+    public static function getPossibleActions(string $status, $clientId, $executorId, $userId): ?array
     {
         $actionStatusMap = [
-            self::STATUS_NEW => [self::ACTION_CANCEL, self::ACTION_VOLUNTEER ],
-            self::STATUS_IN_PROGRESS => [self::ACTION_DONE, self::ACTION_REFUSE],
+            self::STATUS_NEW => [new CancelAction(), new VolunteerAction()],
+            self::STATUS_IN_PROGRESS => [new DoneAction(), new RefuseAction()],
         ];
 
-        return $actionStatusMap[$status] ?? null;
+        if (array_key_exists($status, $actionStatusMap)) {
+            $userAvailableActions = [];
+            foreach ($actionStatusMap[$status] as $action) {
+                if ($action->getUserRightsCheck($clientId, $executorId, $userId)) {
+                    $userAvailableActions[] = $action->getAvailableAction();
+                }
+            }
+        }
+
+        return (!empty($userAvailableActions)) ? $userAvailableActions : null;
     }
 
 }
