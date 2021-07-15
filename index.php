@@ -2,5 +2,5 @@
 require_once 'vendor/autoload.php';
 
 
-print_r(\App\business\Task::getPossibleActions('in progress', 1, 2, 2));
+print_r(\App\business\Task::getPossibleActions('new', 1, null, 2));
 

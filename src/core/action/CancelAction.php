@@ -9,7 +9,7 @@ use App\core\TaskActionTemplate;
 class CancelAction extends TaskActionTemplate
 {
 
-    public function getAvailableAction()
+    public function getActionCode()
     {
         return 'cancel';
     }
@@ -21,6 +21,6 @@ class CancelAction extends TaskActionTemplate
 
     public function getUserRightsCheck(int $clientId, $executorId, int $userId)
     {
-        return ($userId === $clientId);
+        return $userId === $clientId;
     }
 }

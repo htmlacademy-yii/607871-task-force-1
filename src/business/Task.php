@@ -6,6 +6,7 @@ use App\core\action\CancelAction;
 use App\core\action\DoneAction;
 use App\core\action\RefuseAction;
 use App\core\action\VolunteerAction;
+use App\core\TaskActionTemplate;
 
 class Task
 {
@@ -43,32 +44,29 @@ class Task
     public static function getStatusByAction(string $action): ?string
     {
         $actionStatusMap = [
-            (new CancelAction())->getAvailableAction() => self::STATUS_CANCELED,
-            (new DoneAction())->getAvailableAction() => self::STATUS_FINISHED,
-            (new RefuseAction())->getAvailableAction() => self::STATUS_FAILED,
-            (new VolunteerAction())->getAvailableAction() => self::STATUS_IN_PROGRESS,
+            (new CancelAction())->getActionCode() => self::STATUS_CANCELED,
+            (new DoneAction())->getActionCode() => self::STATUS_FINISHED,
+            (new RefuseAction())->getActionCode() => self::STATUS_FAILED,
+            (new VolunteerAction())->getActionCode() => self::STATUS_IN_PROGRESS,
         ];
 
         return $actionStatusMap[$action] ?? null;
     }
 
-    public static function getPossibleActions(string $status, $clientId, $executorId, $userId): ?array
+    public static function getPossibleActions(string $status, $clientId, $executorId, $userId): array
     {
         $actionStatusMap = [
             self::STATUS_NEW => [new CancelAction(), new VolunteerAction()],
             self::STATUS_IN_PROGRESS => [new DoneAction(), new RefuseAction()],
         ];
 
-        if (array_key_exists($status, $actionStatusMap)) {
-            $userAvailableActions = [];
-            foreach ($actionStatusMap[$status] as $action) {
-                if ($action->getUserRightsCheck($clientId, $executorId, $userId)) {
-                    $userAvailableActions[] = $action->getAvailableAction();
-                }
-            }
+        if (!isset($actionStatusMap[$status])) {
+            return [];
         }
 
-        return (!empty($userAvailableActions)) ? $userAvailableActions : null;
+        return array_values(array_filter($actionStatusMap[$status], function(TaskActionTemplate $action) use ($clientId, $executorId, $userId) {
+           return $action->getUserRightsCheck($clientId, $executorId, $userId);
+        }));
     }
 
 }

@@ -9,7 +9,7 @@ use App\core\TaskActionTemplate;
 class DoneAction extends TaskActionTemplate
 {
 
-    public function getAvailableAction()
+    public function getActionCode()
     {
         return 'done';
     }
@@ -21,6 +21,6 @@ class DoneAction extends TaskActionTemplate
 
     public function getUserRightsCheck(int $clientId, $executorId, int $userId)
     {
-        return ($userId === $clientId);
+        return $userId === $clientId;
     }
 }

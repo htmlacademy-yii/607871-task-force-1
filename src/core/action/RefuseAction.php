@@ -9,7 +9,7 @@ use App\core\TaskActionTemplate;
 class RefuseAction extends TaskActionTemplate
 {
 
-    public function getAvailableAction()
+    public function getActionCode()
     {
         return 'refuse';
 
@@ -22,6 +22,6 @@ class RefuseAction extends TaskActionTemplate
 
     public function getUserRightsCheck(int $clientId, $executorId, int $userId)
     {
-        return ($userId === $executorId);
+        return $userId === $executorId;
     }
 }

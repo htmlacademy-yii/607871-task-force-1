@@ -9,7 +9,7 @@ use App\core\TaskActionTemplate;
 class VolunteerAction extends TaskActionTemplate
 {
 
-    public function getAvailableAction()
+    public function getActionCode()
     {
         return 'volunteer';
     }
