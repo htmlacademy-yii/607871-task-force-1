@@ -2,6 +2,12 @@
 
 namespace App\business;
 
+use App\core\action\CancelAction;
+use App\core\action\DoneAction;
+use App\core\action\RefuseAction;
+use App\core\action\VolunteerAction;
+use App\core\TaskActionTemplate;
+
 class Task
 {
     const STATUS_NEW = 'new';
@@ -9,12 +15,6 @@ class Task
     const STATUS_IN_PROGRESS = 'in progress';
     const STATUS_FINISHED = 'finished';
     const STATUS_FAILED = 'failed';
-
-    const ACTION_CANCEL = 'cancel';
-    const ACTION_DONE = 'done';
-    const ACTION_VOLUNTEER = 'volunteer';
-    const ACTION_REFUSE = 'refuse';
-
 
     protected $clientId;
     protected $executorId;
@@ -41,36 +41,32 @@ class Task
         ];
     }
 
-    public static function getActionMapping(): array
-    {
-        return [
-            self::ACTION_VOLUNTEER => 'Откликнуться',
-            self::ACTION_CANCEL => 'Отменить',
-            self::ACTION_DONE => 'Выполнено',
-            self::ACTION_REFUSE => 'Отказаться',
-        ];
-    }
-
     public static function getStatusByAction(string $action): ?string
     {
         $actionStatusMap = [
-            self::ACTION_CANCEL => self::STATUS_CANCELED,
-            self::ACTION_DONE => self::STATUS_FINISHED,
-            self::ACTION_REFUSE => self::STATUS_FAILED,
-            self::ACTION_VOLUNTEER => self::STATUS_IN_PROGRESS,
+            (new CancelAction())->getActionCode() => self::STATUS_CANCELED,
+            (new DoneAction())->getActionCode() => self::STATUS_FINISHED,
+            (new RefuseAction())->getActionCode() => self::STATUS_FAILED,
+            (new VolunteerAction())->getActionCode() => self::STATUS_IN_PROGRESS,
         ];
 
         return $actionStatusMap[$action] ?? null;
     }
 
-    public static function getPossibleActions(string $status): ?array
+    public static function getPossibleActions(string $status, $clientId, $executorId, $userId): array
     {
         $actionStatusMap = [
-            self::STATUS_NEW => [self::ACTION_CANCEL, self::ACTION_VOLUNTEER ],
-            self::STATUS_IN_PROGRESS => [self::ACTION_DONE, self::ACTION_REFUSE],
+            self::STATUS_NEW => [new CancelAction(), new VolunteerAction()],
+            self::STATUS_IN_PROGRESS => [new DoneAction(), new RefuseAction()],
         ];
 
-        return $actionStatusMap[$status] ?? null;
+        if (!isset($actionStatusMap[$status])) {
+            return [];
+        }
+
+        return array_values(array_filter($actionStatusMap[$status], function(TaskActionTemplate $action) use ($clientId, $executorId, $userId) {
+           return $action->getUserRightsCheck($clientId, $executorId, $userId);
+        }));
     }
 
 }
