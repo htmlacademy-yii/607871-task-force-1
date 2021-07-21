@@ -7,6 +7,7 @@ use App\core\action\DoneAction;
 use App\core\action\RefuseAction;
 use App\core\action\VolunteerAction;
 use App\core\TaskActionTemplate;
+use App\Exception\DataException;
 
 class Task
 {
@@ -41,7 +42,7 @@ class Task
         ];
     }
 
-    public static function getStatusByAction(string $action): ?string
+    public static function getStatusByAction(string $action): string
     {
         $actionStatusMap = [
             (new CancelAction())->getActionCode() => self::STATUS_CANCELED,
@@ -50,10 +51,14 @@ class Task
             (new VolunteerAction())->getActionCode() => self::STATUS_IN_PROGRESS,
         ];
 
-        return $actionStatusMap[$action] ?? null;
+        if (!isset($actionStatusMap[$action])) {
+            throw new DataException("Для действия $action не назначен соответствующий статус задания");
+        }
+
+        return $actionStatusMap[$action];
     }
 
-    public static function getPossibleActions(string $status, $clientId, $executorId, $userId): array
+    public static function getPossibleActions(string $status, int $clientId, $executorId, int $userId): array
     {
         $actionStatusMap = [
             self::STATUS_NEW => [new CancelAction(), new VolunteerAction()],
@@ -61,7 +66,7 @@ class Task
         ];
 
         if (!isset($actionStatusMap[$status])) {
-            return [];
+            throw new DataException("Для статуса $status нет подходящих действий");
         }
 
         return array_values(array_filter($actionStatusMap[$status], function(TaskActionTemplate $action) use ($clientId, $executorId, $userId) {
