@@ -66,7 +66,7 @@ class Task
         ];
 
         if (!isset($actionStatusMap[$status])) {
-            throw new DataException("Для статуса $status нет подходящих действий");
+            throw new DataException("Для статуса задания $status нет подходящих действий");
         }
 
         return array_values(array_filter($actionStatusMap[$status], function(TaskActionTemplate $action) use ($clientId, $executorId, $userId) {
