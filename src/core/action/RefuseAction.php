@@ -9,18 +9,17 @@ use App\core\TaskActionTemplate;
 class RefuseAction extends TaskActionTemplate
 {
 
-    public function getActionCode()
+    public function getActionCode(): string
     {
         return 'refuse';
-
     }
 
-    public function getActionTitle()
+    public function getActionTitle(): string
     {
         return 'Отказаться';
     }
 
-    public function getUserRightsCheck(int $clientId, $executorId, int $userId)
+    public function getUserRightsCheck(int $clientId, $executorId, int $userId): bool
     {
         return $userId === $executorId;
     }
