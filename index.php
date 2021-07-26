@@ -2,10 +2,13 @@
 require_once 'vendor/autoload.php';
 
 try {
-    print_r(\App\business\Task::getStatusByAction('done'));
-    print_r(\App\business\Task::getPossibleActions('new1', 1, null, 3));
-} catch (\App\Exception\DataException $e) {
-    print_r('Ошибка: '. $e->getMessage());
+    $contacts = new \App\Service\DataImporter('data\categories.csv', ['name', 'icon']);
+    $contacts->import();
+    print_r($contacts->getData());
+} catch (\App\Exception\SourceFileException $exception) {
+    print_r('Ошибка: '. $exception->getMessage());
+} catch (\App\Exception\FileFormatException $exception) {
+    print_r('Ошибка: '. $exception->getMessage());
 }
 
 
