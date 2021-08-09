@@ -10,7 +10,7 @@ SET GLOBAL time_zone = 'Europe/Moscow';
 
 CREATE TABLE IF NOT EXISTS city (
 id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-name VARCHAR(100) NOT NULL UNIQUE,
+name VARCHAR(100) NOT NULL,
 latitude DECIMAL(10,7),
 longitude DECIMAL(10,7)
 );
@@ -29,29 +29,30 @@ icon VARCHAR(100) NOT NULL
 CREATE TABLE IF NOT EXISTS user (
     id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 	name VARCHAR(50) NOT NULL UNIQUE,
+	email VARCHAR(50) NOT NULL UNIQUE,
     reg_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-	birth_date TIMESTAMP NOT NULL,
 	last_visit_date TIMESTAMP NOT NULL,
-	avatar VARCHAR(100) NOT NULL,
-	description text,
-	city_id INT UNSIGNED NOT NULL,
-    password CHAR(64) NOT NULL,
+    password CHAR(64) NOT NULL
 
-	FOREIGN KEY (city_id) REFERENCES city (id)
 );
 
 
 /*Таблица для хранения контактов пользователей*/
 
-CREATE TABLE IF NOT EXISTS contact (
+CREATE TABLE IF NOT EXISTS profile (
 id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 user_id INT UNSIGNED NOT NULL,
-email VARCHAR(50) NOT NULL UNIQUE,
+birth_date TIMESTAMP NOT NULL,
+description text,
+avatar VARCHAR(100),
+city_id INT UNSIGNED NOT NULL,
+address VARCHAR(255),
 phone VARCHAR(12) UNIQUE,
 skype VARCHAR(50) UNIQUE,
 other VARCHAR(50) UNIQUE,
 
-FOREIGN KEY (user_id) REFERENCES user (id)
+FOREIGN KEY (user_id) REFERENCES user (id),
+FOREIGN KEY (city_id) REFERENCES city (id)
 );
 
 /*Таблица для хранения заданий*/
@@ -136,6 +137,7 @@ id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 task_id INT UNSIGNED NOT NULL,
 description text NOT NULL,
 rating TINYINT UNSIGNED NOT NULL,
+creation_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 
 FOREIGN KEY (task_id) REFERENCES task (id)
 );
