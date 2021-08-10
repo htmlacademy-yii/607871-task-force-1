@@ -27,7 +27,7 @@ class CSVToSQLFileConverter
             }
 
             if ($callback && !is_callable($callback)) {
-                throw new DataException("Дополнительные данные не могут быть добавлены в файл {$sqlFile}, проверьте callback параметр. ");
+                throw new DataException("Дополнительные данные не могут быть добавлены в файл {$sqlFile}, проверьте callback параметр.");
             }
 
             $valuesLine = ($callback  && is_callable($callback)) ? array_merge($csvLine, call_user_func($callback)): $csvLine;
