@@ -13,24 +13,20 @@ class CSVToSQLFileConverter
     public static function convert(string $fileName, string $dirName, string $tableName, string $delimiter = ',', array $extraColumns = [], $callback = null)
     {
         $fileObject = BaseFileInspector::checkFileAvailability($fileName, 'csv');
-        $fileObject->rewind();
-        $csvHeaders = $fileObject->fgetcsv($delimiter);
+
+        $csvHeaders = self::getHeaders($fileObject, $delimiter);
 
         $sqlFile = $fileObject->getBasename('.csv') . '.sql';
 
+        if ($callback && !is_callable($callback)) {
+            throw new DataException("Дополнительные данные не могут быть добавлены в файл {$sqlFile}, проверьте callback параметр.");
+        }
+
         $values = [];
 
-        while (!$fileObject->eof()) {
-            $csvLine = $fileObject->fgetcsv($delimiter);
-            if (!array_filter($csvLine)) {
-                continue;
-            }
+        foreach (self::getNextLine($fileObject, $delimiter) as $csvLine) {
 
-            if ($callback && !is_callable($callback)) {
-                throw new DataException("Дополнительные данные не могут быть добавлены в файл {$sqlFile}, проверьте callback параметр.");
-            }
-
-            $valuesLine = ($callback  && is_callable($callback)) ? array_merge($csvLine, call_user_func($callback)): $csvLine;
+            $valuesLine = ($callback && is_callable($callback)) ? array_merge($csvLine, call_user_func($callback)): $csvLine;
 
                 $values[] = sprintf("\t(%s)", implode(', ', array_map(function ($value) {
                         return "'$value'";
@@ -47,6 +43,25 @@ class CSVToSQLFileConverter
         if (!file_put_contents($sqlPath, $sqlResult)) {
             throw new SourceFileException("Не удалось экспортировать данные в файл {$sqlPath}");
         }
+    }
+
+    private static function getHeaders(\SplFileObject $fileObject, string $delimiter)
+    {
+        $fileObject->rewind();
+        return $fileObject->fgetcsv($delimiter);
+    }
+
+    private static function getNextLine(\SplFileObject $fileObject, string $delimiter): ?iterable
+    {
+        $result = null;
+        while (!$fileObject->eof()) {
+            $csvLine = $fileObject->fgetcsv($delimiter);
+            if (!array_filter($csvLine)) {
+                continue;
+            }
+            yield $csvLine;
+        }
+        return $result;
     }
 
 }
