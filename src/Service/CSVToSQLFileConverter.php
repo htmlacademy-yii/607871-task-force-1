@@ -23,10 +23,11 @@ class CSVToSQLFileConverter
         }
 
         $values = [];
+        $extraValues = $callback && is_callable($callback);
 
         foreach (self::getNextLine($fileObject, $delimiter) as $csvLine) {
 
-            $valuesLine = ($callback && is_callable($callback)) ? array_merge($csvLine, call_user_func($callback)): $csvLine;
+            $valuesLine = $extraValues ? array_merge($csvLine, call_user_func($callback)): $csvLine;
 
                 $values[] = sprintf("\t(%s)", implode(', ', array_map(function ($value) {
                         return "'$value'";
