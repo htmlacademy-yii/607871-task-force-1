@@ -9,7 +9,16 @@ use App\Exception\SourceFileException;
 
 class CSVToSQLFileConverter
 {
-
+    /**
+     * @param string $fileName - полное имя csv-файла, из которого экспортируются данные
+     * @param string $dirName - адрес директории, куда будет создаваться sql-файл
+     * @param string $tableName - имя таблицы в БД, куда будут импортированы данные
+     * @param string $delimiter - разделитель данныех в csv-файле.
+     * @param array $extraColumns - названия дополнительных столбцов с данными для импорта
+     * @param null $callback - функция, возвращающая массив значений для дополнительных столбцов с данными
+     * @throws DataException - исключения, выбрасываемые из-за проблем с данными
+     * @throws SourceFileException - исключения, выбрасываемые из-за проблем с доступом к файлу/директории
+     */
     public static function convert(string $fileName, string $dirName, string $tableName, string $delimiter = ',', array $extraColumns = [], $callback = null)
     {
         $fileObject = BaseFileInspector::checkFileAvailability($fileName, 'csv');
@@ -46,11 +55,27 @@ class CSVToSQLFileConverter
         }
     }
 
-    private static function getHeaders(\SplFileObject $fileObject, string $delimiter)
+    /** Забирает заголовки из csv-файлов
+     * @param \SplFileObject $fileObject
+     * @param string $delimiter - разделитель данныех в csv-файле.
+     * @return array - массив с заголовками столбцов из csv-файла.
+     */
+
+    private static function getHeaders(\SplFileObject $fileObject, string $delimiter): array
     {
         $fileObject->rewind();
-        return $fileObject->fgetcsv($delimiter);
+        $headers = $fileObject->fgetcsv($delimiter);
+        if (!array_filter($headers)) {
+            throw new DataException("Ошибка данных: файл {$fileObject->getBaseName()} не содержит заголовков.");
+        }
+        return $headers;
     }
+
+    /** Забирает строки из csv-файла
+     * @param \SplFileObject $fileObject - объект класса SplFileObject, созданный на основании csv-файла.
+     * @param string $delimiter - разделитель данныех в csv-файле.
+     * @return iterable|null - последовательно выводит данные по каждой строке файла, при достижении конца csv-файла, возвращает null.
+     */
 
     private static function getNextLine(\SplFileObject $fileObject, string $delimiter): ?iterable
     {
