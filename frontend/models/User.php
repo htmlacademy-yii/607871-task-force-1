@@ -156,8 +156,6 @@ class User extends \yii\db\ActiveRecord
      */
     public function getSettings()
     {
-        $query = new Query();
-        $query->from('user_settings')->where('user_id =:user_id', [':user_id'=> $this->id]);
-        return $query->all();
+        return $this->hasMany(UserSettings::class, ['user_id' => 'id']);
     }
 }
