@@ -35,7 +35,7 @@ class Recall extends \yii\db\ActiveRecord
             [['task_id', 'rating'], 'integer'],
             [['description'], 'string'],
             [['creation_date'], 'safe'],
-            [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Task::className(), 'targetAttribute' => ['task_id' => 'id']],
+            [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Task::class, 'targetAttribute' => ['task_id' => 'id']],
         ];
     }
 

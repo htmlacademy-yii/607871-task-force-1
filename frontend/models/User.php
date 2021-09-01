@@ -14,15 +14,15 @@ use yii\db\Query;
  * @property string $reg_date
  * @property string $last_visit_date
  * @property string $password
+ * @property array $portfolios
  *
  * @property Correspondence[] $correspondences
- * @property Profile[] $profile
+ * @property Profile $profile
  * @property Respond[] $responds
- * @property ClientTask[] $clientTasks
- * @property ExecutorTask[] $executorTasks
+ * @property Task[] $clientTasks
+ * @property Task[] $executorTasks
  * @property Category[] $categories
- * @property Favorite[] $favorites
- * @property Portfolio[] $portfolios
+ * @property User[] $favorites
  * @property UserSettings[] $userSettings
  */
 class User extends \yii\db\ActiveRecord

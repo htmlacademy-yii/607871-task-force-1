@@ -57,7 +57,7 @@ class City extends \yii\db\ActiveRecord
      */
     public function getProfiles()
     {
-        return $this->hasMany(Profile::className(), ['city_id' => 'id']);
+        return $this->hasMany(Profile::class, ['city_id' => 'id']);
     }
 
     /**
@@ -67,6 +67,6 @@ class City extends \yii\db\ActiveRecord
      */
     public function getTasks()
     {
-        return $this->hasMany(Task::className(), ['city_id' => 'id']);
+        return $this->hasMany(Task::class, ['city_id' => 'id']);
     }
 }

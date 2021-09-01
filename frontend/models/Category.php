@@ -12,7 +12,7 @@ use Yii;
  * @property string $icon
  *
  * @property Task[] $tasks
- * @property Category[] $categories
+ * @property User[] $users
  */
 class Category extends \yii\db\ActiveRecord
 {
@@ -55,7 +55,7 @@ class Category extends \yii\db\ActiveRecord
      */
     public function getTasks()
     {
-        return $this->hasMany(Task::className(), ['category_id' => 'id']);
+        return $this->hasMany(Task::class, ['category_id' => 'id']);
     }
 
     /**
@@ -65,6 +65,6 @@ class Category extends \yii\db\ActiveRecord
      */
     public function getUsers()
     {
-        return $this->hasMany(User::className(), ['id' => 'user_id'])->viaTable('user_category', ['category_id' => 'id']);
+        return $this->hasMany(User::class, ['id' => 'user_id'])->viaTable('user_category', ['category_id' => 'id']);
     }
 }
