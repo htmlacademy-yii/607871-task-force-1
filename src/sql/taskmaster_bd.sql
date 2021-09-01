@@ -39,7 +39,7 @@ CREATE TABLE IF NOT EXISTS user (
 
 /*Таблица для хранения контактов пользователей*/
 
-CREATE TABLE IF NOT EXISTS profile (
+CREATE TABLE IF NOT EXISTS user_profile (
 id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 user_id INT UNSIGNED NOT NULL,
 birth_date TIMESTAMP NOT NULL,
