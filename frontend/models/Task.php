@@ -3,6 +3,7 @@
 namespace frontend\models;
 
 use Yii;
+use yii\db\Query;
 
 /**
  * This is the model class for table "task".
@@ -22,6 +23,7 @@ use Yii;
  * @property string|null $comments
  * @property float|null $latitude
  * @property float|null $longitude
+ * @property array $taskFiles
  *
  * @property Category $category
  * @property City $city
@@ -30,7 +32,7 @@ use Yii;
  * @property User $executor
  * @property Recall[] $recalls
  * @property Respond[] $responds
- * @property TaskFiles[] $taskFiles
+
  */
 class Task extends \yii\db\ActiveRecord
 {
@@ -123,7 +125,7 @@ class Task extends \yii\db\ActiveRecord
      */
     public function getCorrespondences()
     {
-        return $this->hasMany(Correspondence::className(), ['task_id' => 'id']);
+        return $this->hasMany(Correspondence::class, ['task_id' => 'id']);
     }
 
     /**
@@ -133,7 +135,7 @@ class Task extends \yii\db\ActiveRecord
      */
     public function getExecutor()
     {
-        return $this->hasOne(User::className(), ['id' => 'executor_id']);
+        return $this->hasOne(User::class, ['id' => 'executor_id']);
     }
 
     /**
@@ -143,7 +145,7 @@ class Task extends \yii\db\ActiveRecord
      */
     public function getRecalls()
     {
-        return $this->hasMany(Recall::className(), ['task_id' => 'id']);
+        return $this->hasMany(Recall::class, ['task_id' => 'id']);
     }
 
     /**
@@ -153,7 +155,7 @@ class Task extends \yii\db\ActiveRecord
      */
     public function getResponds()
     {
-        return $this->hasMany(Respond::className(), ['task_id' => 'id']);
+        return $this->hasMany(Respond::class, ['task_id' => 'id']);
     }
 
     /**
@@ -163,6 +165,8 @@ class Task extends \yii\db\ActiveRecord
      */
     public function getTaskFiles()
     {
-        return $this->hasMany(TaskFiles::className(), ['task_id' => 'id']);
+        $query = new Query();
+        $query->from('task_files')->where('task_id =:task_id', [':task_id'=> $this->id]);
+        return $query->all();
     }
 }
