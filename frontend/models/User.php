@@ -2,6 +2,7 @@
 
 namespace frontend\models;
 
+use frontend\models\behaviors\DateBehavior;
 use Yii;
 use yii\db\Query;
 
@@ -66,6 +67,16 @@ class User extends \yii\db\ActiveRecord
     }
 
     /**
+     * @return array|string[]
+     */
+    public function behaviors()
+    {
+        return [
+            DateBehavior::class
+        ];
+    }
+
+    /**
      * Gets query for [[Correspondences]].
      *
      * @return \yii\db\ActiveQuery
@@ -82,7 +93,7 @@ class User extends \yii\db\ActiveRecord
      */
     public function getProfile()
     {
-        return $this->hasOne(Profile::class, ['user_id' => 'id']);
+        return $this->hasOne(Profile::class, ['user_id' => 'id'])->inverseOf('user');
     }
 
     /**
@@ -102,7 +113,7 @@ class User extends \yii\db\ActiveRecord
      */
     public function getClientTasks()
     {
-        return $this->hasMany(Task::class, ['client_id' => 'id']);
+        return $this->hasMany(Task::class, ['client_id' => 'id'])->inverseOf('user');
     }
 
     /**
@@ -112,7 +123,7 @@ class User extends \yii\db\ActiveRecord
      */
     public function getExecutorTasks()
     {
-        return $this->hasMany(Task::class, ['executor_id' => 'id']);
+        return $this->hasMany(Task::class, ['executor_id' => 'id'])->inverseOf('user');
     }
 
     /**
@@ -120,11 +131,14 @@ class User extends \yii\db\ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
+
     public function getCategories()
     {
         return $this->hasMany(Category::class, ['id' => 'category_id'])
-            ->viaTable('user_category', ['user_id' => 'id'])
-            ->onCondition(['active' => 1]);
+            ->viaTable('user_category', ['user_id' => 'id'],
+                function ($query) {
+                    return $query->andWhere(['active' => 1]);
+                });
     }
 
     /**
@@ -134,7 +148,7 @@ class User extends \yii\db\ActiveRecord
      */
     public function getFavorites()
     {
-        return $this->hasMany(User::class, ['id' => 'chosen_id'])->viaTable('user_favorite', ['chooser_id' =>'id']);
+        return $this->hasMany(User::class, ['id' => 'chosen_id'])->viaTable('user_favorite', ['chooser_id' => 'id']);
     }
 
     /**
@@ -145,7 +159,7 @@ class User extends \yii\db\ActiveRecord
     public function getPortfolios()
     {
         $query = new Query();
-        $query->from('user_portfolio')->where('user_id =:user_id', [':user_id'=> $this->id]);
+        $query->from('user_portfolio')->where('user_id =:user_id', [':user_id' => $this->id]);
         return $query->all();
     }
 
@@ -158,4 +172,12 @@ class User extends \yii\db\ActiveRecord
     {
         return $this->hasMany(UserSettings::class, ['user_id' => 'id']);
     }
+
+    public static function getAllExecutors()
+    {
+        return User::find()->joinWith(['profile', 'categories'], true, 'RIGHT JOIN')->all();
+    }
+
+
+
 }

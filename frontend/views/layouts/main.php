@@ -80,10 +80,10 @@ AppAsset::register($this);
                 <div class="header__nav">
                     <ul class="header-nav__list site-list">
                         <li class="site-list__item">
-                            <a href="browse.html">Задания</a>
+                            <a href="/?r=tasks">Задания</a>
                         </li>
                         <li class="site-list__item">
-                            <a href="users.html">Исполнители</a>
+                            <a href="/?r=users">Исполнители</a>
                         </li>
                         <li class="site-list__item">
                             <a href="create.html">Создать задание</a>
@@ -163,13 +163,13 @@ AppAsset::register($this);
                 <div class="page-footer__links">
                     <ul class="links__list">
                         <li class="links__item">
-                            <a href="browse.html">Задания</a>
+                            <a href="/?r=tasks">Задания</a>
                         </li>
                         <li class="links__item">
-                            <a href="account.html">Мой профиль</a>
+                            <a href="/?r=tasks">Мой профиль</a>
                         </li>
                         <li class="links__item">
-                            <a href="users.html">Исполнители</a>
+                            <a href="/?r=users">Исполнители</a>
                         </li>
                         <li class="links__item">
                             <a href="signup.html">Регистрация</a>

@@ -13,7 +13,7 @@ use Yii;
  * @property int $rating
  * @property string $creation_date
  *
- * @property Task $task
+ * @property Task $tasks
  */
 class Recall extends \yii\db\ActiveRecord
 {
