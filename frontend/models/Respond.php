@@ -15,7 +15,7 @@ use Yii;
  * @property int $status
  * @property string $creation_date
  *
- * @property Task $task
+ * @property Task $tasks
  * @property User $user
  */
 class Respond extends \yii\db\ActiveRecord
@@ -66,7 +66,7 @@ class Respond extends \yii\db\ActiveRecord
      */
     public function getTask()
     {
-        return $this->hasOne(Task::class, ['id' => 'task_id']);
+        return $this->hasOne(Task::class, ['id' => 'task_id'])->inverseOf('respond');
     }
 
     /**
@@ -76,6 +76,6 @@ class Respond extends \yii\db\ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(User::class, ['id' => 'user_id']);
+        return $this->hasOne(User::class, ['id' => 'user_id'])->inverseOf('respond');
     }
 }

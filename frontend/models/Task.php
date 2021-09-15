@@ -2,11 +2,12 @@
 
 namespace frontend\models;
 
+use frontend\models\behaviors\DateBehavior;
 use Yii;
 use yii\db\Query;
 
 /**
- * This is the model class for table "task".
+ * This is the model class for table "tasks".
  *
  * @property int $id
  * @property string $title
@@ -87,6 +88,16 @@ class Task extends \yii\db\ActiveRecord
             'longitude' => 'Longitude',
         ];
     }
+    /**
+     * @return array|string[]
+     */
+
+    public function behaviors()
+    {
+        return [
+            DateBehavior::class
+        ];
+    }
 
     /**
      * Gets query for [[Category]].
@@ -161,7 +172,7 @@ class Task extends \yii\db\ActiveRecord
     /**
      * Gets query for [[TaskFiles]].
      *
-     * @return \yii\db\ActiveQuery
+     * @return array
      */
     public function getTaskFiles()
     {

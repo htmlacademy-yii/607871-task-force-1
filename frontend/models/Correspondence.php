@@ -13,7 +13,7 @@ use Yii;
  * @property string $content
  * @property string $creation_date
  *
- * @property Task $task
+ * @property Task $tasks
  * @property User $user
  */
 class Correspondence extends \yii\db\ActiveRecord
