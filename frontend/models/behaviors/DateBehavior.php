@@ -8,6 +8,6 @@ class DateBehavior extends Behavior
 {
     public function getRelativeTime($value)
     {
-        return \Yii::$app->formatter->asRelativeTime($value);
+        return $value ? \Yii::$app->formatter->asRelativeTime($value) : null;
     }
 }

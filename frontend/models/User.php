@@ -123,7 +123,7 @@ class User extends \yii\db\ActiveRecord
      */
     public function getExecutorTasks()
     {
-        return $this->hasMany(Task::class, ['executor_id' => 'id'])->inverseOf('user');
+        return $this->hasMany(Task::class, ['executor_id' => 'id']);
     }
 
     /**

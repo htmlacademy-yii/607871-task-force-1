@@ -17,7 +17,6 @@ AppAsset::register($this);
         <?php $this->registerCsrfMetaTags() ?>
         <title><?= Html::encode($this->title) ?></title>
         <link rel="stylesheet" href="css/normalize.css">
-        <link rel="stylesheet" href="css/style.css">
         <?php $this->head() ?>
     </head>
     <body>
@@ -80,10 +79,10 @@ AppAsset::register($this);
                 <div class="header__nav">
                     <ul class="header-nav__list site-list">
                         <li class="site-list__item">
-                            <a href="/?r=tasks">Задания</a>
+                            <a href="/tasks">Задания</a>
                         </li>
                         <li class="site-list__item">
-                            <a href="/?r=users">Исполнители</a>
+                            <a href="/users">Исполнители</a>
                         </li>
                         <li class="site-list__item">
                             <a href="create.html">Создать задание</a>
@@ -163,13 +162,13 @@ AppAsset::register($this);
                 <div class="page-footer__links">
                     <ul class="links__list">
                         <li class="links__item">
-                            <a href="/?r=tasks">Задания</a>
+                            <a href="/tasks">Задания</a>
                         </li>
                         <li class="links__item">
-                            <a href="/?r=tasks">Мой профиль</a>
+                            <a href="user.html">Мой профиль</a>
                         </li>
                         <li class="links__item">
-                            <a href="/?r=users">Исполнители</a>
+                            <a href="/users">Исполнители</a>
                         </li>
                         <li class="links__item">
                             <a href="signup.html">Регистрация</a>

@@ -609,6 +609,10 @@ footer {
   margin-top: 0;
   margin-bottom: 8px; }
 
+label {
+  margin-bottom: 0;
+}
+
 .search-task__form label {
   font-weight: 400;
   font-size: 14px;
