@@ -32,7 +32,7 @@ class TaskSearchForm extends \yii\base\Model
 
     public function getPeriodsList()
     {
-        return [1 => 'За день', 2 => 'За неделю', 3 => 'За месяц'];
+        return [1 => 'За день', 2 => 'За неделю', 3 => 'За месяц', 4 => 'За все время'];
     }
 
     public function getDataProvider()
@@ -43,6 +43,7 @@ class TaskSearchForm extends \yii\base\Model
             1 => time() - $dayInSeconds,
             2 => time() - 7 * $dayInSeconds,
             3 => time() - 30 * $dayInSeconds,
+            4 => 0,
         ];
 
         $conditionsMap = [

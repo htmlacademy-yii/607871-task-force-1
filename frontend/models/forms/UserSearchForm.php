@@ -9,11 +9,11 @@ use frontend\models\User;
 class UserSearchForm extends \yii\base\Model
 {
     public $categories = [];
-    public $vacant;
-    public $online;
-    public $recalls;
-    public $favorite;
-    public $search;
+    public $vacant = 0;
+    public $online = 0;
+    public $recalls = 0;
+    public $favorite = 0;
+    public $name_search = '';
 
     public function attributeLabels()
     {
@@ -22,38 +22,38 @@ class UserSearchForm extends \yii\base\Model
             'online' => 'Сейчас онлайн',
             'recalls' => 'Есть отзывы',
             'favorite' => 'В избранном',
-            'search' => 'Поиск по имени'
+            'name_search' => 'Поиск по имени'
         ];
     }
 
     public function rules()
     {
         return [
-            [['vacant', 'online', 'recalls', 'favorite','search', 'categories'], 'safe']
+            [['vacant', 'online', 'recalls', 'favorite', 'name_search', 'categories'], 'safe']
         ];
     }
+
     public function getDataProvider()
     {
         $conditionsMap = [
             'categories' => ['user_category.category_id' => $this->categories],
-            'vacant' => ['or', 'task.status!=2', ['task.status'=> null]],
-            //'online' => [],
-            /*SELECT DISTINCT `user`.*
-            FROM `user`
-            RIGHT JOIN `user_profile` ON `user`.`id` = `user_profile`.`user_id`
-            RIGHT JOIN `user_category` ON `user`.`id` = `user_category`.`user_id`
-            RIGHT JOIN `category` ON `user_category`.`category_id` = `category`.`id`
-            LEFT JOIN `task` ON `user`.`id` = `task`.`executor_id`
-            WHERE (`user_category.category_id` IN ('1', '2', '3', '4', '5', '6', '7', '8'))
-        AND (`task`.`status` != 2) AND (`active`=1) ORDER BY `last_visit_date` DESC*/
-            //'recalls' => ['address' => null],
-            //'favorite' => [],
+            'vacant' => ['not in', 'user.id', User::getBusyExecutorsId()],
+            'online' => ['in', 'user.id', User::getOnlineExecutorsId()],
+            'recalls' => ['in', 'user.id', User::getExecutorsWithRecallsId()],
+            'favorite' => ['in', 'user.id', User::findOne(10)->favorites],
+            'name_search' => ['or like', 'user.name', explode(' ', $this->name_search)],
         ];
 
         $query = User::find()
-            ->joinWith(['profile', 'categories'], true, 'RIGHT JOIN')
-            ->joinWith('executorTasks');
-        ;
+            ->joinWith(['profile', 'categories'], true, 'RIGHT JOIN');
+
+        if ($this->name_search) {
+            $this->categories = [];
+            $this->vacant = 0;
+            $this->online = 0;
+            $this->recalls = 0;
+            $this->favorite = 0;
+        }
 
         foreach (get_object_vars($this) as $property => $value) {
             if ($this->$property) {
@@ -63,8 +63,4 @@ class UserSearchForm extends \yii\base\Model
 
         return $query->orderBy(['last_visit_date' => SORT_DESC])->all();
     }
-
-
-
-
 }

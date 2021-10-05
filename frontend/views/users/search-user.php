@@ -32,7 +32,7 @@ use \yii\helpers\Html;
             ])->checkboxList(\frontend\models\Category::getCategoryMap(),
                     [
                         'item' => function ($index, $label, $name, $checked, $value) {
-                            return '<label class="checkbox__legend">' . Html::checkbox($name, false, ['value' => $value, 'class' => 'visually-hidden checkbox__input']) .
+                            return '<label class="checkbox__legend">' . Html::checkbox($name, $checked, ['value' => $value, 'class' => 'visually-hidden checkbox__input']) .
                                 '<span>' . $label . '</span></label>';
                         }
                     ]); ?>
@@ -44,12 +44,12 @@ use \yii\helpers\Html;
             <?= $form->field($model, 'recalls')->checkbox();?>
             <?= $form->field($model, 'favorite')->checkbox();?>
         </fieldset>
-        <?= $form->field($model, 'search', [
+        <?= $form->field($model, 'name_search', [
             'labelOptions' => ['class' => 'search-task__name']
         ])->textInput(['class' => "input-middle input"]) ?>
 
         <div class="form-group">
-            <?= Html::submitButton('Искать', ['class' => "button", 'type' => 'submit', 'name' => 'submit']) ?>
+            <?= Html::submitButton('Искать', ['class' => "button", 'type' => 'submit']) ?>
         </div>
         <? ActiveForm::end(); ?>
     </div>

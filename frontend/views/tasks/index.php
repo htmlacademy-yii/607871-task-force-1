@@ -1,10 +1,3 @@
-<?php
-/**
- * @var $this \yii\base\View
- */
-
-?>
-
 <section class="new-task">
     <div class="new-task__wrapper">
         <h1>Новые задания</h1>

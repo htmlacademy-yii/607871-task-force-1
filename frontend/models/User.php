@@ -5,6 +5,8 @@ namespace frontend\models;
 use frontend\models\behaviors\DateBehavior;
 use Yii;
 use yii\db\Query;
+use yii\helpers\ArrayHelper;
+use yii\web\IdentityInterface;
 
 /**
  * This is the model class for table "user".
@@ -126,6 +128,29 @@ class User extends \yii\db\ActiveRecord
         return $this->hasMany(Task::class, ['executor_id' => 'id']);
     }
 
+    public static function getBusyExecutorsId()
+    {
+        $query = new Query();
+        $query->select('executor_id')
+            ->from('task')
+            ->where('status=2')
+            ->distinct();
+        return ArrayHelper::getColumn($query->all(), 'executor_id');
+    }
+    public static function getExecutorsWithRecallsId()
+    {
+        $query = new Query();
+        $query->select('executor_id')
+            ->from('recall')->leftJoin('task', 'task.id=recall.task_id')
+            ->where('task.executor_id IS NOT NULL')
+            ->distinct();
+        return ArrayHelper::getColumn($query->all(), 'executor_id');
+    }
+
+    public static function getOnlineExecutorsId() {
+        return [2,13];
+    }
+
     /**
      * Gets query for [[Categories]].
      *
@@ -177,7 +202,5 @@ class User extends \yii\db\ActiveRecord
     {
         return User::find()->joinWith(['profile', 'categories'], true, 'RIGHT JOIN')->all();
     }
-
-
 
 }
