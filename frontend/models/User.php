@@ -128,15 +128,6 @@ class User extends \yii\db\ActiveRecord
         return $this->hasMany(Task::class, ['executor_id' => 'id']);
     }
 
-    public static function getBusyExecutorsId()
-    {
-        $query = new Query();
-        $query->select('executor_id')
-            ->from('task')
-            ->where('status=2')
-            ->distinct();
-        return ArrayHelper::getColumn($query->all(), 'executor_id');
-    }
     public static function getExecutorsWithRecallsId()
     {
         $query = new Query();
@@ -147,8 +138,9 @@ class User extends \yii\db\ActiveRecord
         return ArrayHelper::getColumn($query->all(), 'executor_id');
     }
 
-    public static function getOnlineExecutorsId() {
-        return [2,13];
+    public static function getOnlineExecutorsId()
+    {
+        return [2, 13];
     }
 
     /**
@@ -196,11 +188,6 @@ class User extends \yii\db\ActiveRecord
     public function getSettings()
     {
         return $this->hasMany(UserSettings::class, ['user_id' => 'id']);
-    }
-
-    public static function getAllExecutors()
-    {
-        return User::find()->joinWith(['profile', 'categories'], true, 'RIGHT JOIN')->all();
     }
 
 }

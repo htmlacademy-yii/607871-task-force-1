@@ -40,16 +40,16 @@ use \yii\helpers\Html;
         </fieldset>
         <fieldset class="search-task__categories">
             <legend>Дополнительно</legend>
-            <?= $form->field($model, 'no_executor')->checkbox(); ?>
-            <?= $form->field($model, 'no_address')->checkbox(); ?>
+            <?= $form->field($model, 'noExecutor')->checkbox(); ?>
+            <?= $form->field($model, 'remoteWork')->checkbox(); ?>
         </fieldset>
         <?= $form->field($model, 'period', [
             'labelOptions' => ['class' => 'search-task__name']
-        ])->dropDownList($model->periodsList, [
+        ])->dropDownList($model::PERIOD_MAP, [
             'class' => 'multiple-select input',
 
         ])?>
-        <?= $form->field($model, 'search', [
+        <?= $form->field($model, 'titleSearch', [
             'labelOptions' => ['class' => 'search-task__name']
         ])->textInput(['class' => "input-middle input"]) ?>
         <div class="form-group">

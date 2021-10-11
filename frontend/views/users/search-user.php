@@ -44,7 +44,7 @@ use \yii\helpers\Html;
             <?= $form->field($model, 'recalls')->checkbox();?>
             <?= $form->field($model, 'favorite')->checkbox();?>
         </fieldset>
-        <?= $form->field($model, 'name_search', [
+        <?= $form->field($model, 'nameSearch', [
             'labelOptions' => ['class' => 'search-task__name']
         ])->textInput(['class' => "input-middle input"]) ?>
 

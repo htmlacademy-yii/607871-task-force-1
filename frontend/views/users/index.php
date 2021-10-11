@@ -1,5 +1,5 @@
 <section class="user__search">
-    <?php foreach ($users as $user): ?>
+    <?php foreach ($dataProvider->getModels() as $user): ?>
         <div class="content-view__feedback-card user__search-wrapper">
             <div class="feedback-card__top">
                 <div class="user__search-icon">
