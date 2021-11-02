@@ -16,7 +16,7 @@ use yii\db\Query;
  * @property int $client_id
  * @property int|null $executor_id
  * @property int $budget
- * @property int $status
+ * @property int $status (0 - new, 1 - canceled, 2 - in progress, 3 - finished, 5 - failed)
  * @property string $due_date
  * @property string $creation_date
  * @property int|null $city_id

@@ -3,6 +3,8 @@
 namespace frontend\models;
 
 use Yii;
+use yii\db\Query;
+use yii\helpers\ArrayHelper;
 
 /**
  * This is the model class for table "category".
@@ -67,4 +69,11 @@ class Category extends \yii\db\ActiveRecord
     {
         return $this->hasMany(User::class, ['id' => 'user_id'])->viaTable('user_category', ['category_id' => 'id']);
     }
+
+    public static function getCategoryMap()
+    {
+        return ArrayHelper::map(self::find()->all(), 'id', 'name');
+    }
+
+
 }
