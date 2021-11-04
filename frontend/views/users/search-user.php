@@ -46,11 +46,11 @@ use \yii\helpers\Html;
         </fieldset>
         <?= $form->field($model, 'nameSearch', [
             'labelOptions' => ['class' => 'search-task__name']
-        ])->textInput(['class' => "input-middle input"]) ?>
+        ])->textInput(['class' => "input-middle input"]); ?>
 
         <div class="form-group">
-            <?= Html::submitButton('Искать', ['class' => "button", 'type' => 'submit']) ?>
+            <?= Html::submitButton('Искать', ['class' => "button"]); ?>
         </div>
-        <? ActiveForm::end(); ?>
+        <?php ActiveForm::end(); ?>
     </div>
 </section>

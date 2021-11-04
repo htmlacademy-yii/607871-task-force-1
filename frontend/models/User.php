@@ -28,7 +28,7 @@ use yii\web\IdentityInterface;
  * @property User[] $favorites
  * @property UserSettings[] $userSettings
  */
-class User extends \yii\db\ActiveRecord
+class User extends \yii\db\ActiveRecord implements IdentityInterface
 {
     /**
      * {@inheritdoc}
@@ -44,12 +44,15 @@ class User extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name', 'email', 'last_visit_date', 'password'], 'required'],
-            [['reg_date', 'last_visit_date'], 'safe'],
-            [['name', 'email'], 'string', 'max' => 50],
-            [['password'], 'string', 'max' => 64],
-            [['name'], 'unique'],
-            [['email'], 'unique'],
+            [['email', 'name', 'password'], 'safe'],
+            [['email', 'name', 'password'], 'trim'],
+            [['email', 'password'], 'required', 'on' => self::SCENARIO_DEFAULT, 'message' => 'Поле должно быть заполнено'],
+            [ 'name', 'required', 'on' => self::SCENARIO_DEFAULT, 'message' => 'Введите ваше имя и фамилию'],
+            [['name', 'email'], 'string', 'max' => 50, 'message' => 'Не больше 50 символов'],
+            [['password'], 'string', 'min' => 8, 'max' => 64, 'tooShort' => "Длина пароля от {min} символов", 'tooLong' => 'Длина пароля до {max} символов'],
+            [['name'], 'unique', 'message' => 'Пользователь с таким именем уже существует'],
+            [['email'], 'unique', 'message' => 'Пользователь с таким email уже существует'],
+            ['email', 'email', 'message' => 'Введите валидный адрес электронной почты'],
         ];
     }
 
@@ -59,22 +62,9 @@ class User extends \yii\db\ActiveRecord
     public function attributeLabels()
     {
         return [
-            'id' => 'ID',
-            'name' => 'Name',
-            'email' => 'Email',
-            'reg_date' => 'Reg Date',
-            'last_visit_date' => 'Last Visit Date',
-            'password' => 'Password',
-        ];
-    }
-
-    /**
-     * @return array|string[]
-     */
-    public function behaviors()
-    {
-        return [
-            DateBehavior::class
+            'email' => 'Электронная почта',
+            'name' => 'Ваше имя',
+            'password' => 'Пароль',
         ];
     }
 
@@ -165,7 +155,8 @@ class User extends \yii\db\ActiveRecord
      */
     public function getFavorites()
     {
-        return $this->hasMany(User::class, ['id' => 'chosen_id'])->viaTable('user_favorite', ['chooser_id' => 'id']);
+        return $this->hasMany(User::class, ['id' => 'chosen_id'])
+            ->viaTable('user_favorite', ['chooser_id' => 'id']);
     }
 
     /**
@@ -190,4 +181,59 @@ class User extends \yii\db\ActiveRecord
         return $this->hasMany(UserSettings::class, ['user_id' => 'id']);
     }
 
+    public static function getCurrentUser()
+    {
+        if ($id = Yii::$app->user->getId()) {
+            return User::findOne($id);
+        }
+    }
+
+    public function getRating()
+    {
+        $query = new Query();
+        $rating = $query->select(["AVG(rating) AS rating"])
+            ->from('recall')
+            ->rightJoin('task', 'recall.task_id = task.id')
+            ->where(['task.executor_id' => $this->id])->scalar();
+
+        return round($rating, 2);
+    }
+
+    public function getExecutorTasksFinished()
+    {
+        $query = new Query();
+        return $query->select(["COUNT(id) as total"])
+            ->from('task')
+            ->where(['task.executor_id' => $this->id, 'task.status' => 3])->scalar();
+    }
+
+    public static function findIdentity($id)
+    {
+        return self::findOne($id);
+    }
+
+    public static function findIdentityByAccessToken($token, $type = null)
+    {
+        // TODO: Implement findIdentityByAccessToken() method.
+    }
+
+    public function getId()
+    {
+        return $this->getPrimaryKey();
+    }
+
+    public function getAuthKey()
+    {
+        // TODO: Implement getAuthKey() method.
+    }
+
+    public function validateAuthKey($authKey)
+    {
+        // TODO: Implement validateAuthKey() method.
+    }
+
+    public function validatePassword($password)
+    {
+        return Yii::$app->security->validatePassword($password, $this->password);
+    }
 }

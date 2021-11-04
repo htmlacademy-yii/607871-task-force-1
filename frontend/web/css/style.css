@@ -5,7 +5,8 @@ body {
   font-size: 16px;
   line-height: normal;
   background-color: #f1f2f6;
-  color: #333438; }
+  color: #333438;}
+
 body.landing {
   background-image: url("../img/polygon.png");
   background-repeat: no-repeat;
@@ -1185,7 +1186,9 @@ label {
 
 .profile-mini__wrapper h3 {
   margin-top: 0;
-  margin-bottom: 15px; }
+  margin-bottom: 15px;
+  font-weight: bold;
+  font-size: 1.17em; }
 
 .profile-mini__top {
   display: -webkit-box;
@@ -2136,7 +2139,8 @@ label {
   padding-left: 360px;
   padding-top: 45px;
   width: 650px;
-  margin: 0 auto; }
+  margin: 0 auto;
+  box-sizing: content-box;}
 .landing-top h1 {
   font-weight: 600;
   font-size: 36px; }
@@ -2263,7 +2267,8 @@ label {
   padding-top: 70px;
   padding-bottom: 110px;
   padding-left: 170px;
-  padding-right: 170px; }
+  padding-right: 170px;
+  box-sizing: content-box;}
 
 .landing-notice-card {
   width: 460px;

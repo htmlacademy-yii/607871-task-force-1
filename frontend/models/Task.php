@@ -16,7 +16,7 @@ use yii\db\Query;
  * @property int $client_id
  * @property int|null $executor_id
  * @property int $budget
- * @property int $status (0 - new, 1 - canceled, 2 - in progress, 3 - finished, 5 - failed)
+ * @property int $status (0 - new, 1 - canceled, 2 - in progress, 3 - finished, 4 - failed)
  * @property string $due_date
  * @property string $creation_date
  * @property int|null $city_id
@@ -58,10 +58,10 @@ class Task extends \yii\db\ActiveRecord
             [['latitude', 'longitude'], 'number'],
             [['title'], 'string', 'max' => 100],
             [['address', 'comments'], 'string', 'max' => 255],
-            [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['client_id' => 'id']],
-            [['executor_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['executor_id' => 'id']],
-            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::className(), 'targetAttribute' => ['city_id' => 'id']],
-            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Category::className(), 'targetAttribute' => ['category_id' => 'id']],
+            [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['client_id' => 'id']],
+            [['executor_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['executor_id' => 'id']],
+            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['city_id' => 'id']],
+            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Category::class, 'targetAttribute' => ['category_id' => 'id']],
         ];
     }
 
@@ -86,16 +86,6 @@ class Task extends \yii\db\ActiveRecord
             'comments' => 'Comments',
             'latitude' => 'Latitude',
             'longitude' => 'Longitude',
-        ];
-    }
-    /**
-     * @return array|string[]
-     */
-
-    public function behaviors()
-    {
-        return [
-            DateBehavior::class
         ];
     }
 
