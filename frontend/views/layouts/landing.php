@@ -1,11 +1,11 @@
 <?php
 
 use frontend\assets\AppAsset;
+
+
 use yii\helpers\Html;
 use yii\helpers\Url;
-use yii\widgets\ActiveForm;
-use frontend\models\forms\LoginForm;
-
+use \frontend\widgets\LoginDialogWidget;
 
 AppAsset::register($this);
 ?>
@@ -113,11 +113,7 @@ AppAsset::register($this);
             </div>
         </div>
     </footer>
-    <section class="modal enter-form form-modal" id="enter-form">
-        <h2>Вход на сайт</h2>
-        <?= Yii::$app->controller->renderPartial('/main/login-form', ['loginForm' => new LoginForm()]); ?>
-        <button class="form-modal-close" type="button">Закрыть</button>
-    </section>
+<?= LoginDialogWidget::widget(); ?>
 </div>
 <div class="overlay"></div>
 <script src="/js/main.js"></script>

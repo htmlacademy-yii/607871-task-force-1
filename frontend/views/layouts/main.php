@@ -6,10 +6,7 @@
 
 use frontend\assets\AppAsset;
 use yii\bootstrap4\Html;
-use frontend\models\User;
 use yii\helpers\Url;
-
-$currentUser = User::getCurrentUser();
 
 AppAsset::register($this);
 ?>
@@ -96,9 +93,9 @@ AppAsset::register($this);
                         </li>
                     </ul>
                 </div>
-                <?php if (Url::current() !== '/signup' && $currentUser): ?>
+                <?php if (Url::current() !== '/signup' && Yii::$app->user->identity): ?>
                     <div class="header__town">
-                        <select class="multiple-select input town-select" size="1" name="town[]">
+                        <select class="multiple-select input town-select" id = "town-select" size="1" name="town[]">
                             <option value="Moscow">Москва</option>
                             <option selected value="SPB">Санкт-Петербург</option>
                             <option value="Krasnodar">Краснодар</option>
@@ -107,7 +104,7 @@ AppAsset::register($this);
                         </select>
                     </div>
                 <?php endif; ?>
-                <?php if (Url::current() !== '/signup' && $currentUser): ?>
+                <?php if (Url::current() !== '/signup' && Yii::$app->user->identity): ?>
                     <div class="header__lightbulb"></div>
                     <div class="lightbulb__pop-up">
                         <h3>Новые события</h3>
@@ -126,12 +123,13 @@ AppAsset::register($this);
                     </div>
                     <div class="header__account">
                         <a class="header__account-photo">
-                            <img src="<?= $currentUser->profile->avatar; ?>"
+
+                            <img src="<?= Yii::$app->user->identity->avatar; ?>"
                                  width="43" height="44"
                                  alt="Аватар пользователя">
                         </a>
                         <span class="header__account-name">
-                 <?= $currentUser->name; ?>
+                 <?=  Html::encode(Yii::$app->user->identity->name); ?>
                 </span>
                     </div>
                     <div class="account__pop-up">
@@ -143,7 +141,7 @@ AppAsset::register($this);
                                 <a href="account.html">Настройки</a>
                             </li>
                             <li>
-                                <a href="<?= Url::to('users/logout')?>">Выход</a>
+                                <a href="<?= Url::to('/users/logout')?>">Выход</a>
                             </li>
                         </ul>
                     </div>

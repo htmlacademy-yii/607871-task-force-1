@@ -51,7 +51,7 @@ phone VARCHAR(12) UNIQUE,
 skype VARCHAR(50) UNIQUE,
 other VARCHAR(50) UNIQUE,
 
-FOREIGN KEY (user_id) REFERENCES user (id),
+FOREIGN KEY (user_id) REFERENCES user (id) ON DELETE CASCADE,
 FOREIGN KEY (city_id) REFERENCES city (id)
 );
 

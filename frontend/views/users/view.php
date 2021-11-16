@@ -1,11 +1,11 @@
 <?php
-use App\Service\DateFormatter;
+use App\Service\DataFormatter;
 use yii\helpers\Url;
 ?>
 <section class="content-view">
     <div class="user__card-wrapper">
         <div class="user__card">
-            <img src="<?= $user->profile->avatar; ?>" width="120" height="120" alt="Аватар пользователя">
+            <img src="<?= $user->avatar; ?>" width="120" height="120" alt="Аватар пользователя">
             <div class="content-view__headline">
                 <h1><?= $user->name; ?></h1>
                 <p>Россия, Санкт-Петербург, 30 лет</p>
@@ -13,10 +13,13 @@ use yii\helpers\Url;
                     <span></span><span></span><span></span><span></span><span class="star-disabled"></span>
                     <b><?= $user->rating; ?></b>
                 </div>
-                <b class="done-task">Выполнил <?= $user->executorTasksFinished; ?> заказов</b><b class="done-review">Получил <?= count($recalls); ?> отзывов</b>
+                <b class="done-task">Выполнил
+                    <?= DataFormatter::declensionOfNouns($user->executorTasksFinished, ['заказ', 'заказа', 'заказов']); ?></b>
+                <b class="done-review">Получил
+                    <?= DataFormatter::declensionOfNouns(count($user->recalls), ['отзыв', 'отзыва', 'отзывов']); ?></b>
             </div>
             <div class="content-view__headline user__card-bookmark user__card-bookmark--current">
-                <span>Был на сайте <?= DateFormatter::getRelativeTime($user->last_visit_date); ?></span>
+                <span>Был на сайте <?= DataFormatter::getRelativeTime($user->last_visit_date); ?></span>
                 <a href="#"><b></b></a>
             </div>
         </div>
@@ -52,13 +55,13 @@ use yii\helpers\Url;
         </div>
     </div>
     <div class="content-view__feedback">
-        <h2>Отзывы<span>(<?= count($recalls); ?>)</span></h2>
+        <h2>Отзывы<span>(<?= count($user->recalls); ?>)</span></h2>
         <div class="content-view__feedback-wrapper reviews-wrapper">
-            <?php foreach($recalls as $recall): ?>
+            <?php foreach($user->recalls as $recall): ?>
                 <div class="feedback-card__reviews">
-                    <p class="link-task link">Задание <a href="view.html" class="link-regular">«<?= $recall->task->title; ?>»</a></p>
+                    <p class="link-task link">Задание <a href="<?= Url::to("/task/view/{$recall->task->id}")?>" class="link-regular">«<?= $recall->task->title; ?>»</a></p>
                     <div class="card__review">
-                        <a href="#"><img src="<?= $recall->task->client->profile->avatar; ?>" width="55" height="54"></a>
+                        <a href="#"><img src="<?= $recall->task->client->avatar; ?>" width="55" height="54"></a>
                         <div class="feedback-card__reviews-content">
                             <p class="link-name link"><a href="#" class="link-regular"><?= $recall->task->client->name; ?></a></p>
                             <p class="review-text">

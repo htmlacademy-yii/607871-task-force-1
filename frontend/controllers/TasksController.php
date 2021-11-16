@@ -3,7 +3,6 @@
 
 namespace frontend\controllers;
 
-
 use frontend\models\forms\TaskSearchForm;
 use frontend\models\Task;
 use yii\web\Controller;
@@ -21,17 +20,18 @@ class TasksController extends Controller
     public function actionView($id)
     {
         $task = Task::find()
-            ->joinWith('client')
+            ->with('client')
             ->where('task.id =:id', ['id' => $id])
             ->one();
 
         if(!$task) {
-            throw new NotFoundHttpException("Задача с ID {$id} не найдена!");
+            throw new NotFoundHttpException("Задача не найдена!");
         }
 
-        $clientTasks = Task::find()->where(['client_id' => $task->client_id])->count();
+        $searchForm = new TaskSearchForm();
         return $this->render('view', [
             'task' => $task,
-            'clientTasks' => $clientTasks]);
+            'model' => $searchForm,
+            ]);
     }
 }

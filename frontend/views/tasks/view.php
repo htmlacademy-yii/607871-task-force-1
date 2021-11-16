@@ -1,6 +1,6 @@
 <?php
 
-use App\Service\DateFormatter;
+use App\Service\DataFormatter;
 use \yii\helpers\Url;
 
 ?>
@@ -11,8 +11,13 @@ use \yii\helpers\Url;
                 <div class="content-view__headline">
                     <h1><?= $task->title; ?></h1>
                     <span>Размещено в категории
-                                    <a href="browse.html" class="link-regular"><?= $task->category->name; ?></a>
-                                    <?= DateFormatter::getRelativeTime($task->creation_date); ?></span>
+                                    <a href="<?= Url::to([
+                                        'tasks/index', "{$model->formName()}"=>
+                                            ['categories' => [$newTask->category->id],
+                                                'noExecutor' => false
+                                            ]
+                                    ]); ?>" class="link-regular"><?= $task->category->name; ?></a>
+                                    <?= DataFormatter::getRelativeTime($task->creation_date); ?></span>
                 </div>
                 <b class="new-task__price new-task__price--clean content-view-price"><?=$task->budget; ?><b> ₽</b></b>
                 <div class="new-task__icon new-task__icon--<?= $task->category->icon; ?> content-view-icon"></div>
@@ -32,7 +37,7 @@ use \yii\helpers\Url;
                 <h3 class="content-view__h3">Расположение</h3>
                 <div class="content-view__location-wrapper">
                     <div class="content-view__map">
-                        <a href="#"><img src="./img/map.jpg" width="361" height="292"
+                        <a href="#"><img src="/img/map.jpg" width="361" height="292"
                                          alt="Москва, Новый арбат, 23 к. 1"></a>
                     </div>
                     <div class="content-view__address">
@@ -61,17 +66,17 @@ use \yii\helpers\Url;
             <? foreach ($task->responds as $message): ?>
             <div class="content-view__feedback-card">
                 <div class="feedback-card__top">
-                    <a href="<?= Url::to("/user/view/{$message->volunteer->id}"); ?>"><img src="<?= $message->volunteer->profile->avatar;?>" width="55" height="55"></a>
+                    <a href="<?= Url::to("/user/view/{$message->volunteer->id}"); ?>"><img src="<?= $message->volunteer->avatar; ?>" width="55" height="55"></a>
                     <div class="feedback-card__top--name">
-                        <p><a href="<?= Url::to("/user/view/{$message->volunteer->id}"); ?>" class="link-regular"><?= $message->volunteer->name;?></a></p>
+                        <p><a href="<?= Url::to("/user/view/{$message->volunteer->id}"); ?>" class="link-regular"><?= $message->volunteer->name; ?></a></p>
                         <span></span><span></span><span></span><span></span><span class="star-disabled"></span>
                         <b><?= $message->volunteer->rating; ?></b>
                     </div>
-                    <span class="new-task__time"><?= DateFormatter::getRelativeTime($message->creation_date);?></span>
+                    <span class="new-task__time"><?= DataFormatter::getRelativeTime($message->creation_date); ?></span>
                 </div>
                 <div class="feedback-card__content">
                     <p>
-                        <?= $message->description;?>
+                        <?= $message->description; ?>
                     </p>
                     <span>1500 ₽</span>
                 </div>
@@ -91,12 +96,12 @@ use \yii\helpers\Url;
         <div class="profile-mini__wrapper">
             <h3>Заказчик</h3>
             <div class="profile-mini__top">
-                <img src="<?= $task->client->profile->avatar; ?>" width="62" height="62" alt="Аватар заказчика">
+                <img src="<?= $task->client->avatar; ?>" width="62" height="62" alt="Аватар заказчика">
                 <div class="profile-mini__name five-stars__rate">
                     <p><?= $task->client->name; ?></p>
                 </div>
             </div>
-            <p class="info-customer"><span><?= $clientTasks; ?> заданий</span><span class="last-">2 года на сайте</span></p>
+            <p class="info-customer"><span><?= DataFormatter::declensionOfNouns(count($task->client->clientTasks), ['задание', 'задания', 'заданий']); ?></span><span class="last-">2 года на сайте</span></p>
             <a href="#" class="link-regular">Смотреть профиль</a>
         </div>
     </div>

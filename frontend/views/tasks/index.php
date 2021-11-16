@@ -1,6 +1,6 @@
 <?php
 use yii\helpers\Url;
-use App\Service\DateFormatter;
+use App\Service\DataFormatter;
 ?>
 <section class="new-task">
     <div class="new-task__wrapper">
@@ -24,7 +24,7 @@ use App\Service\DateFormatter;
                 <b class="new-task__price new-task__price--<?= $newTask->category->icon; ?>"><?= $newTask->budget; ?><b>
                         ₽</b></b>
                 <p class="new-task__place">Санкт-Петербург, Центральный район</p>
-                <span class="new-task__time"><?= DateFormatter::getRelativeTime($newTask->creation_date); ?></span>
+                <span class="new-task__time"><?= DataFormatter::getRelativeTime($newTask->creation_date); ?></span>
             </div>
         <?php endforeach; ?>
     </div>

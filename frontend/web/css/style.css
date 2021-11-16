@@ -2406,7 +2406,14 @@ label {
 .landing-task-description {
   padding-left: 20px;
   padding-right: 10px;
-  height: 90px; }
+  height: 120px;
+  max-height: 120px;
+  overflow: hidden;
+  display: -webkit-box;
+  -moz-line-clamp: 5;
+  -webkit-line-clamp: 5;
+  -webkit-box-orient: vertical;
+}
 .landing-task-description h3 {
   font-weight: 600;
   font-size: 18px;

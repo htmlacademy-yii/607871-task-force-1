@@ -2,7 +2,6 @@
 
 namespace frontend\models;
 
-use frontend\models\behaviors\DateBehavior;
 use Yii;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
@@ -27,6 +26,7 @@ use yii\web\IdentityInterface;
  * @property Category[] $categories
  * @property User[] $favorites
  * @property UserSettings[] $userSettings
+ * @property Recall[] $recalls
  */
 class User extends \yii\db\ActiveRecord implements IdentityInterface
 {
@@ -105,7 +105,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function getClientTasks()
     {
-        return $this->hasMany(Task::class, ['client_id' => 'id'])->inverseOf('user');
+        return $this->hasMany(Task::class, ['client_id' => 'id'])->inverseOf('client');
     }
 
     /**
@@ -172,6 +172,19 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     }
 
     /**
+     * Gets query for [[Recalls]].
+     *
+     * @return \yii\db\ActiveQuery
+     * @throws \yii\base\InvalidConfigException
+     */
+
+    public function getRecalls()
+    {
+     return $this->hasMany(Recall::class, ['task_id' => 'id'])
+         ->viaTable('task', ['executor_id' => 'id'])->with('task', 'reviewer');
+    }
+
+    /**
      * Gets query for [[UserSettings]].
      *
      * @return \yii\db\ActiveQuery
@@ -181,30 +194,21 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         return $this->hasMany(UserSettings::class, ['user_id' => 'id']);
     }
 
-    public static function getCurrentUser()
-    {
-        if ($id = Yii::$app->user->getId()) {
-            return User::findOne($id);
-        }
-    }
-
     public function getRating()
     {
-        $query = new Query();
-        $rating = $query->select(["AVG(rating) AS rating"])
-            ->from('recall')
-            ->rightJoin('task', 'recall.task_id = task.id')
-            ->where(['task.executor_id' => $this->id])->scalar();
-
-        return round($rating, 2);
+        return round($this->getRecalls()->average('rating'), 2);
     }
+
+    public function getAvatar()
+    {
+        return ($this->profile->avatar) ?: Yii::$app->params['defaultAvatarPath'];
+    }
+
 
     public function getExecutorTasksFinished()
     {
-        $query = new Query();
-        return $query->select(["COUNT(id) as total"])
-            ->from('task')
-            ->where(['task.executor_id' => $this->id, 'task.status' => 3])->scalar();
+        return $this->getExecutorTasks()
+            ->where(['task.status' => Task::STATUS_FINISHED])->count();
     }
 
     public static function findIdentity($id)

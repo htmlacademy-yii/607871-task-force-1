@@ -37,6 +37,12 @@ use yii\db\Query;
  */
 class Task extends \yii\db\ActiveRecord
 {
+    const STATUS_NEW = 0;
+    const STATUS_CANCELED = 1;
+    const STATUS_IN_PROGRESS = 2;
+    const STATUS_FINISHED = 3;
+    const STATUS_FAILED = 4;
+
     /**
      * {@inheritdoc}
      */
@@ -58,10 +64,10 @@ class Task extends \yii\db\ActiveRecord
             [['latitude', 'longitude'], 'number'],
             [['title'], 'string', 'max' => 100],
             [['address', 'comments'], 'string', 'max' => 255],
-            [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['client_id' => 'id']],
-            [['executor_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['executor_id' => 'id']],
-            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['city_id' => 'id']],
-            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Category::class, 'targetAttribute' => ['category_id' => 'id']],
+            [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['client_id' => 'id']],
+            [['executor_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['executor_id' => 'id']],
+            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::className(), 'targetAttribute' => ['city_id' => 'id']],
+            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Category::className(), 'targetAttribute' => ['category_id' => 'id']],
         ];
     }
 
@@ -88,6 +94,16 @@ class Task extends \yii\db\ActiveRecord
             'longitude' => 'Longitude',
         ];
     }
+    /**
+     * @return array|string[]
+     */
+
+    public function behaviors()
+    {
+        return [
+            DateBehavior::class
+        ];
+    }
 
     /**
      * Gets query for [[Category]].
@@ -96,7 +112,7 @@ class Task extends \yii\db\ActiveRecord
      */
     public function getCategory()
     {
-        return $this->hasOne(Category::className(), ['id' => 'category_id']);
+        return $this->hasOne(Category::class, ['id' => 'category_id']);
     }
 
     /**
@@ -106,7 +122,7 @@ class Task extends \yii\db\ActiveRecord
      */
     public function getCity()
     {
-        return $this->hasOne(City::className(), ['id' => 'city_id']);
+        return $this->hasOne(City::class, ['id' => 'city_id']);
     }
 
     /**
@@ -116,7 +132,7 @@ class Task extends \yii\db\ActiveRecord
      */
     public function getClient()
     {
-        return $this->hasOne(User::className(), ['id' => 'client_id']);
+        return $this->hasOne(User::class, ['id' => 'client_id'])->inverseOf('clientTasks');
     }
 
     /**
@@ -136,7 +152,7 @@ class Task extends \yii\db\ActiveRecord
      */
     public function getExecutor()
     {
-        return $this->hasOne(User::class, ['id' => 'executor_id']);
+        return $this->hasOne(User::class, ['id' => 'executor_id'])->inverseOf('executorTasks');
     }
 
     /**
