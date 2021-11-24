@@ -4,9 +4,11 @@
 namespace frontend\controllers;
 
 
+use frontend\models\forms\TaskSearchForm;
 use frontend\models\forms\UserSearchForm;
 use frontend\models\User;
 use yii\web\Controller;
+use yii\web\NotFoundHttpException;
 
 class UsersController extends Controller
 {
@@ -17,5 +19,29 @@ class UsersController extends Controller
         return $this->render('index', ['dataProvider' => $searchForm->getDataProvider(), 'model' => $searchForm]);
     }
 
+    public function actionView($id)
+    {
+        $user = User::find()
+            ->with('profile', 'categories', 'recalls')
+            ->where('user.id =:id', ['id' => $id])
+            ->one();
+
+        if (!$user || !$user->categories) {
+            throw new NotFoundHttpException("Исполнитель не найден!");
+        }
+
+        $searchForm = new TaskSearchForm();
+        
+        return $this->render('view', [
+            'user' => $user,
+            'model' => $searchForm,
+        ]);
+    }
+
+    public function actionLogout()
+    {
+        \Yii::$app->user->logout();
+        return $this->goHome();
+    }
 
 }

@@ -78,4 +78,14 @@ class Respond extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::class, ['id' => 'user_id'])->inverseOf('respond');
     }
+
+    /**
+     * Gets query for [[User]].
+     *
+     * @return \yii\db\ActiveQuery
+     */
+    public function getVolunteer()
+    {
+        return $this->hasOne(User::class, ['id' => 'user_id'])->inverseOf('responds');
+    }
 }

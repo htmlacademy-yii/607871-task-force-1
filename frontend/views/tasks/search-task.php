@@ -10,7 +10,7 @@ use \yii\helpers\Html;
         <?php $form = ActiveForm::begin([
             'action' => ['index'],
             'method' => 'get',
-            'options' => ['class' => 'search-task__form', 'data' => ['pjax' => true]],
+            'options' => ['class' => 'search-task__form'],
             'fieldConfig' => [
                 'checkTemplate' => "{beginLabel}\n{input}<span>{labelTitle}</span>{endLabel}",
                 'checkOptions' => [
@@ -53,8 +53,8 @@ use \yii\helpers\Html;
             'labelOptions' => ['class' => 'search-task__name']
         ])->textInput(['class' => "input-middle input"]) ?>
         <div class="form-group">
-            <?= Html::submitButton('Искать', ['class' => "button", 'type' => 'submit']) ?>
+            <?= Html::submitButton('Искать', ['class' => "button"]) ?>
         </div>
-        <? ActiveForm::end(); ?>
+        <?php ActiveForm::end(); ?>
     </div>
 </section>

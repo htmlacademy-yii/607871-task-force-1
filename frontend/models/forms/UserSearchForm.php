@@ -6,7 +6,6 @@ namespace frontend\models\forms;
 
 use frontend\models\User;
 use yii\data\ActiveDataProvider;
-use yii\db\ActiveQuery;
 
 class UserSearchForm extends \yii\base\Model
 {

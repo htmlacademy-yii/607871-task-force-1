@@ -16,7 +16,7 @@ use yii\db\Query;
  * @property int $client_id
  * @property int|null $executor_id
  * @property int $budget
- * @property int $status (0 - new, 1 - canceled, 2 - in progress, 3 - finished, 5 - failed)
+ * @property int $status (0 - new, 1 - canceled, 2 - in progress, 3 - finished, 4 - failed)
  * @property string $due_date
  * @property string $creation_date
  * @property int|null $city_id
@@ -37,6 +37,12 @@ use yii\db\Query;
  */
 class Task extends \yii\db\ActiveRecord
 {
+    const STATUS_NEW = 0;
+    const STATUS_CANCELED = 1;
+    const STATUS_IN_PROGRESS = 2;
+    const STATUS_FINISHED = 3;
+    const STATUS_FAILED = 4;
+
     /**
      * {@inheritdoc}
      */
@@ -106,7 +112,7 @@ class Task extends \yii\db\ActiveRecord
      */
     public function getCategory()
     {
-        return $this->hasOne(Category::className(), ['id' => 'category_id']);
+        return $this->hasOne(Category::class, ['id' => 'category_id']);
     }
 
     /**
@@ -116,7 +122,7 @@ class Task extends \yii\db\ActiveRecord
      */
     public function getCity()
     {
-        return $this->hasOne(City::className(), ['id' => 'city_id']);
+        return $this->hasOne(City::class, ['id' => 'city_id']);
     }
 
     /**
@@ -126,7 +132,7 @@ class Task extends \yii\db\ActiveRecord
      */
     public function getClient()
     {
-        return $this->hasOne(User::className(), ['id' => 'client_id']);
+        return $this->hasOne(User::class, ['id' => 'client_id'])->inverseOf('clientTasks');
     }
 
     /**
@@ -146,7 +152,7 @@ class Task extends \yii\db\ActiveRecord
      */
     public function getExecutor()
     {
-        return $this->hasOne(User::class, ['id' => 'executor_id']);
+        return $this->hasOne(User::class, ['id' => 'executor_id'])->inverseOf('executorTasks');
     }
 
     /**

@@ -60,6 +60,14 @@ class Recall extends \yii\db\ActiveRecord
      */
     public function getTask()
     {
-        return $this->hasOne(Task::class, ['id' => 'task_id']);
+        return $this->hasOne(Task::class, ['id' => 'task_id'])->with('client');
     }
+
+    public function getReviewer()
+    {
+        return $this->hasOne(User::class, ['id' => 'client_id'])
+            ->viaTable('task', ['id' => 'task_id'])
+            ->with('profile');
+    }
+
 }

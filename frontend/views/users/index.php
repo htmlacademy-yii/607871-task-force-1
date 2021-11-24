@@ -1,21 +1,26 @@
+<?php
+use yii\helpers\Url;
+use App\Service\DataFormatter;
+?>
 <section class="user__search">
     <?php foreach ($dataProvider->getModels() as $user): ?>
         <div class="content-view__feedback-card user__search-wrapper">
             <div class="feedback-card__top">
                 <div class="user__search-icon">
-                    <a href="/user.html"><img src="./img/man-glasses.jpg" width="65" height="65"></a>
-                    <span>17 заданий</span>
-                    <span>6 отзывов</span>
+                    <a href="/user.html"><img src="<?= $user->avatar; ?>" width="65" height="65"></a>
+                    <span><?= DataFormatter::declensionOfNouns($user->executorTasksFinished, ['задание', 'задания', 'заданий']); ?></span>
+                    <span><?= DataFormatter::declensionOfNouns(count($user->recalls), ['отзыв', 'отзыва', 'отзывов']); ?></span>
                 </div>
                 <div class="feedback-card__top--name user__search-card">
-                    <p class="link-name"><a href="user.html" class="link-regular"><?= $user->name; ?></a></p>
+                    <p class="link-name"><a href="<?= Url::to(
+                            "user/view/{$user->id}"); ?>" class="link-regular"><?= $user->name; ?></a></p>
                     <span></span><span></span><span></span><span></span><span class="star-disabled"></span>
-                    <b>4.25</b>
+                    <b><?= $user->rating; ?></b>
                     <p class="user__search-content">
                         <?= $user->profile->description; ?>
                     </p>
                 </div>
-                <span class="new-task__time">Был на сайте <?= $user->getRelativeTime($user->last_visit_date); ?></span>
+                <span class="new-task__time">Был на сайте <?= DataFormatter::getRelativeTime($user->last_visit_date); ?></span>
             </div>
             <div class="link-specialization user__search-link--bottom">
 

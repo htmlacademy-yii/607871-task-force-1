@@ -37,19 +37,19 @@ class Profile extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'birth_date', 'city_id'], 'required'],
+            [['user_id', 'description','birth_date', 'avatar', 'city_id', 'address', 'phone', 'skype', 'other'], 'safe'],
+            [['city_id'], 'required'],
             [['user_id', 'city_id'], 'integer'],
-            [['birth_date'], 'safe'],
             [['description'], 'string'],
             [['avatar'], 'string', 'max' => 100],
             [['address'], 'string', 'max' => 255],
-            [['phone'], 'string', 'max' => 12],
+            [['phone'], 'match', 'pattern' => '/^[\d]{11}/i'],
             [['skype', 'other'], 'string', 'max' => 50],
             [['phone'], 'unique'],
             [['skype'], 'unique'],
             [['other'], 'unique'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
-            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['city_id' => 'id']],
+            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['city_id' => 'id'], 'message' => 'Укажите город, чтобы находить подходящие задачи'],
         ];
     }
 
@@ -64,7 +64,7 @@ class Profile extends \yii\db\ActiveRecord
             'birth_date' => 'Birth Date',
             'description' => 'Description',
             'avatar' => 'Avatar',
-            'city_id' => 'City ID',
+            'city_id' => 'Город проживания',
             'address' => 'Address',
             'phone' => 'Phone',
             'skype' => 'Skype',
@@ -91,4 +91,5 @@ class Profile extends \yii\db\ActiveRecord
     {
         return $this->hasOne(User::class, ['id' => 'user_id']);
     }
+
 }

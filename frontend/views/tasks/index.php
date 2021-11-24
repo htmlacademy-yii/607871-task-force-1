@@ -1,11 +1,16 @@
+<?php
+use yii\helpers\Url;
+use App\Service\DataFormatter;
+?>
 <section class="new-task">
     <div class="new-task__wrapper">
         <h1>Новые задания</h1>
         <?php foreach ($dataProvider->getModels() as $newTask): ?>
             <div class="new-task__card">
                 <div class="new-task__title">
-                    <a href="view.html" class="link-regular"><h2><?= $newTask->title; ?></h2></a>
-                    <a class="new-task__type link-regular" href="<?= \yii\helpers\Url::to([
+                    <a href="<?= Url::to(
+                    "task/view/{$newTask->id}"); ?>" class="link-regular"><h2><?= $newTask->title; ?></h2></a>
+                    <a class="new-task__type link-regular" href="<?= Url::to([
                         'tasks/index', "{$model->formName()}"=>
                             ['categories' => [$newTask->category->id],
                                 'noExecutor' => false
@@ -19,7 +24,7 @@
                 <b class="new-task__price new-task__price--<?= $newTask->category->icon; ?>"><?= $newTask->budget; ?><b>
                         ₽</b></b>
                 <p class="new-task__place">Санкт-Петербург, Центральный район</p>
-                <span class="new-task__time"><?= $newTask->getRelativeTime($newTask->creation_date); ?></span>
+                <span class="new-task__time"><?= DataFormatter::getRelativeTime($newTask->creation_date); ?></span>
             </div>
         <?php endforeach; ?>
     </div>

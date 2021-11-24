@@ -67,7 +67,7 @@ class TaskSearchForm extends \yii\base\Model
             $query->andWhere(['>=', 'creation_date', (new Expression("NOW() - INTERVAL {$this->period} DAY"))]);
 
         }
-        
+
         return new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
