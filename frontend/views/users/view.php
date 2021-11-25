@@ -32,7 +32,7 @@ use yii\helpers\Url;
                 <div class="link-specialization">
                     <?php foreach ($user->categories as $category):?>
                         <a href="<?= Url::to([
-                            'tasks/index', "{$model->formName()}"=>
+                            '/tasks/index', "{$model->formName()}"=>
                                 ['categories' => [$category->id],
                                     'noExecutor' => false
                                 ]
@@ -61,9 +61,9 @@ use yii\helpers\Url;
                 <div class="feedback-card__reviews">
                     <p class="link-task link">Задание <a href="<?= Url::to("/task/view/{$recall->task->id}")?>" class="link-regular">«<?= $recall->task->title; ?>»</a></p>
                     <div class="card__review">
-                        <a href="#"><img src="<?= $recall->task->client->avatar; ?>" width="55" height="54"></a>
+                        <a href="<?= Url::to("/user/view/{$recall->task->client->id}"); ?>"><img src="<?= $recall->task->client->avatar; ?>" width="55" height="54"></a>
                         <div class="feedback-card__reviews-content">
-                            <p class="link-name link"><a href="#" class="link-regular"><?= $recall->task->client->name; ?></a></p>
+                            <p class="link-name link"><a href="<?= Url::to("/user/view/{$recall->task->client->id}"); ?>" class="link-regular"><?= $recall->task->client->name; ?></a></p>
                             <p class="review-text">
                                 <?= $recall->description; ?>
                             </p>

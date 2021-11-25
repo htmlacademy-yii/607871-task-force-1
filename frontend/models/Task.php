@@ -57,17 +57,21 @@ class Task extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['title', 'description', 'category_id', 'client_id', 'budget', 'status', 'due_date'], 'required'],
-            [['description'], 'string'],
+            [['title', 'description', 'category_id', 'budget', 'due_date', 'creation_date', 'latitude', 'longitude'], 'safe'],
+            [['title', 'description', 'category_id', 'client_id', 'status', 'due_date'], 'required',
+                'on' => self::SCENARIO_DEFAULT,  'message' => 'Поле должно быть заполнено'],
+            [['title', 'description', ],'trim'],
+            ['due_date', 'datetime', 'message' => 'Введите дату и время'],
+            [['description'], 'string', 'min' => 15, 'max' => 1500,
+                'tooShort' => "Не менее {min} символов", 'tooLong' => 'Не более {max} символов' ],
             [['category_id', 'client_id', 'executor_id', 'budget', 'status', 'city_id'], 'integer'],
-            [['due_date', 'creation_date'], 'safe'],
             [['latitude', 'longitude'], 'number'],
-            [['title'], 'string', 'max' => 100],
-            [['address', 'comments'], 'string', 'max' => 255],
-            [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['client_id' => 'id']],
-            [['executor_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['executor_id' => 'id']],
-            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::className(), 'targetAttribute' => ['city_id' => 'id']],
-            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Category::className(), 'targetAttribute' => ['category_id' => 'id']],
+            ['title', 'string', 'min' => 5, 'max' => 100, 'tooShort' => "Не менее {min} символов", 'tooLong' => 'Не более {max} символов'],
+            ['address', 'string', 'max' => 255, 'tooLong' => 'Не более {max} символов'],
+            [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['client_id' => 'id']],
+            [['executor_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['executor_id' => 'id']],
+            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['city_id' => 'id']],
+            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Category::class, 'targetAttribute' => ['category_id' => 'id']],
         ];
     }
 
@@ -78,30 +82,20 @@ class Task extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'title' => 'Title',
-            'description' => 'Description',
-            'category_id' => 'Category ID',
+            'title' => 'Мне нужно',
+            'description' => 'Подробности задания',
+            'category_id' => 'Категория',
             'client_id' => 'Client ID',
             'executor_id' => 'Executor ID',
-            'budget' => 'Budget',
+            'budget' => 'Бюджет',
             'status' => 'Status',
-            'due_date' => 'Due Date',
+            'due_date' => 'Сроки исполнения',
             'creation_date' => 'Creation Date',
             'city_id' => 'City ID',
-            'address' => 'Address',
+            'address' => 'Локация',
             'comments' => 'Comments',
             'latitude' => 'Latitude',
             'longitude' => 'Longitude',
-        ];
-    }
-    /**
-     * @return array|string[]
-     */
-
-    public function behaviors()
-    {
-        return [
-            DateBehavior::class
         ];
     }
 

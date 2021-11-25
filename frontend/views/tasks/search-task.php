@@ -2,6 +2,7 @@
 
 use yii\bootstrap4\ActiveForm;
 use \yii\helpers\Html;
+use \frontend\models\Category;
 
 ?>
 
@@ -30,7 +31,7 @@ use \yii\helpers\Html;
                 'template' => "{input}",
                 'options' => ['tag' => false]
             ])
-                ->checkboxList(\frontend\models\Category::getCategoryMap(),
+                ->checkboxList(Category::getCategoryMap(),
                     [
                         'item' => function ($index, $label, $name, $checked, $value) {
                             return '<label class="checkbox__legend">' . Html::checkbox($name, $checked, ['value' => $value, 'class' => 'visually-hidden checkbox__input']) .

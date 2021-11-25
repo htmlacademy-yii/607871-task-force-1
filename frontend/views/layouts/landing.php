@@ -58,7 +58,7 @@ AppAsset::register($this);
                 <a href="#" class="header__account-enter open-modal" data-for="enter-form">
                     <span>Вход</span></a>
                 или
-                <a href="<?=Url::to('signup')?>" class="header__account-registration">
+                <a href="<?=Url::to('/signup')?>" class="header__account-registration">
                     Регистрация
                 </a>
             </div>
@@ -84,19 +84,19 @@ AppAsset::register($this);
             <div class="page-footer__links">
                 <ul class="links__list">
                     <li class="links__item">
-                        <a href="/tasks">Задания</a>
+                        <a href="<?= Url::to('/tasks'); ?>">Задания</a>
                     </li>
                     <li class="links__item">
                         <a href="">Мой профиль</a>
                     </li>
                     <li class="links__item">
-                        <a href="/users">Исполнители</a>
+                        <a href="<?= Url::to('/users'); ?>">Исполнители</a>
                     </li>
                     <li class="links__item">
                         <a href="">Регистрация</a>
                     </li>
                     <li class="links__item">
-                        <a href="">Создать задание</a>
+                        <a href="<?= Url::to('/task/create'); ?>">Создать задание</a>
                     </li>
                     <li class="links__item">
                         <a href="">Справка</a>

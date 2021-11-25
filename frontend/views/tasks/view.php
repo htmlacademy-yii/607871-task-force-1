@@ -12,7 +12,7 @@ use \yii\helpers\Url;
                     <h1><?= $task->title; ?></h1>
                     <span>Размещено в категории
                                     <a href="<?= Url::to([
-                                        'tasks/index', "{$model->formName()}"=>
+                                        '/tasks/index', "{$model->formName()}"=>
                                             ['categories' => [$newTask->category->id],
                                                 'noExecutor' => false
                                             ]
