@@ -9,9 +9,9 @@ use App\Service\DataFormatter;
             <div class="new-task__card">
                 <div class="new-task__title">
                     <a href="<?= Url::to(
-                    "task/view/{$newTask->id}"); ?>" class="link-regular"><h2><?= $newTask->title; ?></h2></a>
+                    "/task/view/{$newTask->id}"); ?>" class="link-regular"><h2><?= $newTask->title; ?></h2></a>
                     <a class="new-task__type link-regular" href="<?= Url::to([
-                        'tasks/index', "{$model->formName()}"=>
+                        '/tasks/index', "{$model->formName()}"=>
                             ['categories' => [$newTask->category->id],
                                 'noExecutor' => false
                             ]

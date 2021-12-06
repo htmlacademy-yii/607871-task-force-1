@@ -7,6 +7,7 @@ use frontend\models\forms\TaskSearchForm;
 use frontend\models\Task;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
+use frontend\models\TaskFiles;
 
 class TasksController extends Controller
 {
@@ -34,4 +35,5 @@ class TasksController extends Controller
             'model' => $searchForm,
             ]);
     }
+
 }

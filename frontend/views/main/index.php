@@ -10,7 +10,7 @@ use \yii\helpers\Url;
     <p>Сломался кран на кухне? Надо отправить документы? Нет времени самому гулять с собакой?
         У нас вы быстро найдёте исполнителя для любой жизненной ситуации?<br>
         Быстро, безопасно и с гарантией. Просто, как раз, два, три. </p>
-    <button class="button">Создать аккаунт</button>
+    <a href="<?=Url::to('/signup')?>" class="button">Создать аккаунт</a>
 </div>
 <div class="landing-center">
     <div class="landing-instruction">
@@ -99,13 +99,13 @@ use \yii\helpers\Url;
         <div class="landing-task">
             <div class="landing-task-top task-<?= $task->category->icon; ?>"></div>
             <div class="landing-task-description">
-                <h3><a href="<?= Url::to("task/view/{$task->id}")?>" class="link-regular"><?= $task->title; ?></a></h3>
+                <h3><a href="<?= Url::to("/task/view/{$task->id}")?>" class="link-regular"><?= $task->title; ?></a></h3>
                 <p><?= $task->description; ?></p>
             </div>
             <div class="landing-task-info">
                 <div class="task-info-left">
                     <p><a href="<?= Url::to([
-                            'tasks/index', "{$model->formName()}"=>
+                            '/tasks/index', "{$model->formName()}"=>
                                 ['categories' => [$task->category->id],
                                     'noExecutor' => false
                                 ]

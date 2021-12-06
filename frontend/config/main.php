@@ -13,6 +13,7 @@ return [
     'timeZone' =>'Europe/Moscow',
     'bootstrap' => ['log'],
     'controllerNamespace' => 'frontend\controllers',
+    'defaultRoute' => 'main/index',
     'components' => [
         'request' => [
             'csrfParam' => '_csrf-frontend',
@@ -44,10 +45,10 @@ return [
             'showScriptName' => false,
             'enableStrictParsing' => false,
             'rules' => [
-                '/' => 'main/index',
                 'tasks' => 'tasks/index',
                 'users' => 'users/index',
                 'task/view/<id:\d+>' => 'tasks/view',
+                'task/create' => 'tasks/create',
                 'user/view/<id:\d+>' => 'users/view',
             ],
         ],

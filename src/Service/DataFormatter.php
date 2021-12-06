@@ -43,25 +43,32 @@ class DataFormatter
         $time_difference = $now - $reg_date;
 
         $time_declensions = [
-
+            'years' => ['год', 'года', 'лет'],
+            'month' => ['месяц', 'месяца', 'месяцев'],
             'days' => ['день', 'дня', 'дней'],
             'hours' => ['час', 'часа', 'часов'],
             'minutes' => ['минуту', 'минуты', 'минут']
         ];
 
         $time_distance = [
+            'years' => floor($time_difference / 3600 / 24 / 30 / 12),
+            'month' => floor($time_difference / 3600 / 24 / 30),
+            'days' => floor($time_difference / 3600 / 24),
             'hours' => floor($time_difference / 3600),
             'minutes' => floor($time_difference / 60)
         ];
 
-        if($time_distance['hours'] > 24) {
-            return date('y.m.d в H:i', $reg_date);
+        foreach ($time_distance as $key => $value) {
+            if ($value > 0 ) {
+                $measure_display = $time_distance[$key];
+                break;
+            } else {
+                $measure_display = $time_distance['minutes'];
+            }
         }
 
-        $key = ($time_distance['hours'] > 0) ? 'hours' : 'minutes';
-        $measure_display = $time_distance[$key];
         $date_format = $time_declensions[$key];
 
-        return declensionOfNouns($measure_display, $date_format) . ' назад';
+        return self::declensionOfNouns($measure_display, $date_format);
     }
 }

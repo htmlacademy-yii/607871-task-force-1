@@ -80,22 +80,22 @@ AppAsset::register($this);
                 <div class="header__nav">
                     <ul class="header-nav__list site-list">
                         <li class="site-list__item">
-                            <a href="/tasks">Задания</a>
+                            <a href="<?= Url::to('/tasks'); ?>">Задания</a>
                         </li>
                         <li class="site-list__item">
-                            <a href="/users">Исполнители</a>
+                            <a href="<?= Url::to('/users'); ?>">Исполнители</a>
                         </li>
                         <li class="site-list__item">
-                            <a href="create.html">Создать задание</a>
+                            <a href="<?= Url::to('/task/create'); ?>">Создать задание</a>
                         </li>
                         <li class="site-list__item">
                             <a href="account.html">Мой профиль</a>
                         </li>
                     </ul>
                 </div>
-                <?php if (Url::current() !== '/signup' && Yii::$app->user->identity): ?>
+                <?php if (Url::current() !== '/signup/index' && !Yii::$app->user->identity): ?>
                     <div class="header__town">
-                        <select class="multiple-select input town-select" id = "town-select" size="1" name="town[]">
+                        <select class="multiple-select input town-select" id="town-select" size="1" name="town[]">
                             <option value="Moscow">Москва</option>
                             <option selected value="SPB">Санкт-Петербург</option>
                             <option value="Krasnodar">Краснодар</option>
@@ -104,7 +104,7 @@ AppAsset::register($this);
                         </select>
                     </div>
                 <?php endif; ?>
-                <?php if (Url::current() !== '/signup' && Yii::$app->user->identity): ?>
+                <?php if (Url::current() !== '/signup/index' && !Yii::$app->user->identity): ?>
                     <div class="header__lightbulb"></div>
                     <div class="lightbulb__pop-up">
                         <h3>Новые события</h3>
@@ -129,7 +129,7 @@ AppAsset::register($this);
                                  alt="Аватар пользователя">
                         </a>
                         <span class="header__account-name">
-                 <?=  Html::encode(Yii::$app->user->identity->name); ?>
+                 <?= Html::encode(Yii::$app->user->identity->name); ?>
                 </span>
                     </div>
                     <div class="account__pop-up">
@@ -141,7 +141,7 @@ AppAsset::register($this);
                                 <a href="account.html">Настройки</a>
                             </li>
                             <li>
-                                <a href="<?= Url::to('/users/logout')?>">Выход</a>
+                                <a href="<?= Url::to('/users/logout') ?>">Выход</a>
                             </li>
                         </ul>
                     </div>
@@ -168,19 +168,19 @@ AppAsset::register($this);
                 <div class="page-footer__links">
                     <ul class="links__list">
                         <li class="links__item">
-                            <a href="/tasks">Задания</a>
+                            <a href="<?= Url::to('/tasks'); ?>">Задания</a>
                         </li>
                         <li class="links__item">
                             <a href="user.html">Мой профиль</a>
                         </li>
                         <li class="links__item">
-                            <a href="/users">Исполнители</a>
+                            <a href="<?= Url::to('/users'); ?>">Исполнители</a>
                         </li>
                         <li class="links__item">
-                            <a href="signup.html">Регистрация</a>
+                            <a href="<?= Url::to('/signup/index'); ?>">Регистрация</a>
                         </li>
                         <li class="links__item">
-                            <a href="create.html">Создать задание</a>
+                            <a href="<?= Url::to('/task/create'); ?>">Создать задание</a>
                         </li>
                         <li class="links__item">
                             <a href="">Справка</a>
@@ -195,7 +195,7 @@ AppAsset::register($this);
                              alt="Логотип HTML Academy">
                     </a>
                 </div>
-                <?php if (Url::current() === '/signup'): ?>
+                <?php if (Url::current() == '/signup/index'): ?>
                     <div class="clipart-woman">
                         <img src="/img/clipart-woman.png" width="238" height="450">
                     </div>
@@ -211,7 +211,8 @@ AppAsset::register($this);
                 <?php endif; ?>
             </div>
         </footer>
-        <?php if (Url::current() !== '/signup'): ?>
+
+        <?php if (Url::current() != '/signup/index'): ?>
             <section class="modal response-form form-modal" id="response-form">
                 <h2>Отклик на задание</h2>
                 <form action="#" method="post">
@@ -279,9 +280,17 @@ AppAsset::register($this);
             </section>
         <?php endif; ?>
     </div>
-    <div class="overlay"></div>
-    <script src="/js/main.js"></script>
-    <script src="/js/messenger.js"></script>
+    <?php if (Url::current() === '/'): ?>
+        <div class="overlay"></div>
+        <script src="/js/main.js"></script>
+        <script src="/js/messenger.js"></script>
+    <?php endif; ?>
+    <?php if (Url::current() === '/task/create'): ?>
+        <script src="/js/dropzone.js"></script>
+        <script>
+            var dropzone = new Dropzone("div.create__file", {url: "upload.php", paramName: "Attach"});
+        </script>
+    <?php endif; ?>
     <?php $this->endBody() ?>
     </body>
     </html>

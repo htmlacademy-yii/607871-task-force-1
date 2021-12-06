@@ -57,7 +57,7 @@ if (starRating.length) {
   });
 }
 
-/*var cityDropdown = document.getElementsByClassName('town-select');
+var cityDropdown = document.getElementsByClassName('town-select');
 
 if (cityDropdown.length) {
   cityDropdown = cityDropdown[0];
@@ -67,4 +67,4 @@ if (cityDropdown.length) {
 
     window.location = '/site/city?city=' + selectedCity;
   });
-}*/
+}
