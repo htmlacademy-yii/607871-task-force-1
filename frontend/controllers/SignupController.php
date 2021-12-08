@@ -6,9 +6,8 @@ namespace frontend\controllers;
 
 use frontend\models\Profile;
 use frontend\models\User;
-use yii\web\Controller;
 
-class SignupController extends Controller
+class SignupController extends SecuredController
 {
     public function actionIndex()
     {
@@ -23,8 +22,7 @@ class SignupController extends Controller
                 if ($isValid) {
                     $passwordHash = \Yii::$app->security->generatePasswordHash($user->getAttribute('password'));
                     $user->setAttribute('password', $passwordHash);
-                    $db = \Yii::$app->db;
-                    $transaction = $db->beginTransaction();
+                     $transaction = \Yii::$app->db->beginTransaction();
 
                     try {
                         $user->save(false);

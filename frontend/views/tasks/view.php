@@ -41,8 +41,8 @@ use \yii\helpers\Url;
                                          alt="Москва, Новый арбат, 23 к. 1"></a>
                     </div>
                     <div class="content-view__address">
-                        <span class="address__town">Москва</span><br>
-                        <span>Новый арбат, 23 к. 1</span>
+                        <span class="address__town"><?=$task->city->name ?? 'Город не определен'; ?></span><br>
+                        <span><?= $task->address ?? 'Удаленная работа'; ?></span>
                         <p>Вход под арку, код домофона 1122</p>
                     </div>
                 </div>

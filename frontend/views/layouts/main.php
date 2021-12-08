@@ -93,7 +93,7 @@ AppAsset::register($this);
                         </li>
                     </ul>
                 </div>
-                <?php if (Url::current() !== '/signup/index' && !Yii::$app->user->identity): ?>
+                <?php if (Url::current() !== '/signup/index' && !Yii::$app->user->isGuest): ?>
                     <div class="header__town">
                         <select class="multiple-select input town-select" id="town-select" size="1" name="town[]">
                             <option value="Moscow">Москва</option>
@@ -104,7 +104,7 @@ AppAsset::register($this);
                         </select>
                     </div>
                 <?php endif; ?>
-                <?php if (Url::current() !== '/signup/index' && !Yii::$app->user->identity): ?>
+                <?php if (Url::current() !== '/signup/index' && !Yii::$app->user->isGuest): ?>
                     <div class="header__lightbulb"></div>
                     <div class="lightbulb__pop-up">
                         <h3>Новые события</h3>
@@ -284,12 +284,11 @@ AppAsset::register($this);
         <div class="overlay"></div>
         <script src="/js/main.js"></script>
         <script src="/js/messenger.js"></script>
+
     <?php endif; ?>
     <?php if (Url::current() === '/task/create'): ?>
         <script src="/js/dropzone.js"></script>
-        <script>
-            var dropzone = new Dropzone("div.create__file", {url: "upload.php", paramName: "Attach"});
-        </script>
+     
     <?php endif; ?>
     <?php $this->endBody() ?>
     </body>

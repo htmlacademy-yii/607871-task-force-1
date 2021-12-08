@@ -7,9 +7,8 @@ namespace frontend\controllers;
 use frontend\models\forms\LoginForm;
 use frontend\models\forms\TaskSearchForm;
 use frontend\models\Task;
-use yii\web\Controller;
 
-class MainController extends Controller
+class MainController extends SecuredController
 {
     public $layout = 'landing';
 
