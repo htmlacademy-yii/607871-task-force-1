@@ -5,12 +5,22 @@ namespace frontend\controllers;
 
 use frontend\models\forms\TaskSearchForm;
 use frontend\models\Task;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use frontend\models\TaskFiles;
+use yii\web\Response;
+use yii\web\UploadedFile;
 
-class TasksController extends Controller
+class TasksController extends SecuredController
 {
+    public function beforeAction($action)
+    {
+        if ($this->action->id == 'upload') {
+            \Yii::$app->response->format = Response::FORMAT_JSON;
+            $this->enableCsrfValidation = false;
+        }
+        return parent::beforeAction($action);
+    }
+
     public function actionIndex()
     {
         $searchForm = new TaskSearchForm();
@@ -25,7 +35,7 @@ class TasksController extends Controller
             ->where('task.id =:id', ['id' => $id])
             ->one();
 
-        if(!$task) {
+        if (!$task) {
             throw new NotFoundHttpException("Задача не найдена!");
         }
 
@@ -33,7 +43,7 @@ class TasksController extends Controller
         return $this->render('view', [
             'task' => $task,
             'model' => $searchForm,
-            ]);
+        ]);
     }
 
 }

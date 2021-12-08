@@ -2,8 +2,8 @@
 
 namespace frontend\models;
 
-use frontend\models\behaviors\DateBehavior;
-use Yii;
+
+use yii\db\ActiveRecord;
 use yii\db\Query;
 
 /**
@@ -35,7 +35,7 @@ use yii\db\Query;
  * @property Respond[] $responds
 
  */
-class Task extends \yii\db\ActiveRecord
+class Task extends ActiveRecord
 {
     const STATUS_NEW = 0;
     const STATUS_CANCELED = 1;
@@ -58,10 +58,10 @@ class Task extends \yii\db\ActiveRecord
     {
         return [
             [['title', 'description', 'category_id', 'budget', 'due_date', 'creation_date', 'latitude', 'longitude'], 'safe'],
-            [['title', 'description', 'category_id', 'client_id', 'status', 'due_date'], 'required',
-                'on' => self::SCENARIO_DEFAULT,  'message' => 'Поле должно быть заполнено'],
+            [['title', 'description', 'category_id', 'client_id', 'due_date'], 'required',
+                'message' => 'Поле должно быть заполнено'],
             [['title', 'description', ],'trim'],
-            ['due_date', 'datetime', 'message' => 'Введите дату и время'],
+            ['due_date', 'date', 'format' => 'Y-m-d', 'message' => 'Введите дату в формате ГГГГ-ММ-ДД'],
             [['description'], 'string', 'min' => 15, 'max' => 1500,
                 'tooShort' => "Не менее {min} символов", 'tooLong' => 'Не более {max} символов' ],
             [['category_id', 'client_id', 'executor_id', 'budget', 'status', 'city_id'], 'integer'],

@@ -7,10 +7,9 @@ namespace frontend\controllers;
 use frontend\models\forms\TaskSearchForm;
 use frontend\models\forms\UserSearchForm;
 use frontend\models\User;
-use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 
-class UsersController extends Controller
+class UsersController extends SecuredController
 {
     public function actionIndex()
     {
