@@ -288,7 +288,7 @@ AppAsset::register($this);
     <?php endif; ?>
     <?php if (Url::current() === '/task/create'): ?>
         <script src="/js/dropzone.js"></script>
-     
+
     <?php endif; ?>
     <?php $this->endBody() ?>
     </body>
