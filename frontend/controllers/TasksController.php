@@ -8,16 +8,14 @@ use frontend\models\forms\UploadFilesForm;
 use frontend\models\Respond;
 use frontend\models\Task;
 use frontend\models\User;
-//use yii\filters\VerbFilter;
 use Yii;
 use yii\web\NotFoundHttpException;
 use frontend\models\TaskFiles;
-use yii\web\Response;
 use yii\web\UploadedFile;
 
 class TasksController extends SecuredController
 {
-    
+
     public function actionIndex()
     {
         $searchForm = new TaskSearchForm();
