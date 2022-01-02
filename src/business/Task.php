@@ -58,7 +58,7 @@ class Task
         return $actionStatusMap[$action];
     }
 
-    public static function getPossibleActions(string $status, int $clientId, $executorId, int $userId): array
+    public static function getPossibleActions(string $status, int $clientId, $executorId, $userId): array
     {
         $actionStatusMap = [
             self::STATUS_NEW => [new CancelAction(), new VolunteerAction()],

@@ -2,6 +2,13 @@
 
 use App\Service\DataFormatter;
 use \yii\helpers\Url;
+use \frontend\models\Task;
+use \frontend\models\Respond;
+
+/**
+ * @var \frontend\models\Task $task
+ * @var \frontend\models\forms\TaskSearchForm $model
+ */
 
 ?>
 <section class="content-view">
@@ -13,7 +20,7 @@ use \yii\helpers\Url;
                     <span>Размещено в категории
                                     <a href="<?= Url::to([
                                         '/tasks/index', "{$model->formName()}"=>
-                                            ['categories' => [$newTask->category->id],
+                                            ['categories' => [$task->category->id],
                                                 'noExecutor' => false
                                             ]
                                     ]); ?>" class="link-regular"><?= $task->category->name; ?></a>
@@ -30,8 +37,9 @@ use \yii\helpers\Url;
             </div>
             <div class="content-view__attach">
                 <h3 class="content-view__h3">Вложения</h3>
-                <a href="#">my_picture.jpeg</a>
-                <a href="#">agreement.docx</a>
+                <?php foreach($task->taskFiles as $file): ?>
+                    <a href="<?= Url::to($file['url']); ?>"><?= $file['name']; ?></a>
+                <?php endforeach; ?>
             </div>
             <div class="content-view__location">
                 <h3 class="content-view__h3">Расположение</h3>
@@ -49,21 +57,22 @@ use \yii\helpers\Url;
             </div>
         </div>
         <div class="content-view__action-buttons">
-            <button class=" button button__big-color response-button open-modal"
-                    type="button" data-for="response-form">Откликнуться
-            </button>
-            <button class="button button__big-color refusal-button open-modal"
-                    type="button" data-for="refuse-form">Отказаться
-            </button>
-            <button class="button button__big-color request-button open-modal"
-                    type="button" data-for="complete-form">Завершить
-            </button>
+            <?php foreach ($actions as $action): ?>
+                <button class=" button button__big-color <?= $action->getButtonColorClass(); ?>-button open-modal"
+                        type="button" data-for="<?= $action->getActionCode(); ?>-form"><?=$action->getActionTitle(); ?>
+                </button>
+            <?php endforeach; ?>
         </div>
     </div>
+
+<?php if ($task->getResponds()->count()): ?>
+    <?php if (Yii::$app->user->id === $task->client->id || $task->isVolunteer(Yii::$app->user->id)): ?>
     <div class="content-view__feedback">
         <h2>Отклики <span>(<?= count($task->responds)?>)</span></h2>
         <div class="content-view__feedback-wrapper">
-            <? foreach ($task->responds as $message): ?>
+
+            <?php  foreach ($task->responds as $message): ?>
+            <?php if (Yii::$app->user->id === $task->client->id || Yii::$app->user->id === $message->volunteer->id): ?>
             <div class="content-view__feedback-card">
                 <div class="feedback-card__top">
                     <a href="<?= Url::to("/user/view/{$message->volunteer->id}"); ?>"><img src="<?= $message->volunteer->avatar; ?>" width="55" height="55"></a>
@@ -78,18 +87,23 @@ use \yii\helpers\Url;
                     <p>
                         <?= $message->description; ?>
                     </p>
-                    <span>1500 ₽</span>
+                    <span><?= $message->rate; ?>&nbsp;₽</span>
                 </div>
+                <?php if (Yii::$app->user->id === $task->client->id && $task->status == Task::STATUS_NEW && $message->status !== Respond::STATUS_REFUSED): ?>
                 <div class="feedback-card__actions">
-                    <a class="button__small-color response-button button"
+                    <a href="<?= Url::to(["/task/confirm/{$task->id}/{$message->id}"]); ?>" class="button__small-color response-button button"
                        type="button">Подтвердить</a>
-                    <a class="button__small-color refusal-button button"
+                    <a href="<?= Url::to(["/task/refuse/{$task->id}/{$message->id}"]); ?>" class="button__small-color refusal-button button"
                        type="button">Отказать</a>
                 </div>
+                <?php endif; ?>
             </div>
-            <?endforeach; ?>
+            <?php endif; ?>
+            <?php endforeach; ?>
         </div>
     </div>
+    <?php endif; ?>
+    <?php endif; ?>
 </section>
 <section class="connect-desk">
     <div class="connect-desk__profile-mini">
@@ -107,6 +121,6 @@ use \yii\helpers\Url;
     </div>
     <div id="chat-container">
         <!--                    добавьте сюда атрибут task с указанием в нем id текущего задания-->
-        <chat class="connect-desk__chat"></chat>
+        <chat class="connect-desk__chat" task="<?= $task->id; ?>"></chat>
     </div>
 </section>

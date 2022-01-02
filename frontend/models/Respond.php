@@ -16,10 +16,13 @@ use Yii;
  * @property string $creation_date
  *
  * @property Task $tasks
- * @property User $user
+ * @property User $volunteer
  */
 class Respond extends \yii\db\ActiveRecord
 {
+    const STATUS_NEW = 0;
+    const STATUS_CONFIRMED = 1;
+    const STATUS_REFUSED = 2;
     /**
      * {@inheritdoc}
      */
@@ -37,7 +40,7 @@ class Respond extends \yii\db\ActiveRecord
             [['user_id', 'task_id', 'description', 'rate'], 'required'],
             [['user_id', 'task_id', 'rate', 'status'], 'integer'],
             [['description'], 'string'],
-            [['creation_date'], 'safe'],
+            [['creation_date', 'status'], 'safe'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
             [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Task::class, 'targetAttribute' => ['task_id' => 'id']],
         ];
@@ -52,8 +55,8 @@ class Respond extends \yii\db\ActiveRecord
             'id' => 'ID',
             'user_id' => 'User ID',
             'task_id' => 'Task ID',
-            'description' => 'Description',
-            'rate' => 'Rate',
+            'description' => 'Комментарий',
+            'rate' => 'Ваша цена',
             'status' => 'Status',
             'creation_date' => 'Creation Date',
         ];
@@ -66,18 +69,9 @@ class Respond extends \yii\db\ActiveRecord
      */
     public function getTask()
     {
-        return $this->hasOne(Task::class, ['id' => 'task_id'])->inverseOf('respond');
+        return $this->hasOne(Task::class, ['id' => 'task_id'])->inverseOf('responds');
     }
 
-    /**
-     * Gets query for [[User]].
-     *
-     * @return \yii\db\ActiveQuery
-     */
-    public function getUser()
-    {
-        return $this->hasOne(User::class, ['id' => 'user_id'])->inverseOf('respond');
-    }
 
     /**
      * Gets query for [[User]].

@@ -19,7 +19,12 @@ class CancelAction extends TaskActionTemplate
         return 'Отменить';
     }
 
-    public function getUserRightsCheck(int $clientId, $executorId, int $userId): bool
+    public function getButtonColorClass(): string
+    {
+        return 'cancel';
+    }
+
+    public function getUserRightsCheck(int $clientId, $executorId, $userId): bool
     {
         return $userId === $clientId;
     }

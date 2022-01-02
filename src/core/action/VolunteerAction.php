@@ -11,7 +11,7 @@ class VolunteerAction extends TaskActionTemplate
 
     public function getActionCode(): string
     {
-        return 'volunteer';
+        return 'response';
     }
 
     public function getActionTitle(): string
@@ -19,7 +19,12 @@ class VolunteerAction extends TaskActionTemplate
         return 'Откликнуться';
     }
 
-    public function getUserRightsCheck(int $clientId, $executorId, int $userId): bool
+    public function getButtonColorClass(): string
+    {
+        return 'response';
+    }
+
+    public function getUserRightsCheck(int $clientId, $executorId, $userId): bool
     {
         return ($userId !== $clientId && $executorId === null);
 
