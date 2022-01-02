@@ -17,27 +17,7 @@ use yii\web\UploadedFile;
 
 class TasksController extends SecuredController
 {
-   /* public function behaviors()
-    {
-        return [
-            'verbs' => [
-                'class' => VerbFilter::class,
-                'actions' => [
-                    'create-task' => ['POST', 'AJAX']
-                ],
-            ],
-        ];
-    }*/
-
-    public function beforeAction($action)
-    {
-        if ($this->action->id == 'upload') {
-            Yii::$app->response->format = Response::FORMAT_JSON;
-            $this->enableCsrfValidation = false;
-        }
-        return parent::beforeAction($action);
-    }
-
+    
     public function actionIndex()
     {
         $searchForm = new TaskSearchForm();
@@ -74,61 +54,47 @@ class TasksController extends SecuredController
 
     public function actionCreate()
     {
-        $task = new Task();
-        $uploadFilesModel = new UploadFilesForm();
-        $errors = [];
-
-        return $this->render('create', ['task' => $task, 'uploadFiles' => $uploadFilesModel, 'errors' => $errors]);
-    }
-
-    public function actionCreateTask()
-    {
-       // Yii::$app->response->format = Response::FORMAT_JSON;
 
         $task = new Task(['scenario' => Task::SCENARIO_CREATE_TASK]);
         $uploadFilesModel = new UploadFilesForm();
         $errors = [];
 
-        $task->load(Yii::$app->request->post());
-        $task->client_id = Yii::$app->user->getId();
-        $task->status = Task::STATUS_NEW;
-        $task->city_id = 2;
+        if (\Yii::$app->request->getIsPost()) {
+            $task->load(Yii::$app->request->post());
+            $task->client_id = Yii::$app->user->getId();
+            $task->status = Task::STATUS_NEW;
+            $task->city_id = 2;
 
-        $uploadFilesModel->files = UploadedFile::getInstances($uploadFilesModel, 'files');
+            $uploadFilesModel->files = UploadedFile::getInstances($uploadFilesModel, 'files');
+            $isValid = $task->validate();
+            $isValid = $uploadFilesModel->validate() && $isValid;
 
-        $isValid = $task->validate();
-        $isValid = $uploadFilesModel->validate() && $isValid;
+            $errors = array_merge($task->errors, $uploadFilesModel->errors);
 
-        $errors = array_merge($task->errors, $uploadFilesModel->errors);
+            if ($isValid) {
+                $transaction = Yii::$app->db->beginTransaction();
+                try {
+                    $task->save();
 
-        if ($isValid) {
-            $transaction = Yii::$app->db->beginTransaction();
-            try {
-                $task->save();
-
-                foreach ($uploadFilesModel->files as $file) {
-                    $newFileName = UploadFilesForm::uploadFile($file); //загрузка файла из временной папки в uploads
-                    if ($newFileName) {
-                        $taskFile = new TaskFiles();
-                        $taskFile->task_id = $task->primaryKey;
-                        $taskFile->name = $file->name;
-                        $taskFile->url = '/uploads/' . $newFileName;
-                        $taskFile->save();
+                    foreach ($uploadFilesModel->files as $file) {
+                        $newFileName = UploadFilesForm::uploadFile($file); //загрузка файла из временной папки в uploads
+                        if ($newFileName) {
+                            $taskFile = new TaskFiles();
+                            $taskFile->task_id = $task->primaryKey;
+                            $taskFile->name = $file->name;
+                            $taskFile->url = '/uploads/' . $newFileName;
+                            $taskFile->save();
+                        }
                     }
+
+                    $transaction->commit();
+
+                    return $this->redirect("/task/view/{$task->primaryKey}");
+                } catch (\Throwable $e) {
+                    $transaction->rollBack();
                 }
-
-                $transaction->commit();
-
-                return $this->redirect("/task/view/{$task->primaryKey}");
-            } catch (\Throwable $e) {
-                $transaction->rollBack();
-                //return ($e->getMessage());
             }
         }
-
-        /*if (!empty($errors)) {
-            throw new \Exception(json_encode(['errors' => $errors, 'labels' => $task->attributeLabels(), 'success' => empty($errors)]), 400);
-        }*/
 
         return $this->render('create', ['task' => $task, 'uploadFiles' => $uploadFilesModel, 'errors' => $errors]);
     }

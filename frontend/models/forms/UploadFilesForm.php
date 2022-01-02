@@ -14,7 +14,7 @@ class UploadFilesForm extends Model
     {
         return [
             [['files'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, jpeg, docx, txt, pdf, doc, xls, csv',
-                'maxSize' => 2048 * 2048, 'maxFiles' => 4],
+                'maxSize' => 2048 * 2048, 'maxFiles' => 4, 'message' => 'Выбран неверный формат файла'],
         ];
     }
 

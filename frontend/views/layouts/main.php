@@ -226,8 +226,6 @@ AppAsset::register($this);
         <script src="/js/main.js"></script>
         <script src="/js/messenger.js"></script>
     <?php endif; ?>
-    <!--<script src="/js/dropzone.js"></script>
-    <script src="/js/myDropzone.js"></script>-->
 
     <?php $this->endBody() ?>
     </body>

@@ -12,14 +12,14 @@ use \yii\helpers\Html;
 
 
 
-//\frontend\assets\DropZoneAsset::register($this);
+\frontend\assets\DropZoneAsset::register($this);
 ?>
 <section class="create__task">
     <h1>Публикация нового задания</h1>
     <div class="create__task-main" id="form-container">
         <?php $form = ActiveForm::begin([
             'id' => 'task-form',
-            'action' => ['create-task'],
+            'action' => ['create'],
             'method' => 'post',
             'options' => [
 
@@ -35,7 +35,7 @@ use \yii\helpers\Html;
                     'class' => 'field-container',
                 ],
             ],
-            'enableAjaxValidation' => true,
+            'enableAjaxValidation' => false,
             'enableClientValidation' => false,
             'validateOnSubmit' => true
 
@@ -54,7 +54,6 @@ use \yii\helpers\Html;
                 'placeholder' => 'Place your text',
                 'rows' => 7,
             ])->hint('Укажите все пожелания и детали, чтобы исполнителям было проще соориентироваться'); ?>
-            <?= \yii\helpers\Html::error($task, 'description', ['class' => 'help-block']); ?>
         </div>
         <div class="field-container">
             <?= $form->field($task, 'category_id')->dropDownList(Category::getCategoryMap(), [
@@ -64,15 +63,13 @@ use \yii\helpers\Html;
             ])->hint('Выберите категорию'); ?>
         </div>
         <div class="field-container">
-            <?= $form->field($uploadFiles, 'files[]', ['options' => ['tag' => false, 'class' => 'dropzone']
+            <?= $form->field($uploadFiles, 'files[]', ['options' => ['tag' => false]
                 , 'template' => "{label}\n<span>{hint}</span>\n<div class='create__file dz-clickable '>{input}\n<span>Добавить новый файл</span>\n{error}\n</div>
 <div id='preview-template'></div>"
-                , 'inputOptions' => ['style' => "display:none"]
             ])->fileInput([
                 'id' => 'files',
                 'multiple' => true,
                 'accept' => 'image/*, .pdf, .docx, .doc, .txt, .xls, .csv',
-                'class' => 'dropzone',
             ])
                 ->hint('Загрузите файлы, которые помогут исполнителю лучше выполнить или оценить работу'); ?>
         </div>
