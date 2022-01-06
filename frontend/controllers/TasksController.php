@@ -3,6 +3,7 @@
 
 namespace frontend\controllers;
 
+use App\Exception\DataException;
 use frontend\models\forms\TaskSearchForm;
 use frontend\models\forms\UploadFilesForm;
 use frontend\models\Respond;
@@ -33,13 +34,16 @@ class TasksController extends SecuredController
         if (!$task) {
             throw new NotFoundHttpException("Задача не найдена!");
         }
-
-        $actions = \App\business\Task::getPossibleActions(
-            Task::BUSINESS_STATUS_MAP[$task->status],
-            $task->client_id,
-            $task->executor_id,
-            \Yii::$app->user->id
-        );
+        try {
+            $actions = \App\business\Task::getPossibleActions(
+                Task::BUSINESS_STATUS_MAP[$task->status],
+                $task->client_id,
+                $task->executor_id,
+                \Yii::$app->user->id
+            );
+        } catch (DataException $e) {
+            $actions = [];
+        }
 
         $searchForm = new TaskSearchForm();
 
@@ -55,19 +59,15 @@ class TasksController extends SecuredController
 
         $task = new Task(['scenario' => Task::SCENARIO_CREATE_TASK]);
         $uploadFilesModel = new UploadFilesForm();
-        $errors = [];
 
         if (\Yii::$app->request->getIsPost()) {
             $task->load(Yii::$app->request->post());
             $task->client_id = Yii::$app->user->getId();
-            $task->status = Task::STATUS_NEW;
             $task->city_id = 2;
 
             $uploadFilesModel->files = UploadedFile::getInstances($uploadFilesModel, 'files');
             $isValid = $task->validate();
             $isValid = $uploadFilesModel->validate() && $isValid;
-
-            $errors = array_merge($task->errors, $uploadFilesModel->errors);
 
             if ($isValid) {
                 $transaction = Yii::$app->db->beginTransaction();
@@ -94,7 +94,7 @@ class TasksController extends SecuredController
             }
         }
 
-        return $this->render('create', ['task' => $task, 'uploadFiles' => $uploadFilesModel, 'errors' => $errors]);
+        return $this->render('create', ['task' => $task, 'uploadFiles' => $uploadFilesModel]);
     }
 
     public function actionConfirm(int $taskId, int $messageId)
@@ -120,7 +120,7 @@ class TasksController extends SecuredController
         return $this->redirect("/task/view/{$taskId}");
     }
 
-    public function actionRefuse(int $taskId, int $messageId)
+    public function actionDeny(int $taskId, int $messageId)
     {
         $task = Task::findOne($taskId);
         $respond = Respond::findOne($messageId);
@@ -130,5 +130,52 @@ class TasksController extends SecuredController
         }
 
         return $this->redirect("/task/view/{$taskId}");
+    }
+
+    public function actionRefuse(int $taskId)
+    {
+        $task = Task::findOne($taskId);
+        if ($task && Yii::$app->user->id == $task->executor_id) {
+            $task->status = Task::STATUS_FAILED;
+            $task->save();
+        }
+        return $this->redirect("/task/view/{$taskId}");
+    }
+
+    public function actionCancel(int $taskId)
+    {
+        $task = Task::findOne($taskId);
+        if ($task && Yii::$app->user->id == $task->client_id && $task->status == Task::STATUS_NEW) {
+            $task->status = Task::STATUS_CANCELED;
+            $task->save();
+        }
+        return $this->redirect("/task/view/{$taskId}");
+    }
+
+    public function actionTaskRespond()
+    {
+
+        $respond = new Respond();
+        if (\Yii::$app->request->isPost) {
+            $respond->load(\Yii::$app->request->post());
+            if ($respond->validate()) {
+                $respond->user_id = Yii::$app->user->id;
+                $respond->save();
+            }
+
+            return $this->redirect("/task/view/{$respond->task_id}");
+
+        }
+
+        if (\Yii::$app->request->isAjax) {
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+            if ($respond->load(\Yii::$app->request->post())) {
+                return \yii\widgets\ActiveForm::validate($respond);
+            }
+        }
+
+        throw new \yii\web\BadRequestHttpException('Неверный запрос!');
+
     }
 }

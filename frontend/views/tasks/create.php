@@ -10,9 +10,6 @@ use \yii\helpers\Html;
  * @var \frontend\models\forms\UploadFilesForm $uploadFiles
  */
 
-
-
-\frontend\assets\DropZoneAsset::register($this);
 ?>
 <section class="create__task">
     <h1>Публикация нового задания</h1>
@@ -22,7 +19,6 @@ use \yii\helpers\Html;
             'action' => ['create'],
             'method' => 'post',
             'options' => [
-
                 'class' => 'create__task-form form-create',
                 'enctype' => 'multipart/form-data',
             ],
@@ -38,34 +34,32 @@ use \yii\helpers\Html;
             'enableAjaxValidation' => false,
             'enableClientValidation' => false,
             'validateOnSubmit' => true
-
         ]); ?>
 
-        <div class="field-container">
+
             <?= $form->field($task, 'title')->textInput([
                 'class' => 'input textarea',
                 'placeholder' => 'Повесить полку',
             ])->hint('Кратко опишите суть работы'); ?>
 
-        </div>
-        <div class="field-container">
+
+
             <?= $form->field($task, 'description')->textarea([
                 'class' => 'input textarea',
                 'placeholder' => 'Place your text',
                 'rows' => 7,
             ])->hint('Укажите все пожелания и детали, чтобы исполнителям было проще соориентироваться'); ?>
-        </div>
-        <div class="field-container">
+
+
             <?= $form->field($task, 'category_id')->dropDownList(Category::getCategoryMap(), [
                 'prompt' => '',
                 'class' => 'multiple-select input multiple-select-big',
                 'size' => 1
             ])->hint('Выберите категорию'); ?>
-        </div>
+
         <div class="field-container">
-            <?= $form->field($uploadFiles, 'files[]', ['options' => ['tag' => false]
-                , 'template' => "{label}\n<span>{hint}</span>\n<div class='create__file dz-clickable '>{input}\n<span>Добавить новый файл</span>\n{error}\n</div>
-<div id='preview-template'></div>"
+            <?= $form->field($uploadFiles, 'files[]', [
+                    'template' => "{label}\n<span>{hint}</span>\n<div class='create__file dz-clickable '>{input}\n<span>Добавить новый файл</span></div>\n{error}\n"
             ])->fileInput([
                 'id' => 'files',
                 'multiple' => true,
@@ -75,7 +69,7 @@ use \yii\helpers\Html;
         </div>
 
 
-        <div class="field-container">
+
             <?= $form->field($task, 'address')
                 ->input('search', [
                     'class' => 'input-navigation input-middle input',
@@ -84,7 +78,7 @@ use \yii\helpers\Html;
 
             <?= $form->field($task, 'latitude')->hiddenInput()->label(false); ?>
             <?= $form->field($task, 'longitude')->hiddenInput()->label(false); ?>
-        </div>
+
         <div class="create__price-time">
             <div class="field-container create__price-time--wrapper">
                 <?= $form->field($task, 'budget')->textInput([
@@ -116,11 +110,19 @@ use \yii\helpers\Html;
                     ракурсов.</p>
             </div>
 
-            <?php if ($task->errors): ?>
+            <?php if ($task->errors || $uploadFiles->errors): ?>
                 <div class="warning-item warning-item--error">
                     <h2>Ошибки заполнения формы</h2>
                     <?php foreach ($task->errors as $label => $errors): ?>
                         <h3> <?= $task->getAttributeLabel($label) ?></h3>
+
+                        <p><?php foreach ($errors as $error): ?>
+                                <?= $error ?><br>
+                            <?php endforeach; ?>
+                        </p>
+                    <?php endforeach; ?>
+                    <?php foreach ($uploadFiles->errors as $label => $errors): ?>
+                        <h3> <?= $uploadFiles->getAttributeLabel($label) ?></h3>
 
                         <p><?php foreach ($errors as $error): ?>
                                 <?= $error ?><br>

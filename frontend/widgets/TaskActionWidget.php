@@ -10,7 +10,7 @@ use yii\base\Widget;
 
 class TaskActionWidget extends Widget
 {
-    public $id;
+    public $taskId;
 
     public function run()
     {
@@ -19,6 +19,7 @@ class TaskActionWidget extends Widget
         return $this->render('task-action-widget', [
             'respond' => $respond,
             'finishForm' => $finishForm,
+            'taskId' => $this->taskId,
         ]);
     }
 }

@@ -8,6 +8,7 @@ use \frontend\models\Respond;
 /**
  * @var \frontend\models\Task $task
  * @var \frontend\models\forms\TaskSearchForm $model
+ * @var \App\business\Task $actions
  */
 
 ?>
@@ -58,9 +59,11 @@ use \frontend\models\Respond;
         </div>
         <div class="content-view__action-buttons">
             <?php foreach ($actions as $action): ?>
+            <?php //if (!$task->isVolunteer(Yii::$app->user->id) && $action->getActionCode() !== 'response'): ?>
                 <button class=" button button__big-color <?= $action->getButtonColorClass(); ?>-button open-modal"
                         type="button" data-for="<?= $action->getActionCode(); ?>-form"><?=$action->getActionTitle(); ?>
                 </button>
+            <?php //endif; ?>
             <?php endforeach; ?>
         </div>
     </div>
@@ -93,7 +96,7 @@ use \frontend\models\Respond;
                 <div class="feedback-card__actions">
                     <a href="<?= Url::to(["/task/confirm/{$task->id}/{$message->id}"]); ?>" class="button__small-color response-button button"
                        type="button">Подтвердить</a>
-                    <a href="<?= Url::to(["/task/refuse/{$task->id}/{$message->id}"]); ?>" class="button__small-color refusal-button button"
+                    <a href="<?= Url::to(["/task/deny/{$task->id}/{$message->id}"]); ?>" class="button__small-color refusal-button button"
                        type="button">Отказать</a>
                 </div>
                 <?php endif; ?>

@@ -11,7 +11,6 @@ use frontend\assets\AppAsset;
 use yii\bootstrap4\Html;
 use yii\helpers\Url;
 use \frontend\widgets\TaskActionWidget;
-\frontend\assets\DropZoneAsset::register($this);
 
 AppAsset::register($this);
 ?>
@@ -217,8 +216,8 @@ AppAsset::register($this);
             </div>
         </footer>
 
-        <?php if (preg_match('~^/task/view/\d+$~', Url::current())): ?>
-            <?= TaskActionWidget::widget(); ?>
+        <?php if (preg_match('~^/task/view/(?<taskId>\d+)$~', Url::current(), $match)): ?>
+            <?= TaskActionWidget::widget(['taskId' => $match['taskId']]); ?>
         <?php endif; ?>
     </div>
     <div class="overlay"></div>

@@ -2,10 +2,12 @@
 
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
+use yii\helpers\Url;
 
 /**
  * @var \frontend\models\Respond $respond
  * @var \frontend\models\forms\TaskFinishForm $finishForm
+ * @var int $taskId
  */
 
 ?>
@@ -17,25 +19,27 @@ use yii\helpers\Html;
         'action' => ['task-respond'],
         'method' => 'post',
         'fieldConfig' => [
-            'template' => "{label}\n{input}",
+            'template' => "{label}\n{input}\n{error}",
             'labelOptions' => [
                 'class' => 'form-modal-description'
             ],
+            'errorOptions' => ['tag' => 'span', 'class' => 'registration__text-error'],
             'options' => [
-                'tag' => false,
+                'tag' => 'p',
             ]],
-        'enableAjaxValidation' => false,
+        'enableAjaxValidation' => true,
+        'enableClientValidation' => false,
     ]); ?>
-    <p>
+
         <?= $form->field($respond, 'rate')->textInput(['class' => 'response-form-payment input input-middle input-money']); ?>
-    </p>
-    <p>
+
         <?= $form->field($respond, 'description')->textarea([
             'class' => 'input textarea',
             'rows' => 4,
             'placeholder' => 'Place your text',
         ]); ?>
-    </p>
+
+    <?= $form->field($respond, 'task_id')->hiddenInput(['value' => $taskId])->label(false); ?>
     <?= Html::submitButton('Отправить', ['class' => "button modal-button"]); ?>
     <?php ActiveForm::end(); ?>
     <button class="form-modal-close" type="button">Закрыть</button>
@@ -115,6 +119,8 @@ use yii\helpers\Html;
     <?php ActiveForm::end(); ?>
     <button class="form-modal-close" type="button">Закрыть</button>
 </section>
+
+
 <section class="modal form-modal refusal-form" id="refuse-form">
     <h2>Отказ от задания</h2>
     <p>
@@ -125,8 +131,24 @@ use yii\helpers\Html;
     <button class="button__form-modal button" id="close-modal"
             type="button">Отмена
     </button>
-    <button class="button__form-modal refusal-button button"
+    <a href="<?=Url::to(["/task/refuse/{$taskId}"]); ?>" class="button__form-modal refusal-button button"
             type="button">Отказаться
+    </a>
+    <button class="form-modal-close" type="button">Закрыть</button>
+</section>
+
+
+<section class="modal form-modal refusal-form" id="cancel-form">
+    <h2>Отмена задания</h2>
+    <p>
+        Вы собираетесь отменить задание.
+        Вы уверены?
+    </p>
+    <button class="button__form-modal button" id="close-modal2"
+            type="button">Нет
     </button>
+    <a href="<?=Url::to(["/task/cancel/{$taskId}"]); ?>" class="button__form-modal refusal-button button"
+       type="button">Да
+    </a>
     <button class="form-modal-close" type="button">Закрыть</button>
 </section>

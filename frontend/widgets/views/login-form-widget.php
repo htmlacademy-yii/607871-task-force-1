@@ -19,7 +19,6 @@ use yii\helpers\Url;
                 'tag' => 'p',
             ]],
         'enableAjaxValidation' => true,
-        'validationUrl' => Url::to(['login']),
         'enableClientValidation' => true,
     ]); ?>
 
