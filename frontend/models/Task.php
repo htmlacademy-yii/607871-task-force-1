@@ -5,6 +5,7 @@ namespace frontend\models;
 
 use yii\db\ActiveRecord;
 use yii\db\Query;
+use yii\web\Response;
 
 /**
  * This is the model class for table "tasks".
@@ -32,8 +33,7 @@ use yii\db\Query;
  * @property Correspondence[] $correspondences
  * @property User $executor
  * @property Recall[] $recalls
- * @property Respond[] $responds
-
+ * @property Respond[] $responses
  */
 class Task extends ActiveRecord
 {
@@ -42,6 +42,16 @@ class Task extends ActiveRecord
     const STATUS_IN_PROGRESS = 2;
     const STATUS_FINISHED = 3;
     const STATUS_FAILED = 4;
+
+    const BUSINESS_STATUS_MAP = [
+        self::STATUS_NEW => \App\business\Task::STATUS_NEW,
+        self::STATUS_CANCELED => \App\business\Task::STATUS_CANCELED,
+        self::STATUS_IN_PROGRESS => \App\business\Task::STATUS_IN_PROGRESS,
+        self::STATUS_FINISHED => \App\business\Task::STATUS_FINISHED,
+        self::STATUS_FAILED => \App\business\Task::STATUS_FAILED
+        ];
+
+    const SCENARIO_CREATE_TASK = 'create_task';
 
     /**
      * {@inheritdoc}
@@ -61,9 +71,10 @@ class Task extends ActiveRecord
             [['title', 'description', 'category_id', 'client_id', 'due_date'], 'required',
                 'message' => 'Поле должно быть заполнено'],
             [['title', 'description', ],'trim'],
-            ['due_date', 'date', 'format' => 'Y-m-d', 'message' => 'Введите дату в формате ГГГГ-ММ-ДД'],
+            [['due_date'], 'datetime', 'format' => 'yyyy-MM-dd', 'strictDateFormat'=> true, 'enableClientValidation' => true,
+                'message' => 'Введите дату в формате ГГГГ-ММ-ДД', 'on' => self::SCENARIO_CREATE_TASK],
             [['description'], 'string', 'min' => 15, 'max' => 1500,
-                'tooShort' => "Не менее {min} символов", 'tooLong' => 'Не более {max} символов' ],
+                'tooShort' => "Не менее {min} символов", 'tooLong' => 'Не более {max} символов'],
             [['category_id', 'client_id', 'executor_id', 'budget', 'status', 'city_id'], 'integer'],
             [['latitude', 'longitude'], 'number'],
             ['title', 'string', 'min' => 5, 'max' => 100, 'tooShort' => "Не менее {min} символов", 'tooLong' => 'Не более {max} символов'],
@@ -126,7 +137,7 @@ class Task extends ActiveRecord
      */
     public function getClient()
     {
-        return $this->hasOne(User::class, ['id' => 'client_id'])->inverseOf('clientTasks');
+        return $this->hasOne(User::class, ['id' => 'client_id']);
     }
 
     /**
@@ -179,5 +190,10 @@ class Task extends ActiveRecord
         $query = new Query();
         $query->from('task_files')->where('task_id =:task_id', [':task_id'=> $this->id]);
         return $query->all();
+    }
+
+    public function isVolunteer($id): bool
+    {
+        return $id ? !!$this->getResponds()->andWhere(['respond.user_id' => $id])->count() : false;
     }
 }

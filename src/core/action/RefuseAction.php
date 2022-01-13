@@ -19,7 +19,12 @@ class RefuseAction extends TaskActionTemplate
         return 'Отказаться';
     }
 
-    public function getUserRightsCheck(int $clientId, $executorId, int $userId): bool
+    public function getButtonColorClass(): string
+    {
+        return 'refusal';
+    }
+
+    public function getUserRightsCheck(int $clientId, $executorId, $userId): bool
     {
         return $userId === $executorId;
     }

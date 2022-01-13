@@ -18,41 +18,35 @@ use yii\web\UploadedFile;
  */
 class TaskFiles extends ActiveRecord
 {
-    /**
-     * @var UploadedFile
-     */
-    public $file;
     public $files = [];
+
+    public static function tableName()
+    {
+        return 'task_files';
+    }
 
     public function rules()
     {
         return [
-            [['files', 'name', 'url'], 'safe'],
+            [['name', 'url', 'task_id'], 'safe'],
             ['name', 'string', 'min' => 1, 'max' => 100,
                'tooShort' => "Имя файла не менее {min} символов", 'tooLong' => 'Имя файла не более {max} символов' ],
             ['url', 'string', 'min' => 1, 'max' => 255,
                 'tooShort' => "Путь к файлу не менее {min} символов", 'tooLong' => 'Путь к файлу не более {max} символов' ],
-
-            [['files'], 'file', 'skipOnEmpty' => true,   'extensions' => 'png, jpg, jpeg, docx, txt, pdf, doc, xls, csv',
-                'maxSize' => 2048 * 2048, 'maxFiles' => 4],
         ];
     }
 
-    public function attributeLabels()
+
+
+    public function upload()
     {
-        return ['files' => 'Файлы'];
+        foreach ($this->files as $file) {
+                $taskFile = new TaskFiles();
+                $newName = uniqid(date('Y-m-d-')) . '.' . $file->getExtension();
+                $file->saveAs('@webroot/uploads/' . $newName);
+                $taskFile->task_id = $this->task_id;
+
+            }
     }
-
-
-        public function uploadFiles()
-    {
-        $taskFiles = new TaskFiles();
-        $taskFiles->files = UploadedFile::getInstancesByName('files');
-
-
-        return $taskFiles->validate();
-
-    }
-
 
 }

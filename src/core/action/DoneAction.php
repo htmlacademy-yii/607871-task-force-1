@@ -11,7 +11,7 @@ class DoneAction extends TaskActionTemplate
 
     public function getActionCode(): string
     {
-        return 'done';
+        return 'complete';
     }
 
     public function getActionTitle(): string
@@ -19,7 +19,12 @@ class DoneAction extends TaskActionTemplate
         return 'Выполнено';
     }
 
-    public function getUserRightsCheck(int $clientId, $executorId, int $userId): bool
+    public function getButtonColorClass(): string
+    {
+        return 'request';
+    }
+
+    public function getUserRightsCheck(int $clientId, $executorId, $userId): bool
     {
         return $userId === $clientId;
     }

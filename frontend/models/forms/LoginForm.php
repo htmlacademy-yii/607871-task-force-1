@@ -5,9 +5,10 @@ namespace frontend\models\forms;
 
 
 use frontend\models\User;
+use yii\base\Model;
 
 
-class LoginForm extends \yii\base\Model
+class LoginForm extends Model
 {
     public $email;
     public $password;

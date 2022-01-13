@@ -54,7 +54,7 @@ use \frontend\models\Category;
             'labelOptions' => ['class' => 'search-task__name']
         ])->textInput(['class' => "input-middle input"]) ?>
         <div class="form-group">
-            <?= Html::submitButton('Искать', ['class' => "button"]) ?>
+            <?= Html::submitButton('Искать', ['class' => "button"]); ?>
         </div>
         <?php ActiveForm::end(); ?>
     </div>

@@ -68,6 +68,8 @@ class TaskSearchForm extends \yii\base\Model
 
         }
 
+        $query->andWhere(['<>', 'status', Task::STATUS_CANCELED]);
+
         return new ActiveDataProvider([
             'query' => $query,
             'pagination' => [
