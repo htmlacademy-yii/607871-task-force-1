@@ -38,7 +38,7 @@ class Respond extends \yii\db\ActiveRecord
     {
         return [
             [['description', 'rate'], 'safe'],
-            [[/*'user_id', 'task_id',*/ 'description', 'rate'], 'required', 'message' => 'Поле должно быть заполнено'],
+            [['user_id', 'task_id', 'description', 'rate'], 'required', 'message' => 'Поле должно быть заполнено'],
             [['user_id', 'task_id', 'rate', 'status'], 'integer', 'message' => 'Значение должно содержать только цифры'],
             ['description', 'trim'],
             ['description', 'string', 'min' => 2, 'tooShort' => "Минимальное количество символов - {min}"],

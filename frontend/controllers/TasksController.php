@@ -6,6 +6,7 @@ namespace frontend\controllers;
 use App\Exception\DataException;
 use frontend\models\forms\TaskSearchForm;
 use frontend\models\forms\UploadFilesForm;
+use frontend\models\Recall;
 use frontend\models\Respond;
 use frontend\models\Task;
 use frontend\models\User;
@@ -35,12 +36,7 @@ class TasksController extends SecuredController
             throw new NotFoundHttpException("Задача не найдена!");
         }
         try {
-            $actions = \App\business\Task::getPossibleActions(
-                Task::BUSINESS_STATUS_MAP[$task->status],
-                $task->client_id,
-                $task->executor_id,
-                \Yii::$app->user->id
-            );
+            $actions = \App\business\Task::getPossibleActions($task);
         } catch (DataException $e) {
             $actions = [];
         }
@@ -132,39 +128,40 @@ class TasksController extends SecuredController
         return $this->redirect("/task/view/{$taskId}");
     }
 
-    public function actionRefuse(int $taskId)
+    public function actionRefuse()
     {
-        $task = Task::findOne($taskId);
-        if ($task && Yii::$app->user->id == $task->executor_id) {
-            $task->status = Task::STATUS_FAILED;
-            $task->save();
+        if (Yii::$app->request->getIsPost()) {
+            $task = Task::findOne(Yii::$app->request->post('Task')['id']);
+            if ($task && Yii::$app->user->id == $task->executor_id && $task->status == Task::STATUS_IN_PROGRESS) {
+                $task->status = Task::STATUS_FAILED;
+                $task->save();
+                return $this->redirect("/task/view/{$task->id}");
+            }
         }
-        return $this->redirect("/task/view/{$taskId}");
+        return $this->redirect("/tasks");
     }
 
-    public function actionCancel(int $taskId)
+    public function actionCancel()
     {
-        $task = Task::findOne($taskId);
-        if ($task && Yii::$app->user->id == $task->client_id && $task->status == Task::STATUS_NEW) {
-            $task->status = Task::STATUS_CANCELED;
-            $task->save();
+        if (Yii::$app->request->getIsPost()) {
+            $task = Task::findOne(Yii::$app->request->post('Task')['id']);
+            if ($task && Yii::$app->user->id == $task->client_id && $task->status == Task::STATUS_NEW) {
+                $task->status = Task::STATUS_CANCELED;
+                $task->save();
+                return $this->redirect("/task/view/{$task->id}");
+            }
         }
-        return $this->redirect("/task/view/{$taskId}");
+        return $this->redirect("/tasks");
     }
 
     public function actionTaskRespond()
     {
-
         $respond = new Respond();
         if (\Yii::$app->request->isPost) {
             $respond->load(\Yii::$app->request->post());
-            if ($respond->validate()) {
-                $respond->user_id = Yii::$app->user->id;
-                $respond->save();
-            }
-
+            $respond->user_id = Yii::$app->user->id;
+            $respond->save();
             return $this->redirect("/task/view/{$respond->task_id}");
-
         }
 
         if (\Yii::$app->request->isAjax) {
@@ -174,8 +171,29 @@ class TasksController extends SecuredController
                 return \yii\widgets\ActiveForm::validate($respond);
             }
         }
-
         throw new \yii\web\BadRequestHttpException('Неверный запрос!');
+    }
 
+    public function actionTaskFinish()
+    {
+        if (Yii::$app->request->getIsPost()) {
+            $recall = new Recall();
+            if ($recall->load(Yii::$app->request->post()) && $recall->validate()) {
+                $task = Task::findOne($recall->task_id);
+                if (Yii::$app->user->id == $task->client_id) {
+                    $transaction = Yii::$app->db->beginTransaction();
+                    try {
+                        $task->status = $recall->taskStatus;
+                        $task->save();
+                        $recall->save();
+                        $transaction->commit();
+                        return $this->redirect("/task/view/{$recall->task_id}");
+                    } catch (\Throwable $e) {
+                        $transaction->rollBack();
+                    }
+                }
+            }
+        }
+        return $this->redirect("/tasks");
     }
 }

@@ -1,6 +1,13 @@
 <?php
 use App\Service\DataFormatter;
 use yii\helpers\Url;
+use \frontend\widgets\UserRatingWidget;
+
+/**
+ * @var \frontend\models\User $user
+ * @var \frontend\models\forms\TaskSearchForm $model
+ */
+
 ?>
 <section class="content-view">
     <div class="user__card-wrapper">
@@ -10,7 +17,7 @@ use yii\helpers\Url;
                 <h1><?= $user->name; ?></h1>
                 <p>Россия, Санкт-Петербург, 30 лет</p>
                 <div class="profile-mini__name five-stars__rate">
-                    <span></span><span></span><span></span><span></span><span class="star-disabled"></span>
+                    <?= UserRatingWidget::widget(['userRating' => $user->rating]); ?>
                     <b><?= $user->rating; ?></b>
                 </div>
                 <b class="done-task">Выполнил

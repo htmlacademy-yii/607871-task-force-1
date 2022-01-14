@@ -3,6 +3,7 @@
 namespace frontend\models;
 
 use Yii;
+use yii\db\Expression;
 use yii\db\Query;
 use yii\helpers\ArrayHelper;
 use yii\web\IdentityInterface;
@@ -130,7 +131,8 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
 
     public static function getOnlineExecutorsId()
     {
-        return [2, 13];
+        return self::find()->select('id')
+            ->where(['>=', 'last_visit_date', (new Expression("NOW() - INTERVAL 30 MINUTE"))])->column();
     }
 
     /**

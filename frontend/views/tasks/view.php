@@ -59,11 +59,9 @@ use \frontend\models\Respond;
         </div>
         <div class="content-view__action-buttons">
             <?php foreach ($actions as $action): ?>
-            <?php //if (!$task->isVolunteer(Yii::$app->user->id) && $action->getActionCode() !== 'response'): ?>
-                <button class=" button button__big-color <?= $action->getButtonColorClass(); ?>-button open-modal"
+                <button class="button button__big-color <?= $action->getButtonColorClass(); ?>-button open-modal"
                         type="button" data-for="<?= $action->getActionCode(); ?>-form"><?=$action->getActionTitle(); ?>
                 </button>
-            <?php //endif; ?>
             <?php endforeach; ?>
         </div>
     </div>
@@ -92,7 +90,7 @@ use \frontend\models\Respond;
                     </p>
                     <span><?= $message->rate; ?>&nbsp;₽</span>
                 </div>
-                <?php if (Yii::$app->user->id === $task->client->id && $task->status == Task::STATUS_NEW && $message->status !== Respond::STATUS_REFUSED): ?>
+                <?php if (Yii::$app->user->id === $task->client->id && $task->status == Task::STATUS_NEW && $message->status == Respond::STATUS_NEW): ?>
                 <div class="feedback-card__actions">
                     <a href="<?= Url::to(["/task/confirm/{$task->id}/{$message->id}"]); ?>" class="button__small-color response-button button"
                        type="button">Подтвердить</a>

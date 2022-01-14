@@ -1,6 +1,12 @@
 <?php
 use yii\helpers\Url;
 use App\Service\DataFormatter;
+use \frontend\widgets\UserRatingWidget;
+
+/**
+ * @var \yii\data\ActiveDataProvider $dataProvider
+ * @var \frontend\models\forms\UserSearchForm $model
+ */
 ?>
 <section class="user__search">
     <?php foreach ($dataProvider->getModels() as $user): ?>
@@ -15,7 +21,7 @@ use App\Service\DataFormatter;
                 <div class="feedback-card__top--name user__search-card">
                     <p class="link-name"><a href="<?= Url::to(
                             "/user/view/{$user->id}"); ?>" class="link-regular"><?= $user->name; ?></a></p>
-                    <span></span><span></span><span></span><span></span><span class="star-disabled"></span>
+                    <?= UserRatingWidget::widget(['userRating' => $user->rating]); ?>
                     <b><?= $user->rating; ?></b>
                     <p class="user__search-content">
                         <?= $user->profile->description; ?>

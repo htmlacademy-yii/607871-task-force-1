@@ -58,19 +58,21 @@ class Task
         return $actionStatusMap[$action];
     }
 
-    public static function getPossibleActions(string $status, int $clientId, $executorId, $userId): array
+    public static function getPossibleActions(\frontend\models\Task $task): array
     {
         $actionStatusMap = [
             self::STATUS_NEW => [new CancelAction(), new VolunteerAction()],
             self::STATUS_IN_PROGRESS => [new DoneAction(), new RefuseAction()],
         ];
 
+        $status = \frontend\models\Task::BUSINESS_STATUS_MAP[$task->status];
+
         if (!isset($actionStatusMap[$status])) {
             throw new DataException("Для статуса задания $status нет подходящих действий");
         }
 
-        return array_values(array_filter($actionStatusMap[$status], function(TaskActionTemplate $action) use ($clientId, $executorId, $userId) {
-           return $action->getUserRightsCheck($clientId, $executorId, $userId);
+        return array_values(array_filter($actionStatusMap[$status], function(TaskActionTemplate $action) use ($task) {
+           return $action->getUserRightsCheck($task);
         }));
     }
 

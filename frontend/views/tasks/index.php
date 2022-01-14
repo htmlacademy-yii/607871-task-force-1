@@ -1,6 +1,11 @@
 <?php
 use yii\helpers\Url;
 use App\Service\DataFormatter;
+
+/**
+ * @var \yii\data\ActiveDataProvider $dataProvider
+ * @var \frontend\models\forms\TaskSearchForm $model
+ */
 ?>
 <section class="new-task">
     <div class="new-task__wrapper">

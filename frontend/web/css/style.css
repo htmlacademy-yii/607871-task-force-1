@@ -2648,3 +2648,8 @@ label {
   width: 20px;
   display: block;
 }
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
+}

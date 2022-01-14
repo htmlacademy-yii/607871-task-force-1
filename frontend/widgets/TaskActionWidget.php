@@ -4,8 +4,9 @@
 namespace frontend\widgets;
 
 
-use frontend\models\forms\TaskFinishForm;
+use frontend\models\Recall;
 use frontend\models\Respond;
+use frontend\models\Task;
 use yii\base\Widget;
 
 class TaskActionWidget extends Widget
@@ -15,11 +16,13 @@ class TaskActionWidget extends Widget
     public function run()
     {
         $respond = new Respond();
-        $finishForm = new TaskFinishForm();
+        $recall = new Recall();
+        $taskModel = new Task();
         return $this->render('task-action-widget', [
             'respond' => $respond,
-            'finishForm' => $finishForm,
+            'recall' => $recall,
             'taskId' => $this->taskId,
+            'taskModel'=> $taskModel,
         ]);
     }
 }

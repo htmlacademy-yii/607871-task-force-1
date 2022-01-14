@@ -6,6 +6,7 @@ class DataFormatter
 {
     public static function getRelativeTime($value)
     {
+        \Yii::$app->formatter->defaultTimeZone = \Yii::$app->timeZone;
         return $value ? \Yii::$app->formatter->asRelativeTime($value) : null;
     }
 

@@ -26,6 +26,7 @@ use yii\web\Response;
  * @property float|null $latitude
  * @property float|null $longitude
  * @property array $taskFiles
+ * @property string $businessStatus
  *
  * @property Category $category
  * @property City $city
@@ -195,5 +196,10 @@ class Task extends ActiveRecord
     public function isVolunteer($id): bool
     {
         return $id ? !!$this->getResponds()->andWhere(['respond.user_id' => $id])->count() : false;
+    }
+
+    public function getBusinessStatus()
+    {
+        return self::BUSINESS_STATUS_MAP[$this->status];
     }
 }
