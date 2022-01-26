@@ -17,10 +17,6 @@ class Task
     const STATUS_FINISHED = 'finished';
     const STATUS_FAILED = 'failed';
 
-    protected $clientId;
-    protected $executorId;
-
-
     public function __construct(array $data)
     {
         foreach ($data as $key => $value) {

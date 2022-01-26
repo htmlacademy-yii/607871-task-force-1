@@ -23,6 +23,9 @@ return [
     },
     'components' => [
         'request' => [
+            'parsers' => [
+                'application/json' =>'yii\web\JsonParser',
+            ],
             'csrfParam' => '_csrf-frontend',
         ],
         'user' => [
@@ -59,8 +62,15 @@ return [
                 'task/confirm/<taskId:\d+>/<messageId:\d+>' => 'tasks/confirm',
                 'task/deny/<taskId:\d+>/<messageId:\d+>' => 'tasks/deny',
                 'user/view/<id:\d+>' => 'users/view',
+                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/messages'],
+
             ],
         ],
     ],
     'params' => $params,
+    'modules' => [
+        'api' => [
+            'class' => 'frontend\modules\api\Module'
+        ]
+    ],
 ];

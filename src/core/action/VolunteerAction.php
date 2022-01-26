@@ -25,7 +25,7 @@ class VolunteerAction extends TaskActionTemplate
         return 'response';
     }
 
-    public function getUserRightsCheck(Task $task): bool
+    public static function getUserRightsCheck(Task $task): bool
     {
         return (\Yii::$app->user->id !== $task->client_id && $task->executor_id === null && !$task->isVolunteer(\Yii::$app->user->id));
 

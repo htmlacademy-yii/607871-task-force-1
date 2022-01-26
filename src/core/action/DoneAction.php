@@ -25,8 +25,8 @@ class DoneAction extends TaskActionTemplate
         return 'request';
     }
 
-    public function getUserRightsCheck(Task $task): bool
+    public static function getUserRightsCheck(Task $task): bool
     {
-        return \Yii::$app->user->id === $task->client_id;
+        return \Yii::$app->user->id === $task->client_id && $task->status == Task::STATUS_IN_PROGRESS;
     }
 }

@@ -10,8 +10,8 @@ use Yii;
  * @property int $id
  * @property int $task_id
  * @property int $user_id
- * @property string $content
- * @property string $creation_date
+ * @property string $message
+ * @property string $published_at
  *
  * @property Task $tasks
  * @property User $user
@@ -32,10 +32,10 @@ class Correspondence extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['task_id', 'user_id', 'content'], 'required'],
+            [['task_id', 'user_id', 'message'], 'required'],
             [['task_id', 'user_id'], 'integer'],
-            [['content'], 'string'],
-            [['creation_date'], 'safe'],
+            [['message'], 'string'],
+            [['published_at', 'message', 'task_id', 'user_id'], 'safe'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::className(), 'targetAttribute' => ['user_id' => 'id']],
             [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Task::className(), 'targetAttribute' => ['task_id' => 'id']],
         ];
@@ -50,8 +50,8 @@ class Correspondence extends \yii\db\ActiveRecord
             'id' => 'ID',
             'task_id' => 'Task ID',
             'user_id' => 'User ID',
-            'content' => 'Content',
-            'creation_date' => 'Creation Date',
+            'message' => 'Message',
+            'published_at' => 'PUBLISHED AT',
         ];
     }
 

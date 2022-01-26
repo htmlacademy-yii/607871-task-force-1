@@ -3,12 +3,16 @@
 use \yii\widgets\ActiveForm;
 use \frontend\models\Category;
 use \yii\helpers\Html;
+use frontend\assets\AutoCompleteAsset;
 
 /**
  * @var \yii\web\View $this
  * @var \frontend\models\Task $task
  * @var \frontend\models\forms\UploadFilesForm $uploadFiles
+ * @var \frontend\models\City $city
  */
+
+AutoCompleteAsset::register($this);
 
 ?>
 <section class="create__task">
@@ -37,29 +41,29 @@ use \yii\helpers\Html;
         ]); ?>
 
 
-            <?= $form->field($task, 'title')->textInput([
-                'class' => 'input textarea',
-                'placeholder' => 'Повесить полку',
-            ])->hint('Кратко опишите суть работы'); ?>
+        <?= $form->field($task, 'title')->textInput([
+            'class' => 'input textarea',
+            'placeholder' => 'Повесить полку',
+        ])->hint('Кратко опишите суть работы'); ?>
 
 
 
-            <?= $form->field($task, 'description')->textarea([
-                'class' => 'input textarea',
-                'placeholder' => 'Place your text',
-                'rows' => 7,
-            ])->hint('Укажите все пожелания и детали, чтобы исполнителям было проще соориентироваться'); ?>
+        <?= $form->field($task, 'description')->textarea([
+            'class' => 'input textarea',
+            'placeholder' => 'Place your text',
+            'rows' => 7,
+        ])->hint('Укажите все пожелания и детали, чтобы исполнителям было проще соориентироваться'); ?>
 
 
-            <?= $form->field($task, 'category_id')->dropDownList(Category::getCategoryMap(), [
-                'prompt' => '',
-                'class' => 'multiple-select input multiple-select-big',
-                'size' => 1
-            ])->hint('Выберите категорию'); ?>
+        <?= $form->field($task, 'category_id')->dropDownList(Category::getCategoryMap(), [
+            'prompt' => '',
+            'class' => 'multiple-select input multiple-select-big',
+            'size' => 1
+        ])->hint('Выберите категорию'); ?>
 
         <div class="field-container">
             <?= $form->field($uploadFiles, 'files[]', [
-                    'template' => "{label}\n<span>{hint}</span>\n<div class='create__file dz-clickable '>{input}\n<span>Добавить новый файл</span></div>\n{error}\n"
+                'template' => "{label}\n<span>{hint}</span>\n<div class='create__file dz-clickable '>{input}\n<span>Добавить новый файл</span></div>\n{error}\n"
             ])->fileInput([
                 'id' => 'files',
                 'multiple' => true,
@@ -67,17 +71,17 @@ use \yii\helpers\Html;
             ])
                 ->hint('Загрузите файлы, которые помогут исполнителю лучше выполнить или оценить работу'); ?>
         </div>
+        <?= $form->field($task, 'full_address')
+            ->input('search', [
+                'class' => 'input-navigation input-middle input',
+                'placeholder' => 'Санкт-Петербург, Калининский район',
+                'id' => 'autoComplete'
+            ])->hint('Укажите адрес исполнения, если задание требует присутствия'); ?>
 
-
-
-            <?= $form->field($task, 'address')
-                ->input('search', [
-                    'class' => 'input-navigation input-middle input',
-                    'placeholder' => 'Санкт-Петербург, Калининский район',
-                ])->hint('Укажите адрес исполнения, если задание требует присутствия'); ?>
-
-            <?= $form->field($task, 'latitude')->hiddenInput()->label(false); ?>
-            <?= $form->field($task, 'longitude')->hiddenInput()->label(false); ?>
+        <?= $form->field($task, 'latitude')->hiddenInput()->label(false); ?>
+        <?= $form->field($task, 'longitude')->hiddenInput()->label(false); ?>
+        <?= $form->field($city, 'name')->hiddenInput()->label(false); ?>
+        <?= $form->field($task, 'address')->hiddenInput()->label(false); ?>
 
         <div class="create__price-time">
             <div class="field-container create__price-time--wrapper">

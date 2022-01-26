@@ -25,8 +25,8 @@ class RefuseAction extends TaskActionTemplate
         return 'refusal';
     }
 
-    public function getUserRightsCheck(Task $task): bool
+    public static function getUserRightsCheck(Task $task): bool
     {
-        return \Yii::$app->user->id === $task->executor_id;
+        return \Yii::$app->user->id === $task->executor_id && $task->status == Task::STATUS_IN_PROGRESS;
     }
 }
