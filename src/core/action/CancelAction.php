@@ -5,6 +5,7 @@ namespace App\core\action;
 
 
 use App\core\TaskActionTemplate;
+use frontend\models\Task;
 
 class CancelAction extends TaskActionTemplate
 {
@@ -24,8 +25,8 @@ class CancelAction extends TaskActionTemplate
         return 'cancel';
     }
 
-    public function getUserRightsCheck(int $clientId, $executorId, $userId): bool
+    public static function getUserRightsCheck(Task $task): bool
     {
-        return $userId === $clientId;
+        return \Yii::$app->user->id === $task->client_id && $task->status == Task::STATUS_NEW;
     }
 }

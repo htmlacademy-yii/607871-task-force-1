@@ -1,15 +1,21 @@
 <?php
 
 use App\Service\DataFormatter;
+use frontend\assets\YandexMapAsset;
 use \yii\helpers\Url;
 use \frontend\models\Task;
 use \frontend\models\Respond;
+use frontend\assets\TaskViewAsset;
 
 /**
+ * @var \yii\web\View $this
  * @var \frontend\models\Task $task
  * @var \frontend\models\forms\TaskSearchForm $model
  * @var \App\business\Task $actions
  */
+
+TaskViewAsset::register($this);
+YandexMapAsset::register($this);
 
 ?>
 <section class="content-view">
@@ -46,8 +52,10 @@ use \frontend\models\Respond;
                 <h3 class="content-view__h3">Расположение</h3>
                 <div class="content-view__location-wrapper">
                     <div class="content-view__map">
-                        <a href="#"><img src="/img/map.jpg" width="361" height="292"
-                                         alt="Москва, Новый арбат, 23 к. 1"></a>
+                        <a href="#">
+                            <div id="map" style="width: 361px; height: 292px" data-lat="<?= $task->latitude; ?>" data-lon="<?= $task->longitude; ?>">
+                            </div>
+                        </a>
                     </div>
                     <div class="content-view__address">
                         <span class="address__town"><?=$task->city->name ?? 'Город не определен'; ?></span><br>
@@ -59,11 +67,9 @@ use \frontend\models\Respond;
         </div>
         <div class="content-view__action-buttons">
             <?php foreach ($actions as $action): ?>
-            <?php //if (!$task->isVolunteer(Yii::$app->user->id) && $action->getActionCode() !== 'response'): ?>
-                <button class=" button button__big-color <?= $action->getButtonColorClass(); ?>-button open-modal"
+                <button class="button button__big-color <?= $action->getButtonColorClass(); ?>-button open-modal"
                         type="button" data-for="<?= $action->getActionCode(); ?>-form"><?=$action->getActionTitle(); ?>
                 </button>
-            <?php //endif; ?>
             <?php endforeach; ?>
         </div>
     </div>
@@ -92,7 +98,7 @@ use \frontend\models\Respond;
                     </p>
                     <span><?= $message->rate; ?>&nbsp;₽</span>
                 </div>
-                <?php if (Yii::$app->user->id === $task->client->id && $task->status == Task::STATUS_NEW && $message->status !== Respond::STATUS_REFUSED): ?>
+                <?php if (Yii::$app->user->id === $task->client->id && $task->status == Task::STATUS_NEW && $message->status == Respond::STATUS_NEW): ?>
                 <div class="feedback-card__actions">
                     <a href="<?= Url::to(["/task/confirm/{$task->id}/{$message->id}"]); ?>" class="button__small-color response-button button"
                        type="button">Подтвердить</a>
@@ -123,7 +129,9 @@ use \frontend\models\Respond;
         </div>
     </div>
     <div id="chat-container">
-        <!--                    добавьте сюда атрибут task с указанием в нем id текущего задания-->
-        <chat class="connect-desk__chat" task="<?= $task->id; ?>"></chat>
+        <chat class="connect-desk__chat"
+              task="<?= $task->id; ?>"
+              sender_id="<?= Yii::$app->user->id; ?>">
+        </chat>
     </div>
 </section>

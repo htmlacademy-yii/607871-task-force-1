@@ -5,8 +5,6 @@
  * @var string $content
  */
 
-
-
 use frontend\assets\AppAsset;
 use yii\bootstrap4\Html;
 use yii\helpers\Url;
@@ -22,6 +20,8 @@ AppAsset::register($this);
         <?php $this->registerCsrfMetaTags() ?>
         <title><?= Html::encode($this->title) ?></title>
         <link rel="stylesheet" href="/css/normalize.css">
+        <link rel="stylesheet"
+              href="https://cdn.jsdelivr.net/npm/@tarekraafat/autocomplete.js@10.2.6/dist/css/autoComplete.min.css">
         <?php $this->head() ?>
     </head>
     <body>
@@ -218,13 +218,9 @@ AppAsset::register($this);
 
         <?php if (preg_match('~^/task/view/(?<taskId>\d+)$~', Url::current(), $match)): ?>
             <?= TaskActionWidget::widget(['taskId' => $match['taskId']]); ?>
-        <?php endif; ?>
+            <?php endif; ?>
     </div>
     <div class="overlay"></div>
-    <?php if (preg_match('~/task/view/\d+~', Url::current())): ?>
-        <script src="/js/main.js"></script>
-        <script src="/js/messenger.js"></script>
-    <?php endif; ?>
 
     <?php $this->endBody() ?>
     </body>

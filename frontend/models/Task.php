@@ -26,6 +26,7 @@ use yii\web\Response;
  * @property float|null $latitude
  * @property float|null $longitude
  * @property array $taskFiles
+ * @property string $businessStatus
  *
  * @property Category $category
  * @property City $city
@@ -37,6 +38,8 @@ use yii\web\Response;
  */
 class Task extends ActiveRecord
 {
+    public $full_address;
+
     const STATUS_NEW = 0;
     const STATUS_CANCELED = 1;
     const STATUS_IN_PROGRESS = 2;
@@ -67,10 +70,10 @@ class Task extends ActiveRecord
     public function rules()
     {
         return [
-            [['title', 'description', 'category_id', 'budget', 'due_date', 'creation_date', 'latitude', 'longitude'], 'safe'],
+            [['title', 'description', 'category_id', 'budget', 'due_date', 'creation_date', 'latitude', 'longitude', 'address'], 'safe'],
             [['title', 'description', 'category_id', 'client_id', 'due_date'], 'required',
                 'message' => 'Поле должно быть заполнено'],
-            [['title', 'description', ],'trim'],
+            [['title', 'description', 'address'],'trim'],
             [['due_date'], 'datetime', 'format' => 'yyyy-MM-dd', 'strictDateFormat'=> true, 'enableClientValidation' => true,
                 'message' => 'Введите дату в формате ГГГГ-ММ-ДД', 'on' => self::SCENARIO_CREATE_TASK],
             [['description'], 'string', 'min' => 15, 'max' => 1500,
@@ -103,7 +106,8 @@ class Task extends ActiveRecord
             'due_date' => 'Сроки исполнения',
             'creation_date' => 'Creation Date',
             'city_id' => 'City ID',
-            'address' => 'Локация',
+            'full_address' => 'Локация',
+            'address' => 'Адрес',
             'comments' => 'Comments',
             'latitude' => 'Latitude',
             'longitude' => 'Longitude',
@@ -195,5 +199,10 @@ class Task extends ActiveRecord
     public function isVolunteer($id): bool
     {
         return $id ? !!$this->getResponds()->andWhere(['respond.user_id' => $id])->count() : false;
+    }
+
+    public function getBusinessStatus()
+    {
+        return self::BUSINESS_STATUS_MAP[$this->status];
     }
 }

@@ -5,6 +5,7 @@ namespace App\core\action;
 
 
 use App\core\TaskActionTemplate;
+use frontend\models\Task;
 
 class VolunteerAction extends TaskActionTemplate
 {
@@ -24,9 +25,9 @@ class VolunteerAction extends TaskActionTemplate
         return 'response';
     }
 
-    public function getUserRightsCheck(int $clientId, $executorId, $userId): bool
+    public static function getUserRightsCheck(Task $task): bool
     {
-        return ($userId !== $clientId && $executorId === null);
+        return (\Yii::$app->user->id !== $task->client_id && $task->executor_id === null && !$task->isVolunteer(\Yii::$app->user->id));
 
     }
 }

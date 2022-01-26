@@ -14,8 +14,18 @@ return [
     'bootstrap' => ['log'],
     'controllerNamespace' => 'frontend\controllers',
     'defaultRoute' => 'main/index',
+    'on beforeAction' => function ($event) {
+        if (!Yii::$app->user->isGuest) {
+            $user = \frontend\models\User::findOne(Yii::$app->user->id);
+            $user->last_visit_date = null;
+            $user->save();
+        }
+    },
     'components' => [
         'request' => [
+            'parsers' => [
+                'application/json' =>'yii\web\JsonParser',
+            ],
             'csrfParam' => '_csrf-frontend',
         ],
         'user' => [
@@ -51,11 +61,16 @@ return [
                 'task/create' => 'tasks/create',
                 'task/confirm/<taskId:\d+>/<messageId:\d+>' => 'tasks/confirm',
                 'task/deny/<taskId:\d+>/<messageId:\d+>' => 'tasks/deny',
-                'task/refuse/<taskId:\d+>' => 'tasks/refuse',
-                'task/cancel/<taskId:\d+>' => 'tasks/cancel',
                 'user/view/<id:\d+>' => 'users/view',
+                ['class' => 'yii\rest\UrlRule', 'controller' => 'api/messages'],
+
             ],
         ],
     ],
     'params' => $params,
+    'modules' => [
+        'api' => [
+            'class' => 'frontend\modules\api\Module'
+        ]
+    ],
 ];

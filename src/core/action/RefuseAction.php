@@ -5,6 +5,7 @@ namespace App\core\action;
 
 
 use App\core\TaskActionTemplate;
+use frontend\models\Task;
 
 class RefuseAction extends TaskActionTemplate
 {
@@ -24,8 +25,8 @@ class RefuseAction extends TaskActionTemplate
         return 'refusal';
     }
 
-    public function getUserRightsCheck(int $clientId, $executorId, $userId): bool
+    public static function getUserRightsCheck(Task $task): bool
     {
-        return $userId === $executorId;
+        return \Yii::$app->user->id === $task->executor_id && $task->status == Task::STATUS_IN_PROGRESS;
     }
 }

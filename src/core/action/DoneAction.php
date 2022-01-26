@@ -5,6 +5,7 @@ namespace App\core\action;
 
 
 use App\core\TaskActionTemplate;
+use frontend\models\Task;
 
 class DoneAction extends TaskActionTemplate
 {
@@ -16,7 +17,7 @@ class DoneAction extends TaskActionTemplate
 
     public function getActionTitle(): string
     {
-        return 'Выполнено';
+        return 'Завершить';
     }
 
     public function getButtonColorClass(): string
@@ -24,8 +25,8 @@ class DoneAction extends TaskActionTemplate
         return 'request';
     }
 
-    public function getUserRightsCheck(int $clientId, $executorId, $userId): bool
+    public static function getUserRightsCheck(Task $task): bool
     {
-        return $userId === $clientId;
+        return \Yii::$app->user->id === $task->client_id && $task->status == Task::STATUS_IN_PROGRESS;
     }
 }

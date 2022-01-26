@@ -3,9 +3,14 @@
 
 namespace frontend\controllers;
 
+use App\core\action\CancelAction;
+use App\core\action\DoneAction;
+use App\core\action\RefuseAction;
 use App\Exception\DataException;
+use frontend\models\City;
 use frontend\models\forms\TaskSearchForm;
 use frontend\models\forms\UploadFilesForm;
+use frontend\models\Recall;
 use frontend\models\Respond;
 use frontend\models\Task;
 use frontend\models\User;
@@ -26,6 +31,7 @@ class TasksController extends SecuredController
 
     public function actionView($id)
     {
+        /** @var Task $task */
         $task = Task::find()
             ->with('client')
             ->where('task.id =:id', ['id' => $id])
@@ -35,12 +41,7 @@ class TasksController extends SecuredController
             throw new NotFoundHttpException("Задача не найдена!");
         }
         try {
-            $actions = \App\business\Task::getPossibleActions(
-                Task::BUSINESS_STATUS_MAP[$task->status],
-                $task->client_id,
-                $task->executor_id,
-                \Yii::$app->user->id
-            );
+            $actions = \App\business\Task::getPossibleActions($task);
         } catch (DataException $e) {
             $actions = [];
         }
@@ -56,14 +57,28 @@ class TasksController extends SecuredController
 
     public function actionCreate()
     {
-
         $task = new Task(['scenario' => Task::SCENARIO_CREATE_TASK]);
+        $city = new City(['scenario' => City::SCENARIO_CREATE_CITY]);
         $uploadFilesModel = new UploadFilesForm();
 
         if (\Yii::$app->request->getIsPost()) {
             $task->load(Yii::$app->request->post());
-            $task->client_id = Yii::$app->user->getId();
-            $task->city_id = 2;
+            $task->client_id = Yii::$app->user->id;
+
+            if (!$city->load(Yii::$app->request->post()) || !$city->validate()) {
+              throw new DataException('Данный город не может быть указан в задании');
+            }
+
+            $taskCity = City::find()->where(['name' => $city->name])->one();
+            //Если выбранный город не найден в справочнике, создаем его в БД.
+            if ($taskCity) {
+                $task->city_id = $taskCity->id;
+            } else {
+                $city->longitude = $task->longitude;
+                $city->latitude = $task->latitude;
+                $city->save();
+                $task->city_id = $city->primaryKey;
+            }
 
             $uploadFilesModel->files = UploadedFile::getInstances($uploadFilesModel, 'files');
             $isValid = $task->validate();
@@ -94,7 +109,7 @@ class TasksController extends SecuredController
             }
         }
 
-        return $this->render('create', ['task' => $task, 'uploadFiles' => $uploadFilesModel]);
+        return $this->render('create', ['task' => $task, 'uploadFiles' => $uploadFilesModel, 'city' => $city]);
     }
 
     public function actionConfirm(int $taskId, int $messageId)
@@ -103,20 +118,22 @@ class TasksController extends SecuredController
         $respond = Respond::findOne($messageId);
         $executor = User::findOne($respond->volunteer->id);
 
-        if ($task && $executor && $respond && Yii::$app->user->id == $task->client_id && $task->status == Task::STATUS_NEW) {
-            $transaction = Yii::$app->db->beginTransaction();
-            try {
-                $task->status = Task::STATUS_IN_PROGRESS;
-                $task->executor_id = $executor->id;
-                $respond->status = Respond::STATUS_CONFIRMED;
-                $task->save();
-                $respond->save();
-                $transaction->commit();
-            } catch (\Throwable $e) {
-                $transaction->rollBack();
-            }
-
+        if (!$task || !$executor || !$respond || !CancelAction::getUserRightsCheck($task)) {
+            throw new DataException('Данное действие не может быть выполнено!');
         }
+
+        $transaction = Yii::$app->db->beginTransaction();
+        try {
+            $task->status = Task::STATUS_IN_PROGRESS;
+            $task->executor_id = $executor->id;
+            $respond->status = Respond::STATUS_CONFIRMED;
+            $task->save();
+            $respond->save();
+            $transaction->commit();
+        } catch (\Throwable $e) {
+            $transaction->rollBack();
+        }
+
         return $this->redirect("/task/view/{$taskId}");
     }
 
@@ -124,7 +141,7 @@ class TasksController extends SecuredController
     {
         $task = Task::findOne($taskId);
         $respond = Respond::findOne($messageId);
-        if ($task && $respond && Yii::$app->user->id == $task->client_id) {
+        if ($task && $respond && CancelAction::getUserRightsCheck($task)) {
             $respond->status = Respond::STATUS_REFUSED;
             $respond->save();
         }
@@ -132,39 +149,40 @@ class TasksController extends SecuredController
         return $this->redirect("/task/view/{$taskId}");
     }
 
-    public function actionRefuse(int $taskId)
+    public function actionRefuse()
     {
-        $task = Task::findOne($taskId);
-        if ($task && Yii::$app->user->id == $task->executor_id) {
-            $task->status = Task::STATUS_FAILED;
-            $task->save();
+        if (Yii::$app->request->getIsPost()) {
+            $task = Task::findOne(Yii::$app->request->post('Task')['id']);
+            if ($task && RefuseAction::getUserRightsCheck($task)) {
+                $task->status = Task::STATUS_FAILED;
+                $task->save();
+                return $this->redirect("/task/view/{$task->id}");
+            }
         }
-        return $this->redirect("/task/view/{$taskId}");
+        return $this->redirect("/tasks");
     }
 
-    public function actionCancel(int $taskId)
+    public function actionCancel()
     {
-        $task = Task::findOne($taskId);
-        if ($task && Yii::$app->user->id == $task->client_id && $task->status == Task::STATUS_NEW) {
-            $task->status = Task::STATUS_CANCELED;
-            $task->save();
+        if (Yii::$app->request->getIsPost()) {
+            $task = Task::findOne(Yii::$app->request->post('Task')['id']);
+            if ($task && CancelAction::getUserRightsCheck($task)) {
+                $task->status = Task::STATUS_CANCELED;
+                $task->save();
+                return $this->redirect("/task/view/{$task->id}");
+            }
         }
-        return $this->redirect("/task/view/{$taskId}");
+        return $this->redirect("/tasks");
     }
 
     public function actionTaskRespond()
     {
-
         $respond = new Respond();
         if (\Yii::$app->request->isPost) {
             $respond->load(\Yii::$app->request->post());
-            if ($respond->validate()) {
-                $respond->user_id = Yii::$app->user->id;
-                $respond->save();
-            }
-
+            $respond->user_id = Yii::$app->user->id;
+            $respond->save();
             return $this->redirect("/task/view/{$respond->task_id}");
-
         }
 
         if (\Yii::$app->request->isAjax) {
@@ -174,8 +192,37 @@ class TasksController extends SecuredController
                 return \yii\widgets\ActiveForm::validate($respond);
             }
         }
-
         throw new \yii\web\BadRequestHttpException('Неверный запрос!');
+    }
 
+    public function actionTaskFinish()
+    {
+        if (Yii::$app->request->getIsPost()) {
+
+            $recall = new Recall();
+
+            if (!$recall->load(Yii::$app->request->post()) || !$recall->validate()) {
+                throw new DataException('Данный отзыв не может быть размещен');
+            }
+
+            $task = Task::findOne($recall->task_id);
+
+            if (!$task || !DoneAction::getUserRightsCheck($task)) {
+                throw new DataException('Недостаточно прав для выполнения данного действия');
+            }
+
+            $transaction = Yii::$app->db->beginTransaction();
+            try {
+                $task->status = $recall->taskStatus;
+                $task->save();
+                $recall->save();
+                $transaction->commit();
+                return $this->redirect("/task/view/{$recall->task_id}");
+            } catch (\Throwable $e) {
+                $transaction->rollBack();
+            }
+
+        }
+        return $this->redirect("/tasks");
     }
 }

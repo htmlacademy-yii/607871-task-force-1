@@ -1,0 +1,2 @@
+GET http://yii-taskforce/api/messages/1
+Accept: application/json

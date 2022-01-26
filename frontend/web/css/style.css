@@ -1058,7 +1058,8 @@ label {
   width: 670px; }
 
 .content-view__map {
-  margin-right: 20px; }
+  margin-right: 20px;
+}
 
 .content-view__address {
   color: #454242; }
@@ -2647,4 +2648,9 @@ label {
   height: 20px;
   width: 20px;
   display: block;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-between;
 }

@@ -2,7 +2,10 @@
 
 use yii\helpers\Html;
 use \yii\widgets\ActiveForm;
-use yii\helpers\Url;
+
+/**
+ * @var \frontend\models\forms\LoginForm $model
+ */
 
 ?>
 <section class="modal enter-form form-modal" id="enter-form">

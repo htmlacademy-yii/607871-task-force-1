@@ -18,6 +18,7 @@ use yii\helpers\ArrayHelper;
  */
 class City extends \yii\db\ActiveRecord
 {
+    const SCENARIO_CREATE_CITY = 'create_city';
     /**
      * {@inheritdoc}
      */
@@ -32,7 +33,9 @@ class City extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['name'], 'required'],
+            ['name', 'required', 'on' => self::SCENARIO_CREATE_CITY],
+            [['name', 'latitude', 'longitude'],'safe'],
+            ['name', 'trim'],
             [['latitude', 'longitude'], 'number'],
             [['name'], 'string', 'max' => 100],
         ];

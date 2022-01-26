@@ -2,11 +2,11 @@
 
 use yii\widgets\ActiveForm;
 use yii\helpers\Html;
-use yii\helpers\Url;
 
 /**
  * @var \frontend\models\Respond $respond
- * @var \frontend\models\forms\TaskFinishForm $finishForm
+ * @var \frontend\models\Recall $recall
+ * @var \frontend\models\Task $taskModel
  * @var int $taskId
  */
 
@@ -27,8 +27,8 @@ use yii\helpers\Url;
             'options' => [
                 'tag' => 'p',
             ]],
-        'enableAjaxValidation' => true,
-        'enableClientValidation' => false,
+        'enableAjaxValidation' => false,
+        'enableClientValidation' => true,
     ]); ?>
 
         <?= $form->field($respond, 'rate')->textInput(['class' => 'response-form-payment input input-middle input-money']); ?>
@@ -60,11 +60,11 @@ use yii\helpers\Url;
             ]],
         'enableAjaxValidation' => false,
     ]); ?>
-    <?=$form->field($finishForm, 'status', [
+    <?=$form->field($recall, 'status', [
         'template' => "{input}",
         'options' => ['tag' => false]
     ])
-        ->radioList($finishForm::COMPLETION,
+        ->radioList($recall::COMPLETION,
             [
                 'item' => function ($index, $label, $name, $checked, $value) {
                     $radio = Html::radio(
@@ -90,7 +90,7 @@ use yii\helpers\Url;
             ]); ?>
 
     <p>
-        <?= $form->field($finishForm, 'description', [
+        <?= $form->field($recall, 'description', [
             'labelOptions' => ['class' => 'form-modal-description']
         ])->textarea([
             'class' => 'input textarea',
@@ -100,7 +100,7 @@ use yii\helpers\Url;
     </p>
 
     <?= $form->field(
-        $finishForm,
+        $recall,
         'rating',
         [
             'template' => "<p class='form-modal-description'>{label}
@@ -114,13 +114,19 @@ use yii\helpers\Url;
                     {input}</p>{error}"
         ]
     )->hiddenInput(['id' => 'rating']); ?>
-    <input type="hidden" name="rating" id="rating">
+    <?= $form->field($recall, 'task_id')->hiddenInput(['value' => $taskId])->label(false); ?>
     <?= Html::submitButton('Отправить', ['class' => "button modal-button"]); ?>
     <?php ActiveForm::end(); ?>
     <button class="form-modal-close" type="button">Закрыть</button>
 </section>
 
-
+<?php $form = ActiveForm::begin([
+    'id' => 'refuse',
+    'action' => ['refuse'],
+    'method' => 'post',
+    'enableAjaxValidation' => false,
+    'enableClientValidation' => false,
+]); ?>
 <section class="modal form-modal refusal-form" id="refuse-form">
     <h2>Отказ от задания</h2>
     <p>
@@ -128,27 +134,34 @@ use yii\helpers\Url;
         Это действие приведёт к снижению вашего рейтинга.
         Вы уверены?
     </p>
+    <?= $form->field($taskModel, 'id')->hiddenInput(['value' => $taskId])->label(false); ?>
     <button class="button__form-modal button" id="close-modal"
             type="button">Отмена
     </button>
-    <a href="<?=Url::to(["/task/refuse/{$taskId}"]); ?>" class="button__form-modal refusal-button button"
-            type="button">Отказаться
-    </a>
+    <?= Html::submitButton('Отказаться', ['class' => "button__form-modal refusal-button button"]); ?>
     <button class="form-modal-close" type="button">Закрыть</button>
 </section>
+<?php ActiveForm::end(); ?>
 
 
+<?php $form = ActiveForm::begin([
+    'id' => 'cancel',
+    'action' => ['cancel'],
+    'method' => 'post',
+    'enableAjaxValidation' => false,
+    'enableClientValidation' => false,
+]); ?>
 <section class="modal form-modal refusal-form" id="cancel-form">
     <h2>Отмена задания</h2>
     <p>
         Вы собираетесь отменить задание.
         Вы уверены?
     </p>
+    <?= $form->field($taskModel, 'id')->hiddenInput(['value' => $taskId])->label(false); ?>
     <button class="button__form-modal button" id="close-modal2"
             type="button">Нет
     </button>
-    <a href="<?=Url::to(["/task/cancel/{$taskId}"]); ?>" class="button__form-modal refusal-button button"
-       type="button">Да
-    </a>
+    <?= Html::submitButton('Да', ['class' => "button__form-modal refusal-button button"]); ?>
     <button class="form-modal-close" type="button">Закрыть</button>
 </section>
+<?php ActiveForm::end(); ?>
