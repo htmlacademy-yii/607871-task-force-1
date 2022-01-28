@@ -138,9 +138,7 @@ YandexMapAsset::register($this);
     </div>
     <?php if (Yii::$app->user->id === $task->client_id || Yii::$app->user->id === $task->executor_id): ?>
         <div id="chat-container">
-            <chat class="connect-desk__chat"
-                  task="<?= $task->id; ?>"
-                  sender_id="<?= Yii::$app->user->id; ?>">
+            <chat class="connect-desk__chat" task="<?= $task->id; ?>">
             </chat>
         </div>
     <?php endif; ?>
