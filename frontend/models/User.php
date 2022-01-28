@@ -206,6 +206,11 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         return ($this->profile->avatar) ?: Yii::$app->params['defaultAvatarPath'];
     }
 
+    public function getCity()
+    {
+        return City::findOne(['id' => $this->profile->city_id]);
+    }
+
 
     public function getExecutorTasksFinished()
     {

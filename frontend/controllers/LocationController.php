@@ -42,19 +42,24 @@ class LocationController extends SecuredController
             $response_data = json_decode($content, true);
             $addresses = $response_data['response']['GeoObjectCollection']['featureMember'];
             $result = [];
-            $address = [];
+            $location = [];
             foreach ($addresses as $value) {
-                $point = explode(' ', $value['GeoObject']['Point']['pos']);
-                $address['latitude'] = $point[1];
-                $address['longitude'] = $point[0];
-                $address['full_address'] = $value['GeoObject']['metaDataProperty']['GeocoderMetaData']['Address']['formatted'];
-                $address['city'] = array_values(
+                $cityName = array_values(
                     array_filter($value['GeoObject']['metaDataProperty']['GeocoderMetaData']['Address']['Components'], function ($array) {
                         return $array['kind'] === 'locality';
                     })
                 )[0]['name'];
-                $address['address'] = $value['GeoObject']['name'];
-                $result [] = $address;
+                if(\Yii::$app->user->identity->city->name === $cityName) {
+                    $point = explode(' ', $value['GeoObject']['Point']['pos']);
+                    $location['latitude'] = $point[1];
+                    $location['longitude'] = $point[0];
+                    $location['full_address'] = $value['GeoObject']['metaDataProperty']['GeocoderMetaData']['Address']['formatted'];
+                    $location['city'] = $cityName;
+                    $address['address'] = $value['GeoObject']['name'];
+                    $result [] = $location;
+                }else {
+                    continue;
+                }
             }
             return $result;
         } catch (RequestException $e) {

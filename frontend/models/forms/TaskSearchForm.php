@@ -75,6 +75,11 @@ class TaskSearchForm extends \yii\base\Model
             'pagination' => [
                 'pageSize' => 5
             ],
+            'sort' => [
+                'defaultOrder' => [
+                    'creation_date' => SORT_DESC,
+                ]
+            ],
         ]);
     }
 }

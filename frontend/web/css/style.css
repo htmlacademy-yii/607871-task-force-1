@@ -923,7 +923,12 @@ label {
   border-right: 1px solid #2436ab; }
 
 .pagination__item a {
+  display: block;
+  width: 39px;
+  height: 40px;
   color: #ffffff;
+  text-align: center;
+  line-height: 40px;
   text-decoration: none; }
 
 .new-task__pagination-list li:first-child,

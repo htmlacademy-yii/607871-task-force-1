@@ -63,7 +63,6 @@ return [
                 'task/deny/<taskId:\d+>/<messageId:\d+>' => 'tasks/deny',
                 'user/view/<id:\d+>' => 'users/view',
                 ['class' => 'yii\rest\UrlRule', 'controller' => 'api/messages'],
-
             ],
         ],
     ],

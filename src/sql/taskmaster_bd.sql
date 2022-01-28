@@ -11,8 +11,8 @@ SET GLOBAL time_zone = 'Europe/Moscow';
 CREATE TABLE IF NOT EXISTS city (
 id INT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
 name VARCHAR(100) NOT NULL,
-latitude DECIMAL(10,7),
-longitude DECIMAL(10,7)
+latitude DECIMAL(10,7) NOT NULL,
+longitude DECIMAL(10,7) NOT NULL
 );
 
 
@@ -70,7 +70,6 @@ due_date TIMESTAMP NOT NULL,
 creation_date TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 city_id INT UNSIGNED,
 address VARCHAR(255),
-comments VARCHAR (255),
 latitude DECIMAL(10,7),
 longitude DECIMAL(10,7),
 

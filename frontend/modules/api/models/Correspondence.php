@@ -13,7 +13,7 @@ class Correspondence extends BaseCorrespondence
             'message',
             'published_at',
             'is_mine' => function (BaseCorrespondence $model) {
-                return (int) $model->user_id === (int) \Yii::$app->user->getId();
+                return (int) $model->user_id === (int) \Yii::$app->user->id;
             },
         ];
     }
