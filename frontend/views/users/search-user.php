@@ -3,6 +3,9 @@
 use yii\bootstrap4\ActiveForm;
 use \yii\helpers\Html;
 
+/**
+ * @var \frontend\models\forms\UserSearchForm $model
+ */
 ?>
 
 <section class="search-task">

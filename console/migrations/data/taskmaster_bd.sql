@@ -1,10 +1,6 @@
-CREATE DATABASE IF NOT EXISTS taskmaster
+CREATE DATABASE IF NOT EXISTS taskmaster3
     DEFAULT CHARACTER SET utf8
     DEFAULT COLLATE utf8_general_ci;
-
-USE taskmaster;
-SET GLOBAL time_zone = 'Europe/Moscow';
-
 
 /*Таблица для справочника городов*/
 

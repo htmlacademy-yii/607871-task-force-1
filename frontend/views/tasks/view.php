@@ -11,7 +11,7 @@ use frontend\assets\TaskViewAsset;
  * @var \yii\web\View $this
  * @var \frontend\models\Task $task
  * @var \frontend\models\forms\TaskSearchForm $model
- * @var \App\business\Task $actions
+ * @var array $actions
  */
 
 TaskViewAsset::register($this);

@@ -55,7 +55,7 @@ class CSVToSQLFileConverter
 
     /** Забирает заголовки из csv-файлов
      * @param \SplFileObject $fileObject
-     * @param string $delimiter - разделитель данныех в csv-файле.
+     * @param string $delimiter - разделитель данных в csv-файле.
      * @return array - массив с заголовками столбцов из csv-файла.
      */
 

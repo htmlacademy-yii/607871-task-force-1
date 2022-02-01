@@ -3,6 +3,10 @@
 use \App\Service\DataFormatter;
 use \yii\helpers\Url;
 
+/**
+ * @var \frontend\models\forms\TaskSearchForm $model
+ */
+
 ?>
 <div class="landing-top">
     <h1>Работа для всех.<br>
