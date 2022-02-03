@@ -27,6 +27,7 @@ use yii\web\Response;
  * @property float|null $longitude
  * @property array $taskFiles
  * @property string $businessStatus
+ * @property string $district
  *
  * @property Category $category
  * @property City $city
@@ -70,10 +71,10 @@ class Task extends ActiveRecord
     public function rules()
     {
         return [
-            [['title', 'description', 'category_id', 'budget', 'due_date', 'creation_date', 'latitude', 'longitude', 'address'], 'safe'],
+            [['title', 'description', 'category_id', 'budget', 'due_date', 'creation_date', 'latitude', 'longitude', 'address','district'], 'safe'],
             [['title', 'description', 'category_id', 'client_id', 'due_date'], 'required',
                 'message' => 'Поле должно быть заполнено'],
-            [['title', 'description', 'address'],'trim'],
+            [['title', 'description', 'address', 'district'],'trim'],
             [['due_date'], 'datetime', 'format' => 'yyyy-MM-dd', 'strictDateFormat'=> true, 'enableClientValidation' => true,
                 'message' => 'Введите дату в формате ГГГГ-ММ-ДД', 'on' => self::SCENARIO_CREATE_TASK],
             [['description'], 'string', 'min' => 15, 'max' => 1500,
@@ -204,5 +205,25 @@ class Task extends ActiveRecord
     public function getBusinessStatus()
     {
         return self::BUSINESS_STATUS_MAP[$this->status];
+    }
+
+    public function searchDistrict()
+    {
+        if ($this->latitude && $this->longitude) {
+            $geoCode = "{$this->longitude},{$this->latitude}";
+            $response_data = YandexGeo::sendQuery($geoCode, 'district');
+            if ($response_data) {
+                $districts = [];
+                $geoObjects = $response_data['response']['GeoObjectCollection']['featureMember'];
+                foreach ($geoObjects as $value) {
+                    $yandexGeo = new YandexGeo();
+                    $yandexGeo->setComponents($value['GeoObject']);
+                    $districts[] = $yandexGeo->searchDistrict();
+                }
+                if($districts) {
+                    $this->district = array_shift($districts);
+                }
+            }
+        }
     }
 }

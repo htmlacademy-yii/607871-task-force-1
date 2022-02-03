@@ -40,13 +40,10 @@ AutoCompleteAsset::register($this);
             'validateOnSubmit' => true
         ]); ?>
 
-
         <?= $form->field($task, 'title')->textInput([
             'class' => 'input textarea',
             'placeholder' => 'Повесить полку',
         ])->hint('Кратко опишите суть работы'); ?>
-
-
 
         <?= $form->field($task, 'description')->textarea([
             'class' => 'input textarea',
@@ -54,23 +51,21 @@ AutoCompleteAsset::register($this);
             'rows' => 7,
         ])->hint('Укажите все пожелания и детали, чтобы исполнителям было проще соориентироваться'); ?>
 
-
         <?= $form->field($task, 'category_id')->dropDownList(Category::getCategoryMap(), [
             'prompt' => '',
             'class' => 'multiple-select input multiple-select-big',
             'size' => 1
         ])->hint('Выберите категорию'); ?>
 
-        <div class="field-container">
-            <?= $form->field($uploadFiles, 'files[]', [
-                'template' => "{label}\n<span>{hint}</span>\n<div class='create__file dz-clickable '>{input}\n<span>Добавить новый файл</span></div>\n{error}\n"
-            ])->fileInput([
-                'id' => 'files',
-                'multiple' => true,
-                'accept' => 'image/*, .pdf, .docx, .doc, .txt, .xls, .csv',
-            ])
-                ->hint('Загрузите файлы, которые помогут исполнителю лучше выполнить или оценить работу'); ?>
-        </div>
+        <?= $form->field($uploadFiles, 'files[]', [
+            'template' => "{label}\n<span>{hint}</span>\n<div class='create__file dz-clickable '>{input}\n<span>Добавить новый файл</span></div>\n{error}\n"
+        ])->fileInput([
+            'id' => 'files',
+            'multiple' => true,
+            'accept' => 'image/*, .pdf, .docx, .doc, .txt, .xls, .csv',
+        ])
+            ->hint('Загрузите файлы, которые помогут исполнителю лучше выполнить или оценить работу'); ?>
+
         <?= $form->field($task, 'full_address')
             ->input('search', [
                 'class' => 'input-navigation input-middle input',
@@ -84,18 +79,15 @@ AutoCompleteAsset::register($this);
         <?= $form->field($task, 'address')->hiddenInput()->label(false); ?>
 
         <div class="create__price-time">
-            <div class="field-container create__price-time--wrapper">
-                <?= $form->field($task, 'budget')->textInput([
+                <?= $form->field($task, 'budget',['options'=>['class' => 'field-container create__price-time--wrapper']])->textInput([
                     'class' => 'input textarea input-money',
                     'placeholder' => 1000,
                 ])->hint('Не заполняйте для оценки исполнителем'); ?>
-            </div>
-            <div class="field-container create__price-time--wrapper">
-                <?= $form->field($task, 'due_date')->textInput([
+
+                <?= $form->field($task, 'due_date', ['options'=>['class' => 'field-container create__price-time--wrapper']])->textInput([
                     'class' => 'input-middle input input-date',
                     'placeholder' => 'ГГГГ-ММ-ДД',
                 ])->hint('Укажите крайний срок исполнения'); ?>
-            </div>
         </div>
 
         <?php ActiveForm::end(); ?>

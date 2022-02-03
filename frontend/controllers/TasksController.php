@@ -14,6 +14,7 @@ use frontend\models\Recall;
 use frontend\models\Respond;
 use frontend\models\Task;
 use frontend\models\User;
+use frontend\models\YandexGeo;
 use Yii;
 use yii\web\NotFoundHttpException;
 use frontend\models\TaskFiles;
@@ -73,6 +74,7 @@ class TasksController extends SecuredController
                 $taskCity = City::find()->where(['name' => $city->name])->one();
                 if ($taskCity) {
                     $task->city_id = $taskCity->id;
+                    $task->searchDistrict();
                 }
             }
 

@@ -61,7 +61,6 @@ YandexMapAsset::register($this);
                     <div class="content-view__address">
                         <span class="address__town"><?= $task->city->name ?? 'Город не определен'; ?></span><br>
                         <span><?= $task->address ?? 'Удаленная работа'; ?></span>
-                        <p>Вход под арку, код домофона 1122</p>
                     </div>
                 </div>
             </div>
