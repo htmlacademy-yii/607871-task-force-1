@@ -220,8 +220,8 @@ class Task extends ActiveRecord
                     $yandexGeo->setComponents($value['GeoObject']);
                     $districts[] = $yandexGeo->searchDistrict();
                 }
-                if($districts) {
-                    $this->district = array_shift($districts);
+                if ($districts) {
+                    $this->district = $districts[0];
                 }
             }
         }

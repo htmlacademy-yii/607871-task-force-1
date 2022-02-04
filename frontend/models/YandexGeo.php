@@ -49,7 +49,6 @@ class YandexGeo extends Model
         $this->longitude = $this->searchPoint($geoObject)['longitude'];
         $this->full_address = $geoObject['metaDataProperty']['GeocoderMetaData']['Address']['formatted'];
         $this->short_address = $this->searchShortAddress();
-
     }
 
     public function setComponents(array $geoObject)
@@ -57,7 +56,6 @@ class YandexGeo extends Model
         if (!isset($this->components)) {
             $this->components = $geoObject['metaDataProperty']['GeocoderMetaData']['Address']['Components'];
         }
-
     }
 
     private function searchCityName(): ?string
