@@ -3,6 +3,7 @@
 namespace frontend\models;
 
 
+use App\Exception\DataException;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\web\Response;
@@ -217,11 +218,16 @@ class Task extends ActiveRecord
                 $districts = [];
                 $geoObjects = $response_data['response']['GeoObjectCollection']['featureMember'];
                 foreach ($geoObjects as $value) {
-                    $yandexGeo = new YandexGeo();
-                    $districts[] = $yandexGeo->searchDistrict($value['GeoObject']);
+                    try {
+                        $yandexGeo = new YandexGeo();
+                        $districts[] = $yandexGeo->searchDistrict($value['GeoObject']);
+                    } catch (DataException $e) {
+                        continue;
+                    }
+
                 }
-                if ($districts) {
-                    $this->district = $districts[0];
+                if (!empty($districts)) {
+                    $this->district = array_shift($districts);
                 }
             }
         }

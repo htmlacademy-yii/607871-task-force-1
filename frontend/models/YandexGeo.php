@@ -4,6 +4,7 @@
 namespace frontend\models;
 
 
+use App\Exception\DataException;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\BadResponseException;
 use GuzzleHttp\Exception\GuzzleException;
@@ -38,14 +39,19 @@ class YandexGeo extends Model
         $this->city = $this->searchCityName();
         $this->latitude = $this->searchPoint($geoObject)['latitude'];
         $this->longitude = $this->searchPoint($geoObject)['longitude'];
-        $this->full_address = $geoObject['metaDataProperty']['GeocoderMetaData']['Address']['formatted'];
+        $this->full_address = $geoObject['metaDataProperty']['GeocoderMetaData']['Address']['formatted'] ?? null;
         $this->short_address = $this->searchShortAddress();
     }
 
     public function setComponents(array $geoObject)
     {
         if (!isset($this->components)) {
-            $this->components = $geoObject['metaDataProperty']['GeocoderMetaData']['Address']['Components'];
+            $components = $geoObject['metaDataProperty']['GeocoderMetaData']['Address']['Components'];
+            if (isset($components)) {
+                $this->components = $components;
+            } else {
+                throw new DataException("Геоданные не определены");
+            }
         }
     }
 
@@ -54,37 +60,40 @@ class YandexGeo extends Model
         return array_values(array_filter($this->components, function ($array) {
                 return $array['kind'] === 'locality';
             })
-        )[0]['name'];
+        )[0]['name'] ?? null;
     }
 
-    private function searchPoint(array $geoObject): array
+    private function searchPoint(array $geoObject): ?array
     {
-        $point = explode(' ', $geoObject['Point']['pos']);
-        return ['latitude' => $point[1], 'longitude' => $point[0]];
+        if (isset($geoObject['Point']['pos'])) {
+            $point = explode(' ', $geoObject['Point']['pos']);
+            return count($point) == 2 ? ['latitude' => $point[1], 'longitude' => $point[0]] : null;
+        }
+       return null;
     }
 
-    private function searchShortAddress()
+    private function searchShortAddress(): ?string
     {
-        $street = array_values(array_filter($this->components, function ($array) {
+        $street = (array_values(array_filter($this->components, function ($array) {
                 return $array['kind'] === 'street';
             })
-        )[0]['name'];
+        )[0]['name']) ?? null;
 
-        $house = array_values(array_filter($this->components, function ($array) {
+        $house = (array_values(array_filter($this->components, function ($array) {
                 return $array['kind'] === 'house';
             })
-        )[0]['name'];
+        )[0]['name']) ?? null;
 
-        return "{$street}, {$house}";
+        return isset($street, $house) ? "{$street}, {$house}": null;
     }
 
-    public function searchDistrict(array $geoObject)
+    public function searchDistrict(array $geoObject): ?string
     {
         $this->setComponents($geoObject);
         return array_values(array_filter($this->components, function ($array) {
                 return $array['kind'] === 'district';
             })
-        )[0]['name'];
+        )[0]['name'] ?? null;
     }
 
     public static function sendQuery(string $geoCode, $kind = null)

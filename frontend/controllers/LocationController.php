@@ -4,6 +4,7 @@
 namespace frontend\controllers;
 
 
+use App\Exception\DataException;
 use frontend\models\YandexGeo;
 use yii\web\Response;
 
@@ -18,8 +19,13 @@ class LocationController extends SecuredController
             $GeoObjects = $response_data['response']['GeoObjectCollection']['featureMember'];
             $result = [];
             foreach ($GeoObjects as $value) {
-                $yandexGeo = new YandexGeo();
-                $yandexGeo->setParameters($value['GeoObject']);
+                try {
+                    $yandexGeo = new YandexGeo();
+                    $yandexGeo->setParameters($value['GeoObject']);
+                } catch (DataException $e) {
+                    continue;
+                }
+
                 if (\Yii::$app->user->identity->city->name === $yandexGeo->city) {
                     $result [] = $yandexGeo->getAttributes();
                 } else {
