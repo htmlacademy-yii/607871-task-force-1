@@ -83,6 +83,7 @@ class Task extends ActiveRecord
             [['latitude', 'longitude'], 'number'],
             ['title', 'string', 'min' => 5, 'max' => 100, 'tooShort' => "Не менее {min} символов", 'tooLong' => 'Не более {max} символов'],
             ['address', 'string', 'max' => 255, 'tooLong' => 'Не более {max} символов'],
+            ['district', 'string', 'max' => 150, 'tooLong' => 'Не более {max} символов'],
             [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['client_id' => 'id']],
             [['executor_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['executor_id' => 'id']],
             [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['city_id' => 'id']],
@@ -217,8 +218,7 @@ class Task extends ActiveRecord
                 $geoObjects = $response_data['response']['GeoObjectCollection']['featureMember'];
                 foreach ($geoObjects as $value) {
                     $yandexGeo = new YandexGeo();
-                    $yandexGeo->setComponents($value['GeoObject']);
-                    $districts[] = $yandexGeo->searchDistrict();
+                    $districts[] = $yandexGeo->searchDistrict($value['GeoObject']);
                 }
                 if ($districts) {
                     $this->district = $districts[0];

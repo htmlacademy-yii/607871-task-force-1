@@ -32,15 +32,6 @@ class YandexGeo extends Model
         ];
     }
 
-    public function rules()
-    {
-        return [
-            [['city', 'full_address', 'short_address', 'latitude', 'longitude'], 'safe'],
-            [['city', 'full_address', 'short_address', 'latitude', 'longitude'], 'trim'],
-            [['city', 'full_address', 'short_address', 'latitude', 'longitude'], 'string'],
-        ];
-    }
-
     public function setParameters(array $geoObject)
     {
         $this->setComponents($geoObject);
@@ -87,8 +78,9 @@ class YandexGeo extends Model
         return "{$street}, {$house}";
     }
 
-    public function searchDistrict()
+    public function searchDistrict(array $geoObject)
     {
+        $this->setComponents($geoObject);
         return array_values(array_filter($this->components, function ($array) {
                 return $array['kind'] === 'district';
             })
