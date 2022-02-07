@@ -2,6 +2,7 @@
 use yii\helpers\Url;
 use App\Service\DataFormatter;
 use \frontend\widgets\UserRatingWidget;
+use \yii\helpers\Html;
 
 /**
  * @var \yii\data\ActiveDataProvider $dataProvider
@@ -20,11 +21,11 @@ use \frontend\widgets\UserRatingWidget;
                 </div>
                 <div class="feedback-card__top--name user__search-card">
                     <p class="link-name"><a href="<?= Url::to(
-                            "/user/view/{$user->id}"); ?>" class="link-regular"><?= $user->name; ?></a></p>
+                            "/user/view/{$user->id}"); ?>" class="link-regular"><?= Html::encode($user->name); ?></a></p>
                     <?= UserRatingWidget::widget(['userRating' => $user->rating]); ?>
                     <b><?= $user->rating; ?></b>
                     <p class="user__search-content">
-                        <?= $user->profile->description; ?>
+                        <?= Html::encode($user->profile->description); ?>
                     </p>
                 </div>
                 <span class="new-task__time">Был на сайте <?= DataFormatter::getRelativeTime($user->last_visit_date); ?></span>

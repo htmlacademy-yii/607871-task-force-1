@@ -6,6 +6,7 @@ use \yii\helpers\Url;
 use \frontend\models\Task;
 use \frontend\models\Respond;
 use frontend\assets\TaskViewAsset;
+use yii\helpers\Html;
 
 /**
  * @var \yii\web\View $this
@@ -23,7 +24,7 @@ YandexMapAsset::register($this);
         <div class="content-view__card-wrapper">
             <div class="content-view__header">
                 <div class="content-view__headline">
-                    <h1><?= $task->title; ?></h1>
+                    <h1><?= Html::encode($task->title); ?></h1>
                     <span>Размещено в категории
                                     <a href="<?= Url::to([
                                         '/tasks/index', "{$model->formName()}" =>
@@ -39,7 +40,7 @@ YandexMapAsset::register($this);
             <div class="content-view__description">
                 <h3 class="content-view__h3">Общее описание</h3>
                 <p>
-                    <?= $task->description; ?>
+                    <?= Html::encode($task->description); ?>
                 </p>
             </div>
             <div class="content-view__attach">
@@ -53,8 +54,8 @@ YandexMapAsset::register($this);
                 <div class="content-view__location-wrapper">
                     <div class="content-view__map">
                         <a href="#">
-                            <div id="map" style="width: 361px; height: 292px" data-lat="<?= $task->latitude; ?>"
-                                 data-lon="<?= $task->longitude; ?>">
+                            <div id="map" style="width: 361px; height: 292px" data-lat="<?= $task->latitude ?? ''; ?>"
+                                 data-lon="<?= $task->longitude ?? ''; ?>">
                             </div>
                         </a>
                     </div>
@@ -88,7 +89,7 @@ YandexMapAsset::register($this);
                                                 src="<?= $message->volunteer->avatar; ?>" width="55" height="55"></a>
                                     <div class="feedback-card__top--name">
                                         <p><a href="<?= Url::to("/user/view/{$message->volunteer->id}"); ?>"
-                                              class="link-regular"><?= $message->volunteer->name; ?></a></p>
+                                              class="link-regular"><?= Html::encode($message->volunteer->name); ?></a></p>
                                         <span></span><span></span><span></span><span></span><span
                                                 class="star-disabled"></span>
                                         <b><?= $message->volunteer->rating; ?></b>
@@ -97,7 +98,7 @@ YandexMapAsset::register($this);
                                 </div>
                                 <div class="feedback-card__content">
                                     <p>
-                                        <?= $message->description; ?>
+                                        <?= Html::encode($message->description); ?>
                                     </p>
                                     <span><?= $message->rate; ?>&nbsp;₽</span>
                                 </div>
@@ -124,9 +125,9 @@ YandexMapAsset::register($this);
         <div class="profile-mini__wrapper">
             <h3>Заказчик</h3>
             <div class="profile-mini__top">
-                <img src="<?= $task->client->avatar; ?>" width="62" height="62" alt="Аватар заказчика">
+                <img src="<?= Html::encode($task->client->avatar); ?>" width="62" height="62" alt="Аватар заказчика">
                 <div class="profile-mini__name five-stars__rate">
-                    <p><?= $task->client->name; ?></p>
+                    <p><?= Html::encode($task->client->name); ?></p>
                 </div>
             </div>
             <p class="info-customer">

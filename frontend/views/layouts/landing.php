@@ -93,7 +93,7 @@ AppAsset::register($this);
                         <a href="<?= Url::to('/users'); ?>">Исполнители</a>
                     </li>
                     <li class="links__item">
-                        <a href="">Регистрация</a>
+                        <a href="<?= Url::to('/signup')?>">Регистрация</a>
                     </li>
                     <li class="links__item">
                         <a href="<?= Url::to('/task/create'); ?>">Создать задание</a>

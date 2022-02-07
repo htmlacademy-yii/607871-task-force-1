@@ -2,6 +2,7 @@
 
 use \App\Service\DataFormatter;
 use \yii\helpers\Url;
+use yii\helpers\Html;
 
 /**
  * @var \frontend\models\forms\TaskSearchForm $model
@@ -103,8 +104,8 @@ use \yii\helpers\Url;
         <div class="landing-task">
             <div class="landing-task-top task-<?= $task->category->icon; ?>"></div>
             <div class="landing-task-description">
-                <h3><a href="<?= Url::to("/task/view/{$task->id}")?>" class="link-regular"><?= $task->title; ?></a></h3>
-                <p><?= $task->description; ?></p>
+                <h3><a href="<?= Url::to("/task/view/{$task->id}")?>" class="link-regular"><?= Html::encode($task->title); ?></a></h3>
+                <p><?= Html::encode($task->description); ?></p>
             </div>
             <div class="landing-task-info">
                 <div class="task-info-left">

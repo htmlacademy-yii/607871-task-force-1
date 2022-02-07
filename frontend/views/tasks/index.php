@@ -2,6 +2,7 @@
 use yii\helpers\Url;
 use App\Service\DataFormatter;
 use yii\widgets\LinkPager;
+use \yii\helpers\Html;
 
 /**
  * @var \yii\data\ActiveDataProvider $dataProvider
@@ -15,7 +16,7 @@ use yii\widgets\LinkPager;
             <div class="new-task__card">
                 <div class="new-task__title">
                     <a href="<?= Url::to(
-                    "/task/view/{$newTask->id}"); ?>" class="link-regular"><h2><?= $newTask->title; ?></h2></a>
+                    "/task/view/{$newTask->id}"); ?>" class="link-regular"><h2><?= Html::encode($newTask->title); ?></h2></a>
                     <a class="new-task__type link-regular" href="<?= Url::to([
                         '/tasks/index', "{$model->formName()}"=>
                             ['categories' => [$newTask->category->id],
@@ -25,7 +26,7 @@ use yii\widgets\LinkPager;
                 </div>
                 <div class="new-task__icon new-task__icon--<?= $newTask->category->icon; ?>"></div>
                 <p class="new-task_description">
-                    <?= $newTask->description; ?>
+                    <?= Html::encode($newTask->description); ?>
                 </p>
                 <b class="new-task__price new-task__price--<?= $newTask->category->icon; ?>"><?= $newTask->budget; ?><b>
                         ₽</b></b>

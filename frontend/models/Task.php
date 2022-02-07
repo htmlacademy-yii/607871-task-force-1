@@ -76,7 +76,7 @@ class Task extends ActiveRecord
             [['title', 'description', 'category_id', 'client_id', 'due_date'], 'required',
                 'message' => 'Поле должно быть заполнено'],
             [['title', 'description', 'address', 'district'],'trim'],
-            [['due_date'], 'datetime', 'format' => 'yyyy-MM-dd', 'strictDateFormat'=> true, 'enableClientValidation' => true,
+            [['due_date'], 'datetime', 'format' => 'yyyy-MM-dd', 'min' => date('Y-m-d', time() + 86400) , 'strictDateFormat'=> true,
                 'message' => 'Введите дату в формате ГГГГ-ММ-ДД', 'on' => self::SCENARIO_CREATE_TASK],
             [['description'], 'string', 'min' => 15, 'max' => 1500,
                 'tooShort' => "Не менее {min} символов", 'tooLong' => 'Не более {max} символов'],
