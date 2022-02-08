@@ -93,7 +93,7 @@ AppAsset::register($this);
                             <a href="<?= Url::to('/task/create'); ?>">Создать задание</a>
                         </li>
                         <li class="site-list__item">
-                            <a href="account.html">Мой профиль</a>
+                            <a href="<?= Url::to('/account'); ?>">Мой профиль</a>
                         </li>
                     </ul>
                 </div>
@@ -128,7 +128,7 @@ AppAsset::register($this);
                     <div class="header__account">
                         <a class="header__account-photo">
 
-                            <img src="<?= Yii::$app->user->identity->avatar; ?>"
+                            <img src="<?= Html::encode(Yii::$app->user->identity->avatar); ?>"
                                  width="43" height="44"
                                  alt="Аватар пользователя">
                         </a>
@@ -139,13 +139,13 @@ AppAsset::register($this);
                     <div class="account__pop-up">
                         <ul class="account__pop-up-list">
                             <li>
-                                <a href="mylist.html">Мои задания</a>
+                                <a href="<?= Url::to('/mylist'); ?>">Мои задания</a>
                             </li>
                             <li>
-                                <a href="account.html">Настройки</a>
+                                <a href="<?= Url::to('/tasks'); ?>">Настройки</a>
                             </li>
                             <li>
-                                <a href="<?= Url::to('/users/logout') ?>">Выход</a>
+                                <a href="<?= Url::to('/users/logout'); ?>">Выход</a>
                             </li>
                         </ul>
                     </div>
@@ -175,7 +175,7 @@ AppAsset::register($this);
                             <a href="<?= Url::to('/tasks'); ?>">Задания</a>
                         </li>
                         <li class="links__item">
-                            <a href="user.html">Мой профиль</a>
+                            <a href="<?= Url::to('/account'); ?>">Мой профиль</a>
                         </li>
                         <li class="links__item">
                             <a href="<?= Url::to('/users'); ?>">Исполнители</a>

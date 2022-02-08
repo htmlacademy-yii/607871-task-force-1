@@ -1,6 +1,8 @@
 <?php
 use yii\helpers\Url;
 use App\Service\DataFormatter;
+use yii\widgets\LinkPager;
+use \yii\helpers\Html;
 
 /**
  * @var \yii\data\ActiveDataProvider $dataProvider
@@ -14,7 +16,7 @@ use App\Service\DataFormatter;
             <div class="new-task__card">
                 <div class="new-task__title">
                     <a href="<?= Url::to(
-                    "/task/view/{$newTask->id}"); ?>" class="link-regular"><h2><?= $newTask->title; ?></h2></a>
+                    "/task/view/{$newTask->id}"); ?>" class="link-regular"><h2><?= Html::encode($newTask->title); ?></h2></a>
                     <a class="new-task__type link-regular" href="<?= Url::to([
                         '/tasks/index', "{$model->formName()}"=>
                             ['categories' => [$newTask->category->id],
@@ -24,24 +26,26 @@ use App\Service\DataFormatter;
                 </div>
                 <div class="new-task__icon new-task__icon--<?= $newTask->category->icon; ?>"></div>
                 <p class="new-task_description">
-                    <?= $newTask->description; ?>
+                    <?= Html::encode($newTask->description); ?>
                 </p>
                 <b class="new-task__price new-task__price--<?= $newTask->category->icon; ?>"><?= $newTask->budget; ?><b>
                         ₽</b></b>
-                <p class="new-task__place">Санкт-Петербург, Центральный район</p>
+                <p class="new-task__place"><?= $newTask->city->name ?? ''; ?><?= $newTask->district ? ", {$newTask->district}" : ''; ?></p>
                 <span class="new-task__time"><?= DataFormatter::getRelativeTime($newTask->creation_date); ?></span>
             </div>
         <?php endforeach; ?>
     </div>
     <div class="new-task__pagination">
-        <ul class="new-task__pagination-list">
-            <li class="pagination__item"><a href="#"></a></li>
-            <li class="pagination__item pagination__item--current">
-                <a>1</a></li>
-            <li class="pagination__item"><a href="#">2</a></li>
-            <li class="pagination__item"><a href="#">3</a></li>
-            <li class="pagination__item"><a href="#"></a></li>
-        </ul>
+        <?= LinkPager::widget([
+            'pagination' => $dataProvider->getPagination(),
+            'options' => ['class' => 'new-task__pagination-list'],
+            'activePageCssClass' => 'pagination__item--current',
+            'pageCssClass' => 'pagination__item',
+            'nextPageCssClass' => 'pagination__item',
+            'prevPageCssClass' => 'pagination__item',
+            'nextPageLabel' => '',
+            'prevPageLabel' => '',
+        ]); ?>
     </div>
 </section>
 

@@ -4,6 +4,10 @@ use yii\bootstrap4\ActiveForm;
 use \yii\helpers\Html;
 use \frontend\models\Category;
 
+/**
+ * @var \frontend\models\forms\TaskSearchForm $model
+ */
+
 ?>
 
 <section class="search-task">

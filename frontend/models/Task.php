@@ -3,6 +3,7 @@
 namespace frontend\models;
 
 
+use App\Exception\DataException;
 use yii\db\ActiveRecord;
 use yii\db\Query;
 use yii\web\Response;
@@ -27,6 +28,7 @@ use yii\web\Response;
  * @property float|null $longitude
  * @property array $taskFiles
  * @property string $businessStatus
+ * @property string $district
  *
  * @property Category $category
  * @property City $city
@@ -70,11 +72,11 @@ class Task extends ActiveRecord
     public function rules()
     {
         return [
-            [['title', 'description', 'category_id', 'budget', 'due_date', 'creation_date', 'latitude', 'longitude', 'address'], 'safe'],
+            [['title', 'description', 'category_id', 'budget', 'due_date', 'creation_date', 'latitude', 'longitude', 'address','district'], 'safe'],
             [['title', 'description', 'category_id', 'client_id', 'due_date'], 'required',
                 'message' => 'Поле должно быть заполнено'],
-            [['title', 'description', 'address'],'trim'],
-            [['due_date'], 'datetime', 'format' => 'yyyy-MM-dd', 'strictDateFormat'=> true, 'enableClientValidation' => true,
+            [['title', 'description', 'address', 'district'],'trim'],
+            [['due_date'], 'datetime', 'format' => 'yyyy-MM-dd', 'min' => date('Y-m-d', time() + 86400) , 'strictDateFormat'=> true,
                 'message' => 'Введите дату в формате ГГГГ-ММ-ДД', 'on' => self::SCENARIO_CREATE_TASK],
             [['description'], 'string', 'min' => 15, 'max' => 1500,
                 'tooShort' => "Не менее {min} символов", 'tooLong' => 'Не более {max} символов'],
@@ -82,6 +84,7 @@ class Task extends ActiveRecord
             [['latitude', 'longitude'], 'number'],
             ['title', 'string', 'min' => 5, 'max' => 100, 'tooShort' => "Не менее {min} символов", 'tooLong' => 'Не более {max} символов'],
             ['address', 'string', 'max' => 255, 'tooLong' => 'Не более {max} символов'],
+            ['district', 'string', 'max' => 150, 'tooLong' => 'Не более {max} символов'],
             [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['client_id' => 'id']],
             [['executor_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['executor_id' => 'id']],
             [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['city_id' => 'id']],
@@ -204,5 +207,29 @@ class Task extends ActiveRecord
     public function getBusinessStatus()
     {
         return self::BUSINESS_STATUS_MAP[$this->status];
+    }
+
+    public function searchDistrict()
+    {
+        if ($this->latitude && $this->longitude) {
+            $geoCode = "{$this->longitude},{$this->latitude}";
+            $response_data = YandexGeo::sendQuery($geoCode, 'district');
+            if ($response_data) {
+                $districts = [];
+                $geoObjects = $response_data['response']['GeoObjectCollection']['featureMember'];
+                foreach ($geoObjects as $value) {
+                    try {
+                        $yandexGeo = new YandexGeo();
+                        $districts[] = $yandexGeo->searchDistrict($value['GeoObject']);
+                    } catch (DataException $e) {
+                        continue;
+                    }
+
+                }
+                if (!empty($districts)) {
+                    $this->district = array_shift($districts);
+                }
+            }
+        }
     }
 }

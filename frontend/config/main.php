@@ -57,13 +57,13 @@ return [
             'rules' => [
                 'tasks' => 'tasks/index',
                 'users' => 'users/index',
+                'mylist' => 'my-list/index',
                 'task/view/<id:\d+>' => 'tasks/view',
                 'task/create' => 'tasks/create',
                 'task/confirm/<taskId:\d+>/<messageId:\d+>' => 'tasks/confirm',
                 'task/deny/<taskId:\d+>/<messageId:\d+>' => 'tasks/deny',
                 'user/view/<id:\d+>' => 'users/view',
                 ['class' => 'yii\rest\UrlRule', 'controller' => 'api/messages'],
-
             ],
         ],
     ],

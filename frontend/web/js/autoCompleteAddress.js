@@ -69,7 +69,7 @@
         const city = document.getElementById('city-name');
         city.value = feedback.selection.value.city;
         const address = document.getElementById('task-address');
-        address.value = feedback.selection.value.address;
+        address.value = feedback.selection.value.short_address;
     });
 
 })();

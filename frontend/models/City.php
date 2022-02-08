@@ -33,7 +33,7 @@ class City extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            ['name', 'required', 'on' => self::SCENARIO_CREATE_CITY],
+            [['name', 'latitude', 'longitude'], 'required', 'on' => self::SCENARIO_CREATE_CITY],
             [['name', 'latitude', 'longitude'],'safe'],
             ['name', 'trim'],
             [['latitude', 'longitude'], 'number'],
@@ -48,7 +48,7 @@ class City extends \yii\db\ActiveRecord
     {
         return [
             'id' => 'ID',
-            'name' => 'Name',
+            'name' => 'Город',
             'latitude' => 'Latitude',
             'longitude' => 'Longitude',
         ];

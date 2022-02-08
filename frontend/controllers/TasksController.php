@@ -58,26 +58,23 @@ class TasksController extends SecuredController
     public function actionCreate()
     {
         $task = new Task(['scenario' => Task::SCENARIO_CREATE_TASK]);
-        $city = new City(['scenario' => City::SCENARIO_CREATE_CITY]);
+        $city = new City();
         $uploadFilesModel = new UploadFilesForm();
 
         if (\Yii::$app->request->getIsPost()) {
             $task->load(Yii::$app->request->post());
             $task->client_id = Yii::$app->user->id;
+            $city->load(Yii::$app->request->post());
+            if ($city->name) {
+                if (!$city->validate()) {
+                    throw new DataException('Данный город не может быть указан в задании');
+                }
 
-            if (!$city->load(Yii::$app->request->post()) || !$city->validate()) {
-              throw new DataException('Данный город не может быть указан в задании');
-            }
-
-            $taskCity = City::find()->where(['name' => $city->name])->one();
-            //Если выбранный город не найден в справочнике, создаем его в БД.
-            if ($taskCity) {
-                $task->city_id = $taskCity->id;
-            } else {
-                $city->longitude = $task->longitude;
-                $city->latitude = $task->latitude;
-                $city->save();
-                $task->city_id = $city->primaryKey;
+                $taskCity = City::find()->where(['name' => $city->name])->one();
+                if ($taskCity) {
+                    $task->city_id = $taskCity->id;
+                    $task->searchDistrict();
+                }
             }
 
             $uploadFilesModel->files = UploadedFile::getInstances($uploadFilesModel, 'files');

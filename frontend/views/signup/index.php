@@ -4,6 +4,11 @@ use yii\widgets\ActiveForm;
 use frontend\models\City;
 use \yii\helpers\Html;
 
+/**
+ * @var \frontend\models\User $user
+ * @var \frontend\models\Profile $profile
+ */
+
 ?>
 <section class="registration__user">
     <h1>Регистрация аккаунта</h1>
@@ -34,6 +39,6 @@ use \yii\helpers\Html;
 
         <?= $form->field($user, 'password')->passwordInput(); ?>
         <?= Html::submitButton('Создать аккаунт', ['class' => "button button__registration"]) ?>
-        <? ActiveForm::end(); ?>
+        <?php ActiveForm::end(); ?>
     </div>
 </section>
