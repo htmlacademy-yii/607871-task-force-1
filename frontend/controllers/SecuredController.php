@@ -29,7 +29,7 @@ class SecuredController extends Controller
                     ],
                     [
                         'allow' => true,
-                        'controllers' => ['tasks', 'users', 'location'],
+                        'controllers' => ['tasks', 'users', 'location', 'my-list', 'account'],
                         'roles' => ['@']
                     ]
                 ]
