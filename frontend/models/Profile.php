@@ -61,8 +61,8 @@ class Profile extends \yii\db\ActiveRecord
         return [
             'id' => 'ID',
             'user_id' => 'User ID',
-            'birth_date' => 'Birth Date',
-            'description' => 'Description',
+            'birth_date' => 'День рождения',
+            'description' => 'Информация о себе',
             'avatar' => 'Avatar',
             'city_id' => 'Город проживания',
             'address' => 'Address',

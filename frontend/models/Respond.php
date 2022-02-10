@@ -20,9 +20,9 @@ use Yii;
  */
 class Respond extends \yii\db\ActiveRecord
 {
-    const STATUS_NEW = 0;
-    const STATUS_CONFIRMED = 1;
-    const STATUS_REFUSED = 2;
+    const STATUS_NEW = 1;
+    const STATUS_CONFIRMED = 2;
+    const STATUS_REFUSED = 3;
     /**
      * {@inheritdoc}
      */

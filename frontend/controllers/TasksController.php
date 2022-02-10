@@ -84,6 +84,7 @@ class TasksController extends SecuredController
             if ($isValid) {
                 $transaction = Yii::$app->db->beginTransaction();
                 try {
+                    $task->status = Task::STATUS_NEW;
                     $task->save();
 
                     foreach ($uploadFilesModel->files as $file) {
@@ -178,6 +179,7 @@ class TasksController extends SecuredController
         if (\Yii::$app->request->isPost) {
             $respond->load(\Yii::$app->request->post());
             $respond->user_id = Yii::$app->user->id;
+            $respond->status = Respond::STATUS_NEW;
             $respond->save();
             return $this->redirect("/task/view/{$respond->task_id}");
         }

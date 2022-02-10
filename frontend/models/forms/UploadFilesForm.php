@@ -9,6 +9,7 @@ use yii\web\UploadedFile;
 class UploadFilesForm extends Model
 {
     public $files = [];
+    public $avatar;
 
     public function rules()
     {
@@ -20,7 +21,7 @@ class UploadFilesForm extends Model
 
     public function attributeLabels()
     {
-        return ['files' => 'Файлы'];
+        return ['files' => 'Файлы', 'avatar' => 'Сменить аватар'];
     }
 
     public static function uploadFile(UploadedFile $file)
