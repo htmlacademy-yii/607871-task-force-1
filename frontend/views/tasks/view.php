@@ -81,33 +81,33 @@ YandexMapAsset::register($this);
                 <h2>Отклики <span>(<?= count($task->responds) ?>)</span></h2>
                 <div class="content-view__feedback-wrapper">
 
-                    <?php foreach ($task->responds as $message): ?>
-                        <?php if (Yii::$app->user->id === $task->client->id || Yii::$app->user->id === $message->volunteer->id): ?>
+                    <?php foreach ($task->responds as $respond): ?>
+                        <?php if (Yii::$app->user->id === $task->client->id || Yii::$app->user->id === $respond->volunteer->id): ?>
                             <div class="content-view__feedback-card">
                                 <div class="feedback-card__top">
-                                    <a href="<?= Url::to("/user/view/{$message->volunteer->id}"); ?>"><img
-                                                src="<?= $message->volunteer->avatar; ?>" width="55" height="55"></a>
+                                    <a href="<?= Url::to("/user/view/{$respond->volunteer->id}"); ?>"><img
+                                                src="<?= $respond->volunteer->avatar; ?>" width="55" height="55"></a>
                                     <div class="feedback-card__top--name">
-                                        <p><a href="<?= Url::to("/user/view/{$message->volunteer->id}"); ?>"
-                                              class="link-regular"><?= Html::encode($message->volunteer->name); ?></a></p>
+                                        <p><a href="<?= Url::to("/user/view/{$respond->volunteer->id}"); ?>"
+                                              class="link-regular"><?= Html::encode($respond->volunteer->name); ?></a></p>
                                         <span></span><span></span><span></span><span></span><span
                                                 class="star-disabled"></span>
-                                        <b><?= $message->volunteer->rating; ?></b>
+                                        <b><?= $respond->volunteer->rating; ?></b>
                                     </div>
-                                    <span class="new-task__time"><?= DataFormatter::getRelativeTime($message->creation_date); ?></span>
+                                    <span class="new-task__time"><?= DataFormatter::getRelativeTime($respond->creation_date); ?></span>
                                 </div>
                                 <div class="feedback-card__content">
                                     <p>
-                                        <?= Html::encode($message->description); ?>
+                                        <?= Html::encode($respond->description); ?>
                                     </p>
-                                    <span><?= $message->rate; ?>&nbsp;₽</span>
+                                    <span><?= $respond->rate; ?>&nbsp;₽</span>
                                 </div>
-                                <?php if (Yii::$app->user->id === $task->client->id && $task->status == Task::STATUS_NEW && $message->status == Respond::STATUS_NEW): ?>
+                                <?php if (Yii::$app->user->id === $task->client->id && $task->status == Task::STATUS_NEW && $respond->status == Respond::STATUS_NEW): ?>
                                     <div class="feedback-card__actions">
-                                        <a href="<?= Url::to(["/task/confirm/{$task->id}/{$message->id}"]); ?>"
+                                        <a href="<?= Url::to(["/task/confirm/{$task->id}/{$respond->id}"]); ?>"
                                            class="button__small-color response-button button"
                                            type="button">Подтвердить</a>
-                                        <a href="<?= Url::to(["/task/deny/{$task->id}/{$message->id}"]); ?>"
+                                        <a href="<?= Url::to(["/task/deny/{$task->id}/{$respond->id}"]); ?>"
                                            class="button__small-color refusal-button button"
                                            type="button">Отказать</a>
                                     </div>
