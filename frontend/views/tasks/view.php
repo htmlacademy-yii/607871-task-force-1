@@ -136,7 +136,7 @@ YandexMapAsset::register($this);
             <a href="#" class="link-regular">Смотреть профиль</a>
         </div>
     </div>
-    <?php if (Yii::$app->user->id === $task->client_id || Yii::$app->user->id === $task->executor_id): ?>
+    <?php if ($task->status === Task::STATUS_IN_PROGRESS  && (Yii::$app->user->id === $task->client_id || Yii::$app->user->id === $task->executor_id)): ?>
         <div id="chat-container">
             <chat class="connect-desk__chat" task="<?= $task->id; ?>">
             </chat>
