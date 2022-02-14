@@ -16,13 +16,14 @@ use Yii;
  * @property string|null $address
  * @property string|null $phone
  * @property string|null $skype
- * @property string|null $other
+ * @property string|null $telegram
  *
  * @property City $city
  * @property User $user
  */
 class Profile extends \yii\db\ActiveRecord
 {
+    const SCENARIO_ACCOUNT_INPUT_RULES = 'account_input_rules';
     /**
      * {@inheritdoc}
      */
@@ -37,17 +38,22 @@ class Profile extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['user_id', 'description','birth_date', 'avatar', 'city_id', 'address', 'phone', 'skype', 'other'], 'safe'],
-            [['city_id'], 'required'],
+            [['description','birth_date', 'avatar', 'city_id', 'phone', 'skype', 'telegram'], 'safe'],
+            ['birth_date', 'datetime', 'format' => 'yyyy-MM-dd',
+                'max' => date('Y-m-d', strtotime('-14 years', time())), 'strictDateFormat'=> true,
+                'on' => Profile::SCENARIO_DEFAULT, 'message' => 'Введите дату в формате ГГГГ-ММ-ДД'],
+            ['birth_date', 'datetime', 'format' => 'dd.MM.yyyy',
+                'max' => date('d.m.Y', strtotime('-14 years', time())), 'strictDateFormat'=> true,
+                'on' => Profile::SCENARIO_ACCOUNT_INPUT_RULES, 'message' => 'Введите дату в формате ДД.ММ.ГГГГ'],
             [['user_id', 'city_id'], 'integer'],
+            ['city_id', 'required'],
             [['description'], 'string'],
             [['avatar'], 'string', 'max' => 100],
-            [['address'], 'string', 'max' => 255],
-            [['phone'], 'match', 'pattern' => '/^[\d]{11}/i'],
-            [['skype', 'other'], 'string', 'max' => 50],
-            [['phone'], 'unique'],
-            [['skype'], 'unique'],
-            [['other'], 'unique'],
+            [['phone'], 'match', 'pattern' => '/^[\d]{11}/i', 'message' => 'Указан неверный номер телефона'],
+            [['skype', 'telegram'], 'string', 'max' => 50],
+            [['phone'], 'unique', 'message' => 'Пользователь с таким номером телефона уже существует'],
+            [['skype'], 'unique', 'message' => 'Пользователь с таким Skype уже существует'],
+            [['telegram'], 'unique', 'message' => 'Пользователь с таким Skype уже существует'],
             [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
             [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['city_id' => 'id'], 'message' => 'Укажите город, чтобы находить подходящие задачи'],
         ];
@@ -64,11 +70,11 @@ class Profile extends \yii\db\ActiveRecord
             'birth_date' => 'День рождения',
             'description' => 'Информация о себе',
             'avatar' => 'Avatar',
-            'city_id' => 'Город проживания',
-            'address' => 'Address',
-            'phone' => 'Phone',
+            'city_id' => 'Город',
+            'address' => 'Адрес',
+            'phone' => 'Телефон',
             'skype' => 'Skype',
-            'other' => 'Other',
+            'telegram' => 'Телеграм',
         ];
     }
 

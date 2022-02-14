@@ -15,7 +15,9 @@ class UploadFilesForm extends Model
     {
         return [
             [['files'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, jpeg, docx, txt, pdf, doc, xls, csv',
-                'maxSize' => 2048 * 2048, 'maxFiles' => 4, 'message' => 'Выбран неверный формат файла'],
+                'maxSize' => 2048 * 2048, 'maxFiles' => 4, 'message' => 'Выбран неверный формат файла или слишком большой размер'],
+            [['avatar'], 'file', 'skipOnEmpty' => true, 'extensions' => 'png, jpg, jpeg', 'maxSize' => 2048 * 2048,
+                'message' => 'Выбран неверный формат файла или слишком большой размер']
         ];
     }
 
@@ -27,6 +29,6 @@ class UploadFilesForm extends Model
     public static function uploadFile(UploadedFile $file)
     {
         $newName = uniqid(date('Y-m-d-')) . '.' . $file->getExtension();
-       return $file->saveAs('@webroot/uploads/' . $newName) ? $newName : false;
+        return $file->saveAs('@webroot/uploads/' . $newName) ? $newName : false;
     }
 }

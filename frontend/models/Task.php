@@ -76,19 +76,19 @@ class Task extends ActiveRecord
             [['title', 'description', 'category_id', 'client_id', 'due_date'], 'required',
                 'message' => 'Поле должно быть заполнено'],
             [['title', 'description', 'address', 'district'],'trim'],
-            [['due_date'], 'datetime', 'format' => 'yyyy-MM-dd', 'min' => date('Y-m-d', time() + 86400) , 'strictDateFormat'=> true,
+            ['due_date', 'datetime', 'format' => 'yyyy-MM-dd', 'min' => date('Y-m-d', strtotime('+1 days', time())) , 'strictDateFormat'=> true,
                 'message' => 'Введите дату в формате ГГГГ-ММ-ДД', 'on' => self::SCENARIO_CREATE_TASK],
-            [['description'], 'string', 'min' => 15, 'max' => 1500,
+            ['description', 'string', 'min' => 15, 'max' => 1500,
                 'tooShort' => "Не менее {min} символов", 'tooLong' => 'Не более {max} символов'],
             [['category_id', 'client_id', 'executor_id', 'budget', 'status', 'city_id'], 'integer'],
             [['latitude', 'longitude'], 'number'],
             ['title', 'string', 'min' => 5, 'max' => 100, 'tooShort' => "Не менее {min} символов", 'tooLong' => 'Не более {max} символов'],
             ['address', 'string', 'max' => 255, 'tooLong' => 'Не более {max} символов'],
             ['district', 'string', 'max' => 150, 'tooLong' => 'Не более {max} символов'],
-            [['client_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['client_id' => 'id']],
-            [['executor_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['executor_id' => 'id']],
-            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['city_id' => 'id']],
-            [['category_id'], 'exist', 'skipOnError' => true, 'targetClass' => Category::class, 'targetAttribute' => ['category_id' => 'id']],
+            ['client_id', 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['client_id' => 'id']],
+            ['executor_id', 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['executor_id' => 'id']],
+            ['city_id', 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['city_id' => 'id']],
+            ['category_id', 'exist', 'skipOnError' => true, 'targetClass' => Category::class, 'targetAttribute' => ['category_id' => 'id']],
         ];
     }
 
@@ -199,9 +199,9 @@ class Task extends ActiveRecord
         return $query->all();
     }
 
-    public function isVolunteer($id): bool
+    public function isVolunteer(int $id): bool
     {
-        return $id ? !!$this->getResponds()->andWhere(['respond.user_id' => $id])->count() : false;
+        return isset($id) ? !!$this->getResponds()->andWhere(['respond.user_id' => $id])->count() : false;
     }
 
     public function getBusinessStatus()

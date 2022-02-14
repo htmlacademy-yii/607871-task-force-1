@@ -142,7 +142,7 @@ AppAsset::register($this);
                                 <a href="<?= Url::to('/mylist'); ?>">Мои задания</a>
                             </li>
                             <li>
-                                <a href="<?= Url::to('/tasks'); ?>">Настройки</a>
+                                <a href="<?= Url::to('/account'); ?>">Настройки</a>
                             </li>
                             <li>
                                 <a href="<?= Url::to('/users/logout'); ?>">Выход</a>
