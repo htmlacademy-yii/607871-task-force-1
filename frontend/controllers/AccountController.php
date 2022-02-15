@@ -35,15 +35,18 @@ class AccountController extends SecuredController
 
 
             $userSettings = $user->userSettings;
+            if (!isset($userSettings)) {
+                $userSettings = new UserSettings();
+                $userSettings->user_id = $user->id;
+            }
             $userSettings->load(\Yii::$app->request->post());
             $userSettingsIsValid = $userSettings->validate();
 
-            $uploadFilesModel->files= UploadedFile::getInstances($uploadFilesModel, 'files');
-
-           $uploadFilesIsValid = $uploadFilesModel->validate();
+            $uploadFilesModel->files = UploadedFile::getInstances($uploadFilesModel, 'files');
+            $uploadFilesIsValid = $uploadFilesModel->validate();
 
             //$newFileName = UploadFilesForm::uploadFile($uploadFilesModel->avatar);
-           // $profile->avatar = $newFileName;
+            // $profile->avatar = $newFileName;
 
             $profileIsValid = $profile->validate();
 
@@ -65,13 +68,13 @@ class AccountController extends SecuredController
                     $userSettings->save();
 
                     //Сохранение категорий пользователя
-                   /* foreach ($user->new_categories_list as $key => $category_id) {
-                        $userCategory = new UserCategory();
-                        $userCategory->user_id = $user->id;
-                        $userCategory->category_id = $category_id;
-                        $userCategory->active = UserCategory::USER_CATEGORY_ACTIVE_SET;
-                        $userCategory->save();
-                    }*/
+                    /* foreach ($user->new_categories_list as $key => $category_id) {
+                         $userCategory = new UserCategory();
+                         $userCategory->user_id = $user->id;
+                         $userCategory->category_id = $category_id;
+                         $userCategory->active = UserCategory::USER_CATEGORY_ACTIVE_SET;
+                         $userCategory->save();
+                     }*/
 
                     //Сохранения пользовательского портфолио
                     foreach ($uploadFilesModel->files as $file) {
@@ -85,6 +88,7 @@ class AccountController extends SecuredController
                     }
 
                     $transaction->commit();
+                    return $this->redirect('/account');
                 } catch (\Throwable $e) {
                     $transaction->rollBack();
                     var_dump($e->getMessage());
