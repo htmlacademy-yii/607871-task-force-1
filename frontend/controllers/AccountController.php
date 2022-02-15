@@ -4,6 +4,7 @@
 namespace frontend\controllers;
 
 
+use frontend\models\Category;
 use frontend\models\forms\UploadFilesForm;
 use frontend\models\Profile;
 use frontend\models\TaskFiles;
@@ -68,14 +69,20 @@ class AccountController extends SecuredController
                     $userSettings->save();
 
                     //Сохранение категорий пользователя
-                    /* foreach ($user->new_categories_list as $key => $category_id) {
-                         $userCategory = new UserCategory();
-                         $userCategory->user_id = $user->id;
-                         $userCategory->category_id = $category_id;
-                         $userCategory->active = UserCategory::USER_CATEGORY_ACTIVE_SET;
-                         $userCategory->save();
-                     }*/
 
+                    $user->deactivateAllUserCategories();
+                    if ($user->new_categories_list) {
+                        foreach ($user->new_categories_list as $key => $category_id) {
+                            $userCategory = $user->getUserCategory($category_id);
+                            if (!$userCategory) {
+                                $userCategory = new UserCategory();
+                                $userCategory->user_id = $user->id;
+                                $userCategory->category_id = $category_id;
+                            }
+                            $userCategory->active = UserCategory::USER_CATEGORY_ACTIVE_SET;
+                            $userCategory->save();
+                        }
+                    }
                     //Сохранения пользовательского портфолио
                     foreach ($uploadFilesModel->files as $file) {
                         $newFileName = UploadFilesForm::uploadFile($file); //загрузка файла из временной папки в uploads

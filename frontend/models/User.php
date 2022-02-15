@@ -240,6 +240,18 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
        return $this->getCategories()->where(['category.id'=> $category_id])->exists();
     }
 
+    public function getUserCategory(int $category_id)
+    {
+        return UserCategory::find()->where(['user_id' => $this->id, 'category_id' => $category_id])->one();
+    }
+
+    public function deactivateAllUserCategories()
+    {
+            Yii::$app->db
+                ->createCommand('UPDATE user_category SET active = 0 WHERE user_id=:user_id', ['user_id' => $this->id])
+                ->execute();
+    }
+
     public static function findIdentity($id)
     {
         return self::findOne($id);
