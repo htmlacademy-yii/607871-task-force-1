@@ -80,7 +80,7 @@ class AccountController extends SecuredController
      * @throws \yii\base\Exception
      */
 
-    private static function updateUser(User $user)
+    private static function updateUser(User $user): User
     {
         $user->scenario = User::SCENARIO_UPDATE_USER;
         $user->load(\Yii::$app->request->post());
@@ -95,7 +95,7 @@ class AccountController extends SecuredController
      * @param User $user
      * @throws \yii\db\Exception
      */
-    private static function updateUserCategories(User $user)
+    private static function updateUserCategories(User $user): void
     {
         $user->deactivateAllUserCategories();
         if ($user->new_categories_list) {
@@ -114,7 +114,7 @@ class AccountController extends SecuredController
         }
     }
 
-    private function updateProfile(UploadFilesForm $uploadFilesModel, User $user)
+    private function updateProfile(UploadFilesForm $uploadFilesModel, User $user): Profile
     {
         $profile = $user->profile;
         $profile->scenario = Profile::SCENARIO_ACCOUNT_INPUT_RULES;
@@ -128,7 +128,7 @@ class AccountController extends SecuredController
         return $profile;
     }
 
-    private static function updateUserAvatar(UploadFilesForm $uploadFilesModel, $user)
+    private static function updateUserAvatar(UploadFilesForm $uploadFilesModel, $user): ?string
     {
         if (isset($uploadFilesModel->avatar)) {
             $newAvatarFileName = UploadFilesForm::uploadFile($uploadFilesModel->avatar);
@@ -154,7 +154,7 @@ class AccountController extends SecuredController
         return $userSettings;
     }
 
-    private function updateUserPortfolio(UploadFilesForm $uploadFilesModel, User $user)
+    private function updateUserPortfolio(UploadFilesForm $uploadFilesModel, User $user): void
     {
         if ($uploadFilesModel->files) {
             $user->deleteUserPortfolio();

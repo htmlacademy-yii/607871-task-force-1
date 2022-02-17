@@ -61,7 +61,7 @@ class UserSettings extends \yii\db\ActiveRecord
      */
     public function getUser()
     {
-        return $this->hasOne(User::class, ['id' => 'user_id'])->inverseOf('user_settings');
+        return $this->hasOne(User::class, ['id' => 'user_id'])->inverseOf('userSettings');
     }
 
     public function deactivateAll()
