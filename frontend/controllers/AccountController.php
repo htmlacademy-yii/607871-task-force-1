@@ -88,7 +88,7 @@ class AccountController extends SecuredController
         $user->password = $passwordHash;
         $user->password_repeat = $passwordHash;
         $user->validate();
-        return  $user;
+        return $user;
     }
 
     /**
@@ -98,6 +98,7 @@ class AccountController extends SecuredController
     private static function updateUserCategories(User $user): void
     {
         $user->deactivateAllUserCategories();
+
         if ($user->new_categories_list) {
             foreach ($user->new_categories_list as $key => $category_id) {
                 $userCategory = $user->getUserCategory($category_id);
@@ -106,10 +107,8 @@ class AccountController extends SecuredController
                     $userCategory->user_id = $user->id;
                     $userCategory->category_id = $category_id;
                 }
-                if ($userCategory->validate()) {
-                    $userCategory->active = UserCategory::USER_CATEGORY_ACTIVE_SET;
-                    $userCategory->save();
-                }
+                $userCategory->active = UserCategory::USER_CATEGORY_ACTIVE_SET;
+                $userCategory->save();
             }
         }
     }
