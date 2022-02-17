@@ -1,11 +1,14 @@
 <?php
 
 use \yii\helpers\Html;
+
 use yii\bootstrap4\ActiveForm;
 use \frontend\models\Category;
 use \frontend\models\City;
+use \frontend\assets\AccountAvatarPreview;
 
 /**
+ * @var \yii\web\View $this
  * @var \frontend\models\Profile $profileModel
  * @var \frontend\models\forms\UploadFilesForm $uploadFilesModel
  * @var \frontend\models\User $user
@@ -13,6 +16,7 @@ use \frontend\models\City;
  * @var \frontend\models\UserSettings $userSettingsModel
  */
 
+AccountAvatarPreview::register($this);
 ?>
 
 <section class="account__redaction-wrapper">
@@ -28,6 +32,7 @@ use \frontend\models\City;
             'errorOptions' => ['tag' => 'span', 'class' => 'is-invalid'],
             'checkTemplate' => "{beginLabel}\n{input}<span>{labelTitle}</span>{endLabel}",
             'checkOptions' => [
+                'uncheck' => false,
                 'tag' => false,
                 'class' => 'visually-hidden checkbox__input',
                 'labelOptions' => [
@@ -50,14 +55,12 @@ use \frontend\models\City;
                     'template' => "{input}\n{label}\n{error}",
                     'options' => ['tag' => false]
                 ])->fileInput([
-
                     'id' => 'upload-avatar',
                     'multiple' => false,
                     'accept' => 'image/*',
                 ])->label(null, ['class' => 'link-regular']); ?>
             </div>
             <div class="account__redaction">
-
                 <?= $form->field($userModel, 'name', [
                     'options' => ['class' => 'field-container account__input account__input--name'],
                 ])->textInput([
@@ -76,8 +79,8 @@ use \frontend\models\City;
                     'options' => ['class' => 'field-container account__input account__input--address']
                 ])->dropdownList(City::getCityMap(), [
                     'class' => 'input textarea',
-                    'prompt' => 'Выберите город',
-                    'options' => [$user->profile->city_id ?? false => ['selected' => true]]
+                    'prompt' => '',
+                    'options' => [$user->profile->city_id => ['selected' => true]]
                 ]); ?>
 
                 <?= $form->field($profileModel, 'birth_date', [
@@ -157,6 +160,7 @@ use \frontend\models\City;
                 ])->checkbox([
                     'class' => 'visually-hidden checkbox__input',
                     'checked' => $user->checkUserSetting('new_message'),
+
                 ]); ?>
 
                 <?= $form->field($userSettingsModel, 'task_actions', [
@@ -195,3 +199,4 @@ use \frontend\models\City;
     <?= Html::submitButton('Сохранить изменения', ['class' => 'button']); ?>
     <?php ActiveForm::end(); ?>
 </section>
+

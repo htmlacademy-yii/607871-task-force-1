@@ -59,7 +59,7 @@ class TasksController extends SecuredController
     {
         $task = new Task(['scenario' => Task::SCENARIO_CREATE_TASK]);
         $city = new City();
-        $uploadFilesModel = new UploadFilesForm();
+        $uploadFilesModel = new UploadFilesForm(['scenario' => UploadFilesForm::SCENARIO_CREATE_TASK]);
 
         if (\Yii::$app->request->getIsPost()) {
             $task->load(Yii::$app->request->post());
@@ -93,7 +93,7 @@ class TasksController extends SecuredController
                             $taskFile = new TaskFiles();
                             $taskFile->task_id = $task->primaryKey;
                             $taskFile->name = $file->name;
-                            $taskFile->url = '/uploads/' . $newFileName;
+                            $taskFile->url = \Yii::$app->params['defaultUploadDirectory'] . $newFileName;
                             $taskFile->save();
                         }
                     }

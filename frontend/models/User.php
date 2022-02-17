@@ -212,7 +212,8 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
 
     public function getAvatar()
     {
-        return ($this->profile->avatar) ?: Yii::$app->params['defaultAvatarPath'];
+        $defaultAvatar = Yii::$app->params['defaultAvatarPath'] ?? '';
+        return ($this->profile->avatar) ?: $defaultAvatar;
     }
 
     public function getCity()
@@ -235,21 +236,35 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         return false;
     }
 
-    public function checkUserCategory(int $category_id)
+    public function checkUserCategory(int $categoryId)
     {
-       return $this->getCategories()->where(['category.id'=> $category_id])->exists();
+       return $this->getCategories()->where(['category.id'=> $categoryId])->exists();
     }
 
-    public function getUserCategory(int $category_id)
+    public function getUserCategory(int $categoryId)
     {
-        return UserCategory::find()->where(['user_id' => $this->id, 'category_id' => $category_id])->one();
+        return UserCategory::find()->where(['user_id' => $this->id, 'category_id' => $categoryId])->one();
     }
 
+    /**
+     * @throws \yii\db\Exception
+     */
     public function deactivateAllUserCategories()
     {
             Yii::$app->db
                 ->createCommand('UPDATE user_category SET active = 0 WHERE user_id=:user_id', ['user_id' => $this->id])
                 ->execute();
+    }
+
+    public function deleteUserPortfolio()
+    {
+        Yii::$app->db
+            ->createCommand('DELETE FROM user_portfolio WHERE user_id=:user_id', ['user_id' => $this->id])
+            ->execute();
+    }
+
+    public function getUserAge() {
+
     }
 
     public static function findIdentity($id)

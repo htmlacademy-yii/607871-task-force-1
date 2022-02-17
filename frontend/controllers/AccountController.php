@@ -16,9 +16,13 @@ use yii\web\UploadedFile;
 
 class AccountController extends SecuredController
 {
+    /**
+     * @return string|\yii\web\Response
+     * @throws \yii\base\Exception
+     */
     public function actionIndex()
     {
-        $uploadFilesModel = new UploadFilesForm();
+        $uploadFilesModel = new UploadFilesForm(['scenario' => UploadFilesForm::SCENARIO_UPDATE_ACCOUNT]);
         $profileModel = new Profile();
         $userModel = new User();
         $userSettingsModel = new UserSettings();
@@ -26,73 +30,28 @@ class AccountController extends SecuredController
 
         if (\Yii::$app->request->getIsPost()) {
 
-            $user->scenario = User::SCENARIO_UPDATE_USER;
-            $user->load(\Yii::$app->request->post());
-            $userIsValid = $user->validate();
-
-            $profile = $user->profile;
-            $profile->scenario = Profile::SCENARIO_ACCOUNT_INPUT_RULES;
-            $profile->load(\Yii::$app->request->post());
-
-
-            $userSettings = $user->userSettings;
-            if (!isset($userSettings)) {
-                $userSettings = new UserSettings();
-                $userSettings->user_id = $user->id;
-            }
-            $userSettings->load(\Yii::$app->request->post());
-            $userSettingsIsValid = $userSettings->validate();
+            $userUpdated = self::updateUser($user);
+            $userSettings = self::updateUserSettings($user);
 
             $uploadFilesModel->files = UploadedFile::getInstances($uploadFilesModel, 'files');
+            $uploadFilesModel->avatar = UploadedFile::getInstance($uploadFilesModel, 'avatar');
             $uploadFilesIsValid = $uploadFilesModel->validate();
 
-            //$newFileName = UploadFilesForm::uploadFile($uploadFilesModel->avatar);
-            // $profile->avatar = $newFileName;
+            $profileUpdated = self::updateProfile($uploadFilesModel, $user);
 
-            $profileIsValid = $profile->validate();
-
-            if ($userIsValid && $profileIsValid && $userSettingsIsValid && $uploadFilesIsValid) {
+            if (isset($userUpdated, $profileUpdated, $userSettings) && $uploadFilesIsValid) {
                 $transaction = \Yii::$app->db->beginTransaction();
                 try {
                     //Сохранение данных пользователя
-                    $passwordHash = \Yii::$app->security->generatePasswordHash($user->password);
-                    $user->password = $passwordHash;
-                    $user->password_repeat = $passwordHash;
                     $user->save();
-
                     //Сохранение данных пользовательского профиля
-                    $profile->scenario = Profile::SCENARIO_DEFAULT;
-                    $profile->birth_date = date('Y-m-d', strtotime($profile->birth_date));
-                    $profile->save();
-
+                    $profileUpdated->save();
                     //Сохранение настроек пользователя
                     $userSettings->save();
-
                     //Сохранение категорий пользователя
-
-                    $user->deactivateAllUserCategories();
-                    if ($user->new_categories_list) {
-                        foreach ($user->new_categories_list as $key => $category_id) {
-                            $userCategory = $user->getUserCategory($category_id);
-                            if (!$userCategory) {
-                                $userCategory = new UserCategory();
-                                $userCategory->user_id = $user->id;
-                                $userCategory->category_id = $category_id;
-                            }
-                            $userCategory->active = UserCategory::USER_CATEGORY_ACTIVE_SET;
-                            $userCategory->save();
-                        }
-                    }
+                    self::updateUserCategories($user);
                     //Сохранения пользовательского портфолио
-                    foreach ($uploadFilesModel->files as $file) {
-                        $newFileName = UploadFilesForm::uploadFile($file); //загрузка файла из временной папки в uploads
-                        if ($newFileName) {
-                            $userPortfolio = new UserPortfolio();
-                            $userPortfolio->user_id = $user->id;
-                            $userPortfolio->file = '/uploads/' . $newFileName;
-                            $userPortfolio->save();
-                        }
-                    }
+                    self::updateUserPortfolio($uploadFilesModel, $user);
 
                     $transaction->commit();
                     return $this->redirect('/account');
@@ -103,9 +62,8 @@ class AccountController extends SecuredController
 
             } else {
                 $userModel->addErrors($user->errors);
-                $profileModel->addErrors($profile->errors);
+                $profileModel->addErrors($user->profile->errors);
                 $userSettingsModel->addErrors($userSettings->errors);
-
             }
         }
         return $this->render('index', [
@@ -117,5 +75,93 @@ class AccountController extends SecuredController
         ]);
     }
 
+    /**
+     * @param User $user
+     * @throws \yii\base\Exception
+     */
 
+    private function updateUser(User $user)
+    {
+        $user->scenario = User::SCENARIO_UPDATE_USER;
+        $user->load(\Yii::$app->request->post());
+        $passwordHash = \Yii::$app->security->generatePasswordHash($user->password);
+        $user->password = $passwordHash;
+        $user->password_repeat = $passwordHash;
+        $userIsValid = $user->validate();
+        return $userIsValid ? $user : null;
+    }
+
+    /**
+     * @param User $user
+     * @throws \yii\db\Exception
+     */
+    private static function updateUserCategories(User $user)
+    {
+        $user->deactivateAllUserCategories();
+        if ($user->new_categories_list) {
+            foreach ($user->new_categories_list as $key => $category_id) {
+                $userCategory = $user->getUserCategory($category_id);
+                if (!$userCategory) {
+                    $userCategory = new UserCategory();
+                    $userCategory->user_id = $user->id;
+                    $userCategory->category_id = $category_id;
+                }
+                if ($userCategory->validate()) {
+                    $userCategory->active = UserCategory::USER_CATEGORY_ACTIVE_SET;
+                    $userCategory->save();
+                }
+            }
+        }
+    }
+
+    private function updateProfile(UploadFilesForm $uploadFilesModel, User $user)
+    {
+        $profile = $user->profile;
+        $profile->scenario = Profile::SCENARIO_ACCOUNT_INPUT_RULES;
+        $profile->load(\Yii::$app->request->post());
+        $profileIsValid = $profile->validate();
+        if ($profileIsValid) {
+            $profile->scenario = Profile::SCENARIO_DEFAULT;
+            $profile->birth_date = date('Y-m-d', strtotime($profile->birth_date));
+            $profile->avatar = self::updateUserAvatar($uploadFilesModel);
+            return $profile;
+        }
+        return null;
+    }
+
+    private static function updateUserAvatar(UploadFilesForm $uploadFilesModel)
+    {
+        if (isset($uploadFilesModel->avatar)) {
+            $newAvatarFileName = UploadFilesForm::uploadFile($uploadFilesModel->avatar);
+           return $newAvatarFileName ? \Yii::$app->params['defaultUploadDirectory'] . $newAvatarFileName : null;
+        }
+    }
+
+    private static function updateUserSettings(User $user)
+    {
+        $userSettings = $user->userSettings;
+        if (!isset($userSettings)) {
+            $userSettings = new UserSettings();
+            $userSettings->user_id = $user->id;
+        }
+        $userSettings->load(\Yii::$app->request->post());
+        $userSettingsIsValid = $userSettings->validate();
+        return $userSettingsIsValid ? $userSettings : null;
+    }
+
+    private function updateUserPortfolio(UploadFilesForm $uploadFilesModel, User $user)
+    {
+        if ($uploadFilesModel->files) {
+            $user->deleteUserPortfolio();
+        }
+        foreach ($uploadFilesModel->files as $file) {
+            $newFileName = UploadFilesForm::uploadFile($file); //загрузка файла из временной папки в uploads
+            if ($newFileName) {
+                $userPortfolio = new UserPortfolio();
+                $userPortfolio->user_id = $user->id;
+                $userPortfolio->file = \Yii::$app->params['defaultUploadDirectory'] . $newFileName;
+                $userPortfolio->save();
+            }
+        }
+    }
 }

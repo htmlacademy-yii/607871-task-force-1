@@ -54,8 +54,8 @@ class Profile extends \yii\db\ActiveRecord
             [['phone'], 'unique', 'message' => 'Пользователь с таким номером телефона уже существует'],
             [['skype'], 'unique', 'message' => 'Пользователь с таким Skype уже существует'],
             [['telegram'], 'unique', 'message' => 'Пользователь с таким Skype уже существует'],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
-            [['city_id'], 'exist', 'skipOnError' => true, 'targetClass' => City::class, 'targetAttribute' => ['city_id' => 'id'], 'message' => 'Укажите город, чтобы находить подходящие задачи'],
+            [['user_id'], 'exist', 'skipOnError' => false, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+            [['city_id'], 'exist', 'skipOnError' => false, 'targetClass' => City::class, 'targetAttribute' => ['city_id' => 'id'], 'message' => 'Укажите город, чтобы находить подходящие задачи'],
         ];
     }
 
