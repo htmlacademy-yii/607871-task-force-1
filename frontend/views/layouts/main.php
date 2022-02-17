@@ -9,6 +9,7 @@ use frontend\assets\AppAsset;
 use yii\bootstrap4\Html;
 use yii\helpers\Url;
 use \frontend\widgets\TaskActionWidget;
+use \frontend\models\City;
 
 AppAsset::register($this);
 ?>
@@ -99,13 +100,9 @@ AppAsset::register($this);
                 </div>
                 <?php if (Url::current() !== '/signup/index' && !Yii::$app->user->isGuest): ?>
                     <div class="header__town">
-                        <select class="multiple-select input town-select" id="town-select" size="1" name="town[]">
-                            <option value="Moscow">Москва</option>
-                            <option selected value="SPB">Санкт-Петербург</option>
-                            <option value="Krasnodar">Краснодар</option>
-                            <option value="Irkutsk">Иркутск</option>
-                            <option value="Vladivostok">Владивосток</option>
-                        </select>
+                        <?= Html::dropDownList('town[]', Yii::$app->user->identity->city->id, City::getCityMap(),[
+                                'class' => 'multiple-select input town-select'
+                        ]); ?>
                     </div>
                 <?php endif; ?>
                 <?php if (Url::current() !== '/signup/index' && !Yii::$app->user->isGuest): ?>

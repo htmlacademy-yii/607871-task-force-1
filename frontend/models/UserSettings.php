@@ -35,7 +35,7 @@ class UserSettings extends \yii\db\ActiveRecord
             [['new_message', 'task_actions', 'new_recall', 'hide_profile', 'contacts_only_for_client'], 'safe'],
             [['new_message', 'task_actions', 'new_recall', 'hide_profile', 'contacts_only_for_client'], 'integer', 'min' => 0, 'max' => 1],
             ['user_id', 'integer'],
-            [['user_id'], 'exist', 'skipOnError' => true, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
+            [['user_id'], 'exist', 'skipOnError' => false, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
         ];
     }
 
@@ -62,5 +62,14 @@ class UserSettings extends \yii\db\ActiveRecord
     public function getUser()
     {
         return $this->hasOne(User::class, ['id' => 'user_id'])->inverseOf('user_settings');
+    }
+
+    public function deactivateAll()
+    {
+        $this->new_recall = 0;
+        $this->task_actions = 0;
+        $this->new_message = 0;
+        $this->contacts_only_for_client = 0;
+        $this->hide_profile = 0;
     }
 }

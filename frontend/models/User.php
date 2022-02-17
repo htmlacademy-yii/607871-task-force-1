@@ -36,6 +36,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
 
     const SCENARIO_CREATE_USER = 'create_user';
     const SCENARIO_UPDATE_USER = 'update_user';
+
     /**
      * {@inheritdoc}
      */
@@ -52,15 +53,15 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         return [
             [['email', 'name', 'password'], 'safe', 'on' => self::SCENARIO_CREATE_USER],
             [['email', 'name', 'password', 'password_repeat'], 'trim'],
-            [['email', 'password'], 'required', 'on' => self::SCENARIO_CREATE_USER,'message' => 'Поле должно быть заполнено'],
-            [ 'name', 'required', 'on' => self::SCENARIO_CREATE_USER, 'message' => 'Введите ваше имя и фамилию'],
+            [['email', 'password'], 'required', 'on' => self::SCENARIO_CREATE_USER, 'message' => 'Поле должно быть заполнено'],
+            ['name', 'required', 'on' => self::SCENARIO_CREATE_USER, 'message' => 'Введите ваше имя и фамилию'],
             [['name', 'email'], 'string', 'min' => 5, 'max' => 50, 'tooShort' => "Не меньше {min} символов", 'tooLong' => 'Не больше {max} символов'],
             [['password', 'password_repeat'], 'string', 'min' => 8, 'max' => 64, 'tooShort' => "Длина пароля от {min} символов", 'tooLong' => 'Длина пароля до {max} символов'],
             [['name'], 'unique', 'message' => 'Пользователь с таким именем уже существует'],
             [['email'], 'unique', 'message' => 'Пользователь с таким email уже существует'],
             ['email', 'email', 'message' => 'Введите валидный адрес электронной почты'],
             [['email', 'password', 'password_repeat', 'new_categories_list'], 'safe', 'on' => self::SCENARIO_UPDATE_USER],
-            [['email', 'name'],'required', 'on' => self::SCENARIO_UPDATE_USER,'message' => 'Поле должно быть заполнено'],
+            [['email', 'name'], 'required', 'on' => self::SCENARIO_UPDATE_USER, 'message' => 'Поле должно быть заполнено'],
             ['password', 'compare', 'compareAttribute' => 'password_repeat', 'on' => self::SCENARIO_UPDATE_USER, 'message' => 'Пароли должны совпадать']
         ];
     }
@@ -191,8 +192,8 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
 
     public function getRecalls()
     {
-     return $this->hasMany(Recall::class, ['task_id' => 'id'])
-         ->viaTable('task', ['executor_id' => 'id'])->with('task', 'reviewer');
+        return $this->hasMany(Recall::class, ['task_id' => 'id'])
+            ->viaTable('task', ['executor_id' => 'id'])->with('task', 'reviewer');
     }
 
     /**
@@ -231,14 +232,14 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     public function checkUserSetting(string $setting)
     {
         if (isset($this->userSettings)) {
-           return isset($this->userSettings->$setting) ? !!$this->userSettings->$setting : false;
+            return isset($this->userSettings->$setting) ? !!$this->userSettings->$setting : false;
         }
         return false;
     }
 
     public function checkUserCategory(int $categoryId)
     {
-       return $this->getCategories()->where(['category.id'=> $categoryId])->exists();
+        return $this->getCategories()->where(['category.id' => $categoryId])->exists();
     }
 
     public function getUserCategory(int $categoryId)
@@ -251,9 +252,9 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
      */
     public function deactivateAllUserCategories()
     {
-            Yii::$app->db
-                ->createCommand('UPDATE user_category SET active = 0 WHERE user_id=:user_id', ['user_id' => $this->id])
-                ->execute();
+        Yii::$app->db
+            ->createCommand('UPDATE user_category SET active = 0 WHERE user_id=:user_id', ['user_id' => $this->id])
+            ->execute();
     }
 
     public function deleteUserPortfolio()
@@ -261,10 +262,6 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         Yii::$app->db
             ->createCommand('DELETE FROM user_portfolio WHERE user_id=:user_id', ['user_id' => $this->id])
             ->execute();
-    }
-
-    public function getUserAge() {
-
     }
 
     public static function findIdentity($id)

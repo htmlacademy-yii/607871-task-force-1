@@ -35,11 +35,11 @@ class AccountController extends SecuredController
 
             $uploadFilesModel->files = UploadedFile::getInstances($uploadFilesModel, 'files');
             $uploadFilesModel->avatar = UploadedFile::getInstance($uploadFilesModel, 'avatar');
-            $uploadFilesIsValid = $uploadFilesModel->validate();
+            $uploadFilesModel->validate();
 
             $profileUpdated = self::updateProfile($uploadFilesModel, $user);
 
-            if (isset($userUpdated, $profileUpdated, $userSettings) && $uploadFilesIsValid) {
+            if (!$userUpdated->errors && !$profileUpdated->errors && !$userSettings->errors && !$uploadFilesModel->errors) {
                 $transaction = \Yii::$app->db->beginTransaction();
                 try {
                     //Сохранение данных пользователя
@@ -80,15 +80,15 @@ class AccountController extends SecuredController
      * @throws \yii\base\Exception
      */
 
-    private function updateUser(User $user)
+    private static function updateUser(User $user)
     {
         $user->scenario = User::SCENARIO_UPDATE_USER;
         $user->load(\Yii::$app->request->post());
         $passwordHash = \Yii::$app->security->generatePasswordHash($user->password);
         $user->password = $passwordHash;
         $user->password_repeat = $passwordHash;
-        $userIsValid = $user->validate();
-        return $userIsValid ? $user : null;
+        $user->validate();
+        return  $user;
     }
 
     /**
@@ -123,30 +123,35 @@ class AccountController extends SecuredController
         if ($profileIsValid) {
             $profile->scenario = Profile::SCENARIO_DEFAULT;
             $profile->birth_date = date('Y-m-d', strtotime($profile->birth_date));
-            $profile->avatar = self::updateUserAvatar($uploadFilesModel);
-            return $profile;
+            $profile->avatar = self::updateUserAvatar($uploadFilesModel, $user);
         }
-        return null;
+        return $profile;
     }
 
-    private static function updateUserAvatar(UploadFilesForm $uploadFilesModel)
+    private static function updateUserAvatar(UploadFilesForm $uploadFilesModel, $user)
     {
         if (isset($uploadFilesModel->avatar)) {
             $newAvatarFileName = UploadFilesForm::uploadFile($uploadFilesModel->avatar);
-           return $newAvatarFileName ? \Yii::$app->params['defaultUploadDirectory'] . $newAvatarFileName : null;
+            return $newAvatarFileName ? \Yii::$app->params['defaultUploadDirectory'] . $newAvatarFileName : null;
         }
+        return $user->avatar;
     }
 
-    private static function updateUserSettings(User $user)
+
+    private static function updateUserSettings(User $user): UserSettings
     {
         $userSettings = $user->userSettings;
+
         if (!isset($userSettings)) {
             $userSettings = new UserSettings();
             $userSettings->user_id = $user->id;
+        } else {
+            $userSettings->deactivateAll();
         }
+
         $userSettings->load(\Yii::$app->request->post());
-        $userSettingsIsValid = $userSettings->validate();
-        return $userSettingsIsValid ? $userSettings : null;
+        $userSettings->validate();
+        return $userSettings;
     }
 
     private function updateUserPortfolio(UploadFilesForm $uploadFilesModel, User $user)

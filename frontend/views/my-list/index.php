@@ -132,9 +132,6 @@ use \frontend\widgets\UserRatingWidget;
                                    class="link-regular"><?= Html::encode($myTask->executor->name); ?>
                                 </a>
                             </p>
-                            <a href="<?= Url::to("/task/view/{$myTask->id}"); ?>" class="my-list__bottom-chat  my-list__bottom-chat--new">
-                                <b>3</b>
-                            </a>
                             <?= UserRatingWidget::widget(['userRating' => $myTask->executor->rating]); ?>
                             <b><?= $myTask->executor->rating; ?></b>
                         </div>
