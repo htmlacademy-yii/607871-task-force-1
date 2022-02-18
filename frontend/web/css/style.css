@@ -2659,7 +2659,8 @@ label {
 .has-error .create__file {
   border-color: #FF116E; }
 
-.has-error span {
+.has-error span,
+span.is-invalid {
   color: #FF116E; }
 /*# sourceMappingURL=style.css.map */
 
@@ -2675,4 +2676,8 @@ label {
 .button-container {
   display: flex;
   justify-content: space-between;
+}
+
+input.is-invalid {
+  border-color: #FF116E;
 }

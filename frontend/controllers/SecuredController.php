@@ -35,6 +35,5 @@ class SecuredController extends Controller
                 ]
             ]
         ];
-
     }
 }

@@ -48,6 +48,9 @@ class TaskTest extends \Codeception\Test\Unit
         }
     }
 
+    /**
+     * @throws \App\Exception\DataException
+     */
     public function testGetPossibleActions()
     {
         $map = [

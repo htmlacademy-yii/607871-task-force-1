@@ -5,13 +5,14 @@ namespace frontend\controllers;
 
 
 use frontend\models\Profile;
+use frontend\models\Task;
 use frontend\models\User;
 
 class SignupController extends SecuredController
 {
     public function actionIndex()
     {
-        $user = new User();
+        $user = new User(['scenario' => User::SCENARIO_CREATE_USER]);
         $profile = new Profile();
         if (\Yii::$app->request->getIsPost()) {
 

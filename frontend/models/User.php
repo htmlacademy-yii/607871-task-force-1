@@ -31,6 +31,12 @@ use yii\web\IdentityInterface;
  */
 class User extends \yii\db\ActiveRecord implements IdentityInterface
 {
+    public $password_repeat;
+    public $new_categories_list = [];
+
+    const SCENARIO_CREATE_USER = 'create_user';
+    const SCENARIO_UPDATE_USER = 'update_user';
+
     /**
      * {@inheritdoc}
      */
@@ -45,15 +51,18 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            [['email', 'name', 'password'], 'safe'],
-            [['email', 'name', 'password'], 'trim'],
-            [['email', 'password'], 'required', 'message' => 'Поле должно быть заполнено'],
-            [ 'name', 'required', 'message' => 'Введите ваше имя и фамилию'],
-            [['name', 'email'], 'string', 'max' => 50, 'message' => 'Не больше 50 символов'],
-            [['password'], 'string', 'min' => 8, 'max' => 64, 'tooShort' => "Длина пароля от {min} символов", 'tooLong' => 'Длина пароля до {max} символов'],
+            [['email', 'name', 'password'], 'safe', 'on' => self::SCENARIO_CREATE_USER],
+            [['email', 'name', 'password', 'password_repeat'], 'trim'],
+            [['email', 'password'], 'required', 'on' => self::SCENARIO_CREATE_USER, 'message' => 'Поле должно быть заполнено'],
+            ['name', 'required', 'on' => self::SCENARIO_CREATE_USER, 'message' => 'Введите ваше имя и фамилию'],
+            [['name', 'email'], 'string', 'min' => 5, 'max' => 50, 'tooShort' => "Не меньше {min} символов", 'tooLong' => 'Не больше {max} символов'],
+            [['password', 'password_repeat'], 'string', 'min' => 8, 'max' => 64, 'tooShort' => "Длина пароля от {min} символов", 'tooLong' => 'Длина пароля до {max} символов'],
             [['name'], 'unique', 'message' => 'Пользователь с таким именем уже существует'],
             [['email'], 'unique', 'message' => 'Пользователь с таким email уже существует'],
             ['email', 'email', 'message' => 'Введите валидный адрес электронной почты'],
+            [['email', 'password', 'password_repeat', 'new_categories_list'], 'safe', 'on' => self::SCENARIO_UPDATE_USER],
+            [['email', 'name'], 'required', 'on' => self::SCENARIO_UPDATE_USER, 'message' => 'Поле должно быть заполнено'],
+            ['password', 'compare', 'compareAttribute' => 'password_repeat', 'on' => self::SCENARIO_UPDATE_USER, 'message' => 'Пароли должны совпадать']
         ];
     }
 
@@ -66,6 +75,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             'email' => 'Электронная почта',
             'name' => 'Ваше имя',
             'password' => 'Пароль',
+            'password_repeat' => 'Повтор пароля'
         ];
     }
 
@@ -182,8 +192,8 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
 
     public function getRecalls()
     {
-     return $this->hasMany(Recall::class, ['task_id' => 'id'])
-         ->viaTable('task', ['executor_id' => 'id'])->with('task', 'reviewer');
+        return $this->hasMany(Recall::class, ['task_id' => 'id'])
+            ->viaTable('task', ['executor_id' => 'id'])->with('task', 'reviewer');
     }
 
     /**
@@ -191,9 +201,9 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getSettings()
+    public function getUserSettings()
     {
-        return $this->hasMany(UserSettings::class, ['user_id' => 'id']);
+        return $this->hasOne(UserSettings::class, ['user_id' => 'id'])->inverseOf('user');
     }
 
     public function getRating()
@@ -203,7 +213,8 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
 
     public function getAvatar()
     {
-        return ($this->profile->avatar) ?: Yii::$app->params['defaultAvatarPath'];
+        $defaultAvatar = Yii::$app->params['defaultAvatarPath'] ?? '';
+        return ($this->profile->avatar) ?: $defaultAvatar;
     }
 
     public function getCity()
@@ -216,6 +227,41 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     {
         return $this->getExecutorTasks()
             ->where(['task.status' => Task::STATUS_FINISHED])->count();
+    }
+
+    public function checkUserSetting(string $setting)
+    {
+        if (isset($this->userSettings)) {
+            return isset($this->userSettings->$setting) ? !!$this->userSettings->$setting : false;
+        }
+        return false;
+    }
+
+    public function checkUserCategory(int $categoryId)
+    {
+        return $this->getCategories()->where(['category.id' => $categoryId])->exists();
+    }
+
+    public function getUserCategory(int $categoryId)
+    {
+        return UserCategory::find()->where(['user_id' => $this->id, 'category_id' => $categoryId])->one();
+    }
+
+    /**
+     * @throws \yii\db\Exception
+     */
+    public function deactivateAllUserCategories()
+    {
+        Yii::$app->db
+            ->createCommand('UPDATE user_category SET active = 0 WHERE user_id=:user_id', ['user_id' => $this->id])
+            ->execute();
+    }
+
+    public function deleteUserPortfolio()
+    {
+        Yii::$app->db
+            ->createCommand('DELETE FROM user_portfolio WHERE user_id=:user_id', ['user_id' => $this->id])
+            ->execute();
     }
 
     public static function findIdentity($id)

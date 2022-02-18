@@ -52,7 +52,6 @@ use \frontend\models\Category;
             'labelOptions' => ['class' => 'search-task__name']
         ])->dropDownList($model::PERIOD_MAP, [
             'class' => 'multiple-select input',
-
         ])?>
         <?= $form->field($model, 'titleSearch', [
             'labelOptions' => ['class' => 'search-task__name']
