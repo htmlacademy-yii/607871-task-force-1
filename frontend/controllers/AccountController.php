@@ -30,14 +30,14 @@ class AccountController extends SecuredController
 
         if (\Yii::$app->request->getIsPost()) {
 
-            $userUpdated = self::updateUser($user);
-            $userSettings = self::updateUserSettings($user);
+            $userUpdated = $this->updateUser($user);
+            $userSettings = $this->updateUserSettings($user);
 
             $uploadFilesModel->files = UploadedFile::getInstances($uploadFilesModel, 'files');
             $uploadFilesModel->avatar = UploadedFile::getInstance($uploadFilesModel, 'avatar');
             $uploadFilesModel->validate();
 
-            $profileUpdated = self::updateProfile($uploadFilesModel, $user);
+            $profileUpdated = $this->updateProfile($uploadFilesModel, $user);
 
             if (!$userUpdated->errors && !$profileUpdated->errors && !$userSettings->errors && !$uploadFilesModel->errors) {
                 $transaction = \Yii::$app->db->beginTransaction();
@@ -49,15 +49,14 @@ class AccountController extends SecuredController
                     //Сохранение настроек пользователя
                     $userSettings->save();
                     //Сохранение категорий пользователя
-                    self::updateUserCategories($user);
+                    $this->updateUserCategories($user);
                     //Сохранения пользовательского портфолио
-                    self::updateUserPortfolio($uploadFilesModel, $user);
+                    $this->updateUserPortfolio($uploadFilesModel, $user);
 
                     $transaction->commit();
                     return $this->redirect('/account');
                 } catch (\Throwable $e) {
                     $transaction->rollBack();
-                    var_dump($e->getMessage());
                 }
 
             } else {
@@ -80,7 +79,7 @@ class AccountController extends SecuredController
      * @throws \yii\base\Exception
      */
 
-    private static function updateUser(User $user): User
+    private function updateUser(User $user): User
     {
         $user->scenario = User::SCENARIO_UPDATE_USER;
         $user->load(\Yii::$app->request->post());
@@ -95,7 +94,7 @@ class AccountController extends SecuredController
      * @param User $user
      * @throws \yii\db\Exception
      */
-    private static function updateUserCategories(User $user): void
+    private function updateUserCategories(User $user): void
     {
         $user->deactivateAllUserCategories();
 
@@ -122,12 +121,12 @@ class AccountController extends SecuredController
         if ($profileIsValid) {
             $profile->scenario = Profile::SCENARIO_DEFAULT;
             $profile->birth_date = date('Y-m-d', strtotime($profile->birth_date));
-            $profile->avatar = self::updateUserAvatar($uploadFilesModel, $user);
+            $profile->avatar = $this->updateUserAvatar($uploadFilesModel, $user);
         }
         return $profile;
     }
 
-    private static function updateUserAvatar(UploadFilesForm $uploadFilesModel, $user): ?string
+    private function updateUserAvatar(UploadFilesForm $uploadFilesModel, $user): ?string
     {
         if (isset($uploadFilesModel->avatar)) {
             $newAvatarFileName = UploadFilesForm::uploadFile($uploadFilesModel->avatar);
@@ -137,7 +136,7 @@ class AccountController extends SecuredController
     }
 
 
-    private static function updateUserSettings(User $user): UserSettings
+    private function updateUserSettings(User $user): UserSettings
     {
         $userSettings = $user->userSettings;
 
