@@ -78,25 +78,9 @@ class MainController extends SecuredController
                         \Yii::t('app', "Пользователь с такой электронной почтой как в {client} уже существует, но с ним не связан. Для начала войдите на сайт использую электронную почту, для того, что бы связать её.", ['client' => $client->getTitle()]),
                     ]);
                 } else {
-                    $password = \Yii::$app->security->generateRandomString(10);
-                    $user = new User([
-                        'scenario' => User::SCENARIO_CREATE_USER,
-                        'email' => $attributes['email'],
-                        'password' => $password,
-                        'name' => implode(' ', array($attributes['last_name'], $attributes['first_name'])),
 
-                    ]);
-
-                    $city = City::find()->where(['name' => $attributes['city']['title']])->one();
-                    $profile = new Profile([
-                        'scenario' => Profile::SCENARIO_DEFAULT,
-                        'city_id' => $city->id,
-                        'avatar' => $attributes['photo'],
-                        'birth_date' => date('Y-m-d', strtotime($attributes['bdate'])),
-                    ]);
-
-                    $user->validate();
-                    $profile->validate();
+                    $user = $this->loadUserVkAttributes($attributes);
+                    $profile = $this->loadProfileVKAttributes($attributes);
 
                     if (!$user->errors && !$profile->errors) {
                         $transaction = \Yii::$app->db->beginTransaction();
@@ -128,5 +112,49 @@ class MainController extends SecuredController
                 $auth->save();
             }
         }
+    }
+
+    private function loadProfileVKAttributes(array $attributes): Profile
+    {
+        $profile = new Profile(['scenario' => Profile::SCENARIO_DEFAULT]);
+
+        if (isset($attributes['city']['title'])) {
+            $city = City::find()->where(['name' => $attributes['city']['title']])->one();
+            if ($city) {
+                $profile->city_id = $city->id;
+            }
+        }
+
+        if (isset($attributes['photo'])) {
+            $profile->avatar = $attributes['photo'];
+        }
+
+        if (isset($attributes['bdate'])) {
+            $profile->birth_date = date('Y-m-d', strtotime($attributes['bdate']));
+        }
+
+        $profile->validate();
+        return $profile;
+    }
+
+    private function loadUserVkAttributes(array $attributes): User
+    {
+        $password = \Yii::$app->security->generateRandomString(15);
+        $user = new User([
+            'scenario' => User::SCENARIO_CREATE_USER,
+
+            'password' => \Yii::$app->security->generatePasswordHash($password),
+        ]);
+
+        if (isset($attributes['email'])) {
+            $user->email = $attributes['email'];
+        }
+
+        if (isset($attributes['last_name'], $attributes['first_name'])) {
+            $user->name = implode(' ', array($attributes['last_name'], $attributes['first_name']));
+        }
+
+        $user->validate();
+        return $user;
     }
 }
