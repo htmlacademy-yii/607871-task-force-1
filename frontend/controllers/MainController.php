@@ -5,8 +5,10 @@ namespace frontend\controllers;
 
 
 use frontend\models\Auth;
+use frontend\models\City;
 use frontend\models\forms\LoginForm;
 use frontend\models\forms\TaskSearchForm;
+use frontend\models\Profile;
 use frontend\models\Task;
 use frontend\models\User;
 use GuzzleHttp\Client;
@@ -56,12 +58,6 @@ class MainController extends SecuredController
         throw new \yii\web\BadRequestHttpException('Неверный запрос!');
     }
 
-    public function actionLoginVkontakte()
-    {
-
- //$this->redirect('https://oauth.vk.com/authorize?client_id=8084301&redirect_uri=http://yii-taskforce/loginvk&display=popup&response_type=code');
-
-    }
     public function onAuthSuccess($client)
     {
         $attributes = $client->getUserAttributes();
@@ -82,26 +78,43 @@ class MainController extends SecuredController
                         \Yii::t('app', "Пользователь с такой электронной почтой как в {client} уже существует, но с ним не связан. Для начала войдите на сайт использую электронную почту, для того, что бы связать её.", ['client' => $client->getTitle()]),
                     ]);
                 } else {
-                    $password = \Yii::$app->security->generateRandomString(6);
+                    $password = \Yii::$app->security->generateRandomString(10);
                     $user = new User([
+                        'scenario' => User::SCENARIO_CREATE_USER,
                         'email' => $attributes['email'],
                         'password' => $password,
+                        'name' => implode(' ', array($attributes['last_name'], $attributes['first_name'])),
+
                     ]);
-                    $transaction = $user->getDb()->beginTransaction();
-                    if ($user->save()) {
-                        $auth = new Auth([
-                            'user_id' => $user->id,
-                            'source' => $client->getId(),
-                            'source_id' => (string)$attributes['id'],
-                        ]);
-                        if ($auth->save()) {
+
+                    $city = City::find()->where(['name' => $attributes['city']['title']])->one();
+                    $profile = new Profile([
+                        'scenario' => Profile::SCENARIO_DEFAULT,
+                        'city_id' => $city->id,
+                        'avatar' => $attributes['photo'],
+                        'birth_date' => date('Y-m-d', strtotime($attributes['bdate'])),
+                    ]);
+
+                    $user->validate();
+                    $profile->validate();
+
+                    if (!$user->errors && !$profile->errors) {
+                        $transaction = \Yii::$app->db->beginTransaction();
+                        try {
+                            $user->save();
+                            $profile->user_id = $user->getPrimaryKey();
+                            $profile->save();
+                            $auth = new Auth([
+                                'user_id' => $user->getPrimaryKey(),
+                                'source' => $client->getId(),
+                                'source_id' => (string)$attributes['id'],
+                            ]);
+                            $auth->save();
                             $transaction->commit();
                             \Yii::$app->user->login($user);
-                        } else {
-                            print_r($auth->getErrors());
+                        } catch (\Throwable $e) {
+                            $transaction->rollBack();
                         }
-                    } else {
-                        print_r($user->getErrors());
                     }
                 }
             }
@@ -116,5 +129,4 @@ class MainController extends SecuredController
             }
         }
     }
-
 }

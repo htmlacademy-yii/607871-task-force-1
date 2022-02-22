@@ -22,6 +22,15 @@ return [
         }
     },
     'components' => [
+        'cache' => [
+            'class' => 'yii\redis\Cache',
+            'redis' => [
+                'class' =>'yii\redis\Connection',
+                'hostname' => 'localhost',
+                'port' => 6379,
+                'database' => 0,
+            ]
+        ],
         'authClientCollection' => [
             'class' => 'yii\authclient\Collection',
             'clients' => [
@@ -29,6 +38,7 @@ return [
                     'class' => 'yii\authclient\clients\VKontakte',
                     'clientId' => '8084301',
                     'clientSecret' => 'UQyNgaTSrEKCQY52pe4w',
+                    'scope' => 'email',
                 ],
             ],
         ],
@@ -73,7 +83,6 @@ return [
                 'task/confirm/<taskId:\d+>/<messageId:\d+>' => 'tasks/confirm',
                 'task/deny/<taskId:\d+>/<messageId:\d+>' => 'tasks/deny',
                 'user/view/<id:\d+>' => 'users/view',
-                'loginvk' => 'main/login-vkontakte',
                 ['class' => 'yii\rest\UrlRule', 'controller' => 'api/messages'],
             ],
         ],

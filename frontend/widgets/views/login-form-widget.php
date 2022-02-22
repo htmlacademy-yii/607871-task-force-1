@@ -25,9 +25,7 @@ use \yii\helpers\Url;
         'enableAjaxValidation' => true,
         'enableClientValidation' => true,
     ]); ?>
-   <!-- <a href="<?/*= Url::to(['/loginvk']); */?>" rel ="nofollow" title="Войти через Вконтакте" class="modal__social-vk">
-<img src="/img/vk-icon.svg" width="60" height="60" alt="Вконтакте">
-    </a>-->
+
     <?= yii\authclient\widgets\AuthChoice::widget([
         'baseAuthUrl' => ['main/auth'],
         'popupMode' => false,
