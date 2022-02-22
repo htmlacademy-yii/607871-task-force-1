@@ -29,7 +29,7 @@ use \yii\helpers\Url;
 <img src="/img/vk-icon.svg" width="60" height="60" alt="Вконтакте">
     </a>-->
     <?= yii\authclient\widgets\AuthChoice::widget([
-        'baseAuthUrl' => ['/loginvk'],
+        'baseAuthUrl' => ['main/auth'],
         'popupMode' => false,
     ]); ?>
     <?= $form->field($model, 'email')->textInput(); ?>

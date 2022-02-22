@@ -84,12 +84,9 @@ class MainController extends SecuredController
                 } else {
                     $password = \Yii::$app->security->generateRandomString(6);
                     $user = new User([
-                        'username' => $attributes['login'],
                         'email' => $attributes['email'],
                         'password' => $password,
                     ]);
-                   // $user->generateAuthKey();
-                   // $user->generatePasswordResetToken();
                     $transaction = $user->getDb()->beginTransaction();
                     if ($user->save()) {
                         $auth = new Auth([
