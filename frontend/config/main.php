@@ -22,6 +22,16 @@ return [
         }
     },
     'components' => [
+        'authClientCollection' => [
+            'class' => 'yii\authclient\Collection',
+            'clients' => [
+                'vkontakte' => [
+                    'class' => 'yii\authclient\clients\VKontakte',
+                    'clientId' => '8084301',
+                    'clientSecret' => 'UQyNgaTSrEKCQY52pe4w',
+                ],
+            ],
+        ],
         'request' => [
             'parsers' => [
                 'application/json' =>'yii\web\JsonParser',
@@ -63,6 +73,7 @@ return [
                 'task/confirm/<taskId:\d+>/<messageId:\d+>' => 'tasks/confirm',
                 'task/deny/<taskId:\d+>/<messageId:\d+>' => 'tasks/deny',
                 'user/view/<id:\d+>' => 'users/view',
+                'loginvk' => 'main/login-vkontakte',
                 ['class' => 'yii\rest\UrlRule', 'controller' => 'api/messages'],
             ],
         ],

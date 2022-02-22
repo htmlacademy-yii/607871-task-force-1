@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use \yii\widgets\ActiveForm;
+use \yii\helpers\Url;
 
 /**
  * @var \frontend\models\forms\LoginForm $model
@@ -24,7 +25,13 @@ use \yii\widgets\ActiveForm;
         'enableAjaxValidation' => true,
         'enableClientValidation' => true,
     ]); ?>
-
+   <!-- <a href="<?/*= Url::to(['/loginvk']); */?>" rel ="nofollow" title="Войти через Вконтакте" class="modal__social-vk">
+<img src="/img/vk-icon.svg" width="60" height="60" alt="Вконтакте">
+    </a>-->
+    <?= yii\authclient\widgets\AuthChoice::widget([
+        'baseAuthUrl' => ['/loginvk'],
+        'popupMode' => false,
+    ]); ?>
     <?= $form->field($model, 'email')->textInput(); ?>
     <?= $form->field($model, 'password')->passwordInput(); ?>
 
