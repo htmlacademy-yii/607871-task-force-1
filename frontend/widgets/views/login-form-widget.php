@@ -2,6 +2,7 @@
 
 use yii\helpers\Html;
 use \yii\widgets\ActiveForm;
+use \yii\helpers\Url;
 
 /**
  * @var \frontend\models\forms\LoginForm $model
@@ -25,6 +26,10 @@ use \yii\widgets\ActiveForm;
         'enableClientValidation' => true,
     ]); ?>
 
+    <?= yii\authclient\widgets\AuthChoice::widget([
+        'baseAuthUrl' => ['main/auth'],
+        'popupMode' => false,
+    ]); ?>
     <?= $form->field($model, 'email')->textInput(); ?>
     <?= $form->field($model, 'password')->passwordInput(); ?>
 

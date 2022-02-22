@@ -2681,3 +2681,19 @@ span.is-invalid {
 input.is-invalid {
   border-color: #FF116E;
 }
+
+.portfolio__preview-container {
+  display: flex;
+}
+
+.portfolio__preview {
+  margin-right: 10px;
+}
+
+.modal__social-vk {
+  display: block;
+  height: 60px;
+  line-height: 56px;
+  text-align: center;
+  background-color: #4887c2;
+}

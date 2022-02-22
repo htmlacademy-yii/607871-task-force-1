@@ -125,6 +125,9 @@ AccountAvatarPreview::register($this);
         </div>
 
         <h3 class="div-line">Фото работ</h3>
+        <div class="portfolio__preview"></div>
+        <div class="portfolio__preview-container">
+        </div>
 
         <?= $form->field($uploadFilesModel, 'files[]', [
             'template' => "{label}\n<div class='account__redaction-section-wrapper account__redaction'>{input}\n<span></span></div>\n{error}\n"

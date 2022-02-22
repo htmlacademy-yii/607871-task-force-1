@@ -22,6 +22,26 @@ return [
         }
     },
     'components' => [
+        'cache' => [
+            'class' => 'yii\redis\Cache',
+            'redis' => [
+                'class' =>'yii\redis\Connection',
+                'hostname' => 'localhost',
+                'port' => 6379,
+                'database' => 0,
+            ]
+        ],
+        'authClientCollection' => [
+            'class' => 'yii\authclient\Collection',
+            'clients' => [
+                'vkontakte' => [
+                    'class' => 'yii\authclient\clients\VKontakte',
+                    'clientId' => '8084301',
+                    'clientSecret' => 'UQyNgaTSrEKCQY52pe4w',
+                    'scope' => 'email',
+                ],
+            ],
+        ],
         'request' => [
             'parsers' => [
                 'application/json' =>'yii\web\JsonParser',

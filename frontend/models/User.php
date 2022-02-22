@@ -53,7 +53,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         return [
             [['email', 'name', 'password'], 'safe', 'on' => self::SCENARIO_CREATE_USER],
             [['email', 'name', 'password', 'password_repeat'], 'trim'],
-            [['email', 'password'], 'required', 'on' => self::SCENARIO_CREATE_USER, 'message' => 'Поле должно быть заполнено'],
+            [['email', 'password', 'name'], 'required', 'on' => self::SCENARIO_CREATE_USER, 'message' => 'Поле должно быть заполнено'],
             ['name', 'required', 'on' => self::SCENARIO_CREATE_USER, 'message' => 'Введите ваше имя и фамилию'],
             [['name', 'email'], 'string', 'min' => 5, 'max' => 50, 'tooShort' => "Не меньше {min} символов", 'tooLong' => 'Не больше {max} символов'],
             [['password', 'password_repeat'], 'string', 'min' => 8, 'max' => 64, 'tooShort' => "Длина пароля от {min} символов", 'tooLong' => 'Длина пароля до {max} символов'],

@@ -48,7 +48,7 @@ class Profile extends \yii\db\ActiveRecord
             [['user_id', 'city_id'], 'integer'],
             ['city_id', 'required'],
             [['description'], 'string'],
-            [['avatar'], 'string', 'max' => 100],
+            [['avatar'], 'string', 'max' => 255],
             [['phone'], 'match', 'pattern' => '/^[\d]{11}/i', 'message' => 'Указан неверный номер телефона'],
             [['skype', 'telegram'], 'string', 'max' => 50],
             [['phone'], 'unique', 'message' => 'Пользователь с таким номером телефона уже существует'],
