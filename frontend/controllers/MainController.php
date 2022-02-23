@@ -68,48 +68,37 @@ class MainController extends SecuredController
             'source_id' => $attributes['id'],
         ])->one();
 
-        if (\Yii::$app->user->isGuest) {
-            if ($auth) { // авторизация
-                $user = $auth->user;
-                \Yii::$app->user->login($user);
-            } else { // регистрация
-                if (isset($attributes['email']) && User::find()->where(['email' => $attributes['email']])->exists()) {
-                    \Yii::$app->getSession()->setFlash('error', [
-                        \Yii::t('app', "Пользователь с такой электронной почтой как в {client} уже существует, но с ним не связан. Для начала войдите на сайт использую электронную почту, для того, что бы связать её.", ['client' => $client->getTitle()]),
-                    ]);
-                } else {
+        if (!\Yii::$app->user->isGuest) {
+            $this->redirect('/tasks');
+        }
 
-                    $user = $this->loadUserVkAttributes($attributes);
-                    $profile = $this->loadProfileVKAttributes($attributes);
+        if ($auth) { // авторизация
+            $user = $auth->user;
+            \Yii::$app->user->login($user);
+        } else { // регистрация
+            if (isset($attributes['email']) && !User::find()->where(['email' => $attributes['email']])->exists()) {
 
-                    if (!$user->errors && !$profile->errors) {
-                        $transaction = \Yii::$app->db->beginTransaction();
-                        try {
-                            $user->save();
-                            $profile->user_id = $user->getPrimaryKey();
-                            $profile->save();
-                            $auth = new Auth([
-                                'user_id' => $user->getPrimaryKey(),
-                                'source' => $client->getId(),
-                                'source_id' => (string)$attributes['id'],
-                            ]);
-                            $auth->save();
-                            $transaction->commit();
-                            \Yii::$app->user->login($user);
-                        } catch (\Throwable $e) {
-                            $transaction->rollBack();
-                        }
+                $user = $this->loadUserVkAttributes($attributes);
+                $profile = $this->loadProfileVKAttributes($attributes);
+
+                if (!$user->errors && !$profile->errors) {
+                    $transaction = \Yii::$app->db->beginTransaction();
+                    try {
+                        $user->save();
+                        $profile->user_id = $user->getPrimaryKey();
+                        $profile->save();
+                        $auth = new Auth([
+                            'user_id' => $user->getPrimaryKey(),
+                            'source' => $client->getId(),
+                            'source_id' => (string)$attributes['id'],
+                        ]);
+                        $auth->save();
+                        $transaction->commit();
+                        \Yii::$app->user->login($user);
+                    } catch (\Throwable $e) {
+                        $transaction->rollBack();
                     }
                 }
-            }
-        } else { // Пользователь уже зарегистрирован
-            if (!$auth) { // добавляем внешний сервис аутентификации
-                $auth = new Auth([
-                    'user_id' => \Yii::$app->user->id,
-                    'source' => $client->getId(),
-                    'source_id' => $attributes['id'],
-                ]);
-                $auth->save();
             }
         }
     }
@@ -142,7 +131,6 @@ class MainController extends SecuredController
         $password = \Yii::$app->security->generateRandomString(15);
         $user = new User([
             'scenario' => User::SCENARIO_CREATE_USER,
-
             'password' => \Yii::$app->security->generatePasswordHash($password),
         ]);
 

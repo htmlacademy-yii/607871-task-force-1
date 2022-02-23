@@ -2690,10 +2690,4 @@ input.is-invalid {
   margin-right: 10px;
 }
 
-.modal__social-vk {
-  display: block;
-  height: 60px;
-  line-height: 56px;
-  text-align: center;
-  background-color: #4887c2;
-}
+

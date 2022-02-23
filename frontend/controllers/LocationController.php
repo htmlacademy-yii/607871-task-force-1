@@ -14,6 +14,14 @@ class LocationController extends SecuredController
     {
         $this->layout = false;
         \Yii::$app->response->format = Response::FORMAT_JSON;
+        $addressQuery = \Yii::$app->request->get('search');
+        $addressQueryModified = 'Yandex' . mb_substr(md5($addressQuery), 0, 26);
+        $addressInCache = \Yii::$app->cache->get($addressQueryModified);
+
+         if ($addressInCache) {
+             return $addressInCache;
+         }
+
         $response_data = YandexGeo::sendQuery(\Yii::$app->request->get('search'));
         if ($response_data) {
             $GeoObjects = $response_data['response']['GeoObjectCollection']['featureMember'];
@@ -32,6 +40,7 @@ class LocationController extends SecuredController
                     continue;
                 }
             }
+            \Yii::$app->cache->set($addressQueryModified, $result, 86400);
             return $result;
         }
     }
