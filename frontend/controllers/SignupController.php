@@ -17,19 +17,19 @@ class SignupController extends SecuredController
         if (\Yii::$app->request->getIsPost()) {
 
             if ($user->load(\Yii::$app->request->post()) && $profile->load(\Yii::$app->request->post())) {
-                $isValid = $user->validate();
-                $isValid = $profile->validate() && $isValid;
+                $user->validate();
+                $profile->validate();
 
-                if ($isValid) {
+                if (!$user->errors && !$profile->errors) {
                     $passwordHash = \Yii::$app->security->generatePasswordHash($user->getAttribute('password'));
                     $user->setAttribute('password', $passwordHash);
                      $transaction = \Yii::$app->db->beginTransaction();
 
                     try {
-                        $user->save(false);
+                        $user->save();
                         $userId = $user->getId();
                         $profile->setAttribute('user_id', $userId);
-                        $profile->save(false);
+                        $profile->save();
                         $transaction->commit();
                         $this->redirect('/');
                     } catch (\Throwable $e) {
