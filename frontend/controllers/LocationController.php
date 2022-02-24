@@ -22,9 +22,9 @@ class LocationController extends SecuredController
              return $addressInCache;
          }
 
-        $response_data = YandexGeo::sendQuery(\Yii::$app->request->get('search'));
-        if ($response_data) {
-            $GeoObjects = $response_data['response']['GeoObjectCollection']['featureMember'];
+        $responseData = YandexGeo::sendQuery(\Yii::$app->request->get('search'));
+        if ($responseData) {
+            $GeoObjects = $responseData['response']['GeoObjectCollection']['featureMember'];
             $result = [];
             foreach ($GeoObjects as $value) {
                 try {
