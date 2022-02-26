@@ -12,6 +12,7 @@ class m220131_123459_init extends Migration
      */
     public function safeUp()
     {
+        $this->execute("CREATE DATABASE taskmaster");
         $sql = file_get_contents('console/migrations/data/taskmaster_bd.sql');
         $this->execute($sql);
     }
