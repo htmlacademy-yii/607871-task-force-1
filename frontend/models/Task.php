@@ -213,10 +213,10 @@ class Task extends ActiveRecord
     {
         if ($this->latitude && $this->longitude) {
             $geoCode = "{$this->longitude},{$this->latitude}";
-            $response_data = YandexGeo::sendQuery($geoCode, 'district');
-            if ($response_data) {
+            $responseData = YandexGeo::sendQuery($geoCode, 'district');
+            if ($responseData) {
                 $districts = [];
-                $geoObjects = $response_data['response']['GeoObjectCollection']['featureMember'];
+                $geoObjects = $responseData['response']['GeoObjectCollection']['featureMember'];
                 foreach ($geoObjects as $value) {
                     try {
                         $yandexGeo = new YandexGeo();
