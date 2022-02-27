@@ -3,11 +3,16 @@ use yii\helpers\Url;
 use App\Service\DataFormatter;
 use \frontend\widgets\UserRatingWidget;
 use \yii\helpers\Html;
+use yii\widgets\LinkPager;
+use \frontend\assets\TaskIndexAsset;
 
 /**
+ * @var \yii\web\View $this
  * @var \yii\data\ActiveDataProvider $dataProvider
  * @var \frontend\models\forms\UserSearchForm $model
  */
+
+TaskIndexAsset::register($this);
 ?>
 <section class="user__search">
     <?php foreach ($dataProvider->getModels() as $user): ?>
@@ -39,10 +44,21 @@ use \yii\helpers\Html;
                     ]); ?>" class="link-regular">
                         <?= $category->name; ?>
                     </a>
-
                 <?php endforeach; ?>
             </div>
         </div>
     <?php endforeach; ?>
+    <div class="new-task__pagination">
+        <?= LinkPager::widget([
+            'pagination' => $dataProvider->getPagination(),
+            'options' => ['class' => 'new-task__pagination-list'],
+            'activePageCssClass' => 'pagination__item--current',
+            'pageCssClass' => 'pagination__item',
+            'nextPageCssClass' => 'pagination__item',
+            'prevPageCssClass' => 'pagination__item',
+            'nextPageLabel' => '',
+            'prevPageLabel' => '',
+        ]); ?>
+    </div>
 </section>
 <?= Yii::$app->controller->renderPartial('/users/search-user', ['model' => $model]); ?>

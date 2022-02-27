@@ -52,7 +52,7 @@ class DataFormatter
         ];
 
         $time_distance = [
-            'years' => floor($time_difference / 3600 / 24 / 30 / 12),
+            'years' => floor($time_difference / 3600 / 24 / 365.25),
             'month' => floor($time_difference / 3600 / 24 / 30),
             'days' => floor($time_difference / 3600 / 24),
             'hours' => floor($time_difference / 3600),

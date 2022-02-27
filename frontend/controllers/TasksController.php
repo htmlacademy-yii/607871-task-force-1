@@ -26,6 +26,7 @@ class TasksController extends SecuredController
     {
         $searchForm = new TaskSearchForm();
         $searchForm->load(Yii::$app->request->get());
+
         return $this->render('index', ['dataProvider' => $searchForm->getDataProvider(), 'model' => $searchForm]);
     }
 
@@ -128,6 +129,7 @@ class TasksController extends SecuredController
             $task->save();
             $respond->save();
             $transaction->commit();
+
         } catch (\Throwable $e) {
             $transaction->rollBack();
         }
