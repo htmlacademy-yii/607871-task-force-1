@@ -43,4 +43,11 @@ class UsersController extends SecuredController
         return $this->goHome();
     }
 
+    public function actionSetCity()
+    {
+        if (\Yii::$app->request->get('city')) {
+            \Yii::$app->session->set('city_id', \Yii::$app->request->get('city'));
+        }
+        $this->redirect(\Yii::$app->request->referrer);
+    }
 }

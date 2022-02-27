@@ -74,7 +74,7 @@ if (cityDropdown.length) {
   cityDropdown.addEventListener('change', function(event) {
     var selectedCity = event.target.value;
 
-    window.location = '/site/city?city=' + selectedCity;
+    window.location = '/users/set-city?city=' + selectedCity;
   });
 }
 

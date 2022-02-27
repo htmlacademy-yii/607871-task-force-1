@@ -3,11 +3,15 @@ use yii\helpers\Url;
 use App\Service\DataFormatter;
 use yii\widgets\LinkPager;
 use \yii\helpers\Html;
+use \frontend\assets\TaskIndexAsset;
 
 /**
+ * @var \yii\web\View $this
  * @var \yii\data\ActiveDataProvider $dataProvider
  * @var \frontend\models\forms\TaskSearchForm $model
  */
+
+TaskIndexAsset::register($this);
 ?>
 <section class="new-task">
     <div class="new-task__wrapper">

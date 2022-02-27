@@ -22,6 +22,18 @@ return [
         }
     },
     'components' => [
+        'mailer' => [
+            'class' => 'yii\swiftmailer\Mailer',
+            'useFileTransport' => false,
+            'transport' => [
+                'class' => 'Swift_SmtpTransport',
+                'encryption' => 'tls',
+                'host' => 'phpdemo.ru',
+                'port' => '25',
+                'username' => 'keks@phpdemo.ru',
+                'password' => 'htmlacademy',
+            ]
+        ],
         'cache' => [
             'class' => 'yii\redis\Cache',
             'redis' => [

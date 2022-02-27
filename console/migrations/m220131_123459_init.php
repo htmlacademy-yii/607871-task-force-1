@@ -12,7 +12,7 @@ class m220131_123459_init extends Migration
      */
     public function safeUp()
     {
-        $sql = file_get_contents('console/migrations/data/taskmaster_bd.sql');
+        $sql = file_get_contents(__DIR__ . '/data/taskmaster_bd.sql');
         $this->execute($sql);
     }
 

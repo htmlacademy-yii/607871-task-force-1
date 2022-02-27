@@ -57,7 +57,7 @@ class UserSearchForm extends \yii\base\Model
 
         if ($this->vacant) {
             $query->leftJoin('task', 'task.executor_id=user.id AND task.status=2')
-               ->andWhere('executor_id IS NULL');
+                ->andWhere('executor_id IS NULL');
         }
 
         if ($this->online) {
@@ -73,7 +73,15 @@ class UserSearchForm extends \yii\base\Model
         }
 
         return new ActiveDataProvider([
-        'query' => $query,
-    ]);
+            'query' => $query,
+            'pagination' => [
+                'pageSize' => 5
+            ],
+            'sort' => [
+                'defaultOrder' => [
+                    'last_visit_date' => SORT_DESC,
+                ]
+            ],
+        ]);
     }
 }

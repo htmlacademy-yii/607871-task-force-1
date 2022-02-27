@@ -1,7 +1,3 @@
-CREATE DATABASE IF NOT EXISTS taskmaster
-    DEFAULT CHARACTER SET utf8
-    DEFAULT COLLATE utf8_general_ci;
-
 /*Таблица для справочника городов*/
 
 CREATE TABLE IF NOT EXISTS city (

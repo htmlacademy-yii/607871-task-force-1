@@ -44,6 +44,7 @@ class MainController extends SecuredController
             if ($loginForm->validate()) {
                 $user = $loginForm->getUser();
                 \Yii::$app->user->login($user);
+                \Yii::$app->session->set('city_id', \Yii::$app->user->city->id);
                 return $this->redirect('/tasks');
             }
         }
