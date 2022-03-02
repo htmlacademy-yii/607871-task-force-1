@@ -1,12 +1,12 @@
 INSERT INTO `task` 
 	(`creation_date`, `category_id`, `description`, `due_date`, `title`, `address`, `budget`, `latitude`, `longitude`, `client_id`, `executor_id`, `status`, `city_id`) 
 VALUES 
-	('2021-03-09', '2', 'Suspendisse potenti. In eleifend quam a odio. In hac habitasse platea dictumst.', '2019-11-15', 'enable impactful technologies', '1 Eagan Crossing', '6587', '6.9641667', '158.2083333', '7', NULL, '0', '62'),
+	('2021-03-09', '2', 'Suspendisse potenti. In eleifend quam a odio. In hac habitasse platea dictumst.', '2019-11-15', 'enable impactful technologies', '1 Eagan Crossing', '6587', '6.9641667', '158.2083333', '7', NULL, '0', NULL),
 	('2021-07-03', '3', 'Nam ultrices, libero non mattis pulvinar, nulla pede ullamcorper augue, a suscipit nulla elit ac nulla. Sed vel enim sit amet nunc viverra dapibus. Nulla suscipit ligula in lacus.
-Curabitur at ipsum ac tellus semper interdum. Mauris ullamcorper purus sit amet nulla. Quisque arcu libero, rutrum ac, lobortis vel, dapibus at, diam.', '2019-12-07', 'exploit revolutionary portals', '24043 Paget Alley', '2904', '5.623505', '10.2544044', '14', NULL, '0', '775'),
+Curabitur at ipsum ac tellus semper interdum. Mauris ullamcorper purus sit amet nulla. Quisque arcu libero, rutrum ac, lobortis vel, dapibus at, diam.', '2019-12-07', 'exploit revolutionary portals', '24043 Paget Alley', '2904', '5.623505', '10.2544044', '14', NULL, '0', NULL),
 	('2021-06-27', '2', 'Nulla ut erat id mauris vulputate elementum. Nullam varius. Nulla facilisi.
 Cras non velit nec nisi vulputate nonummy. Maecenas tincidunt lacus at velit. Vivamus vel nulla eget eros elementum pellentesque.
-Quisque porta volutpat erat. Quisque erat eros, viverra eget, congue eget, semper rutrum, nulla. Nunc purus.', '2019-11-23', 'matrix next-generation e-commerce', '2867 Dryden Pass', '1170', '63.593219', '53.9068532', '15', NULL, '0', '186'),
+Quisque porta volutpat erat. Quisque erat eros, viverra eget, congue eget, semper rutrum, nulla. Nunc purus.', '2019-11-23', 'matrix next-generation e-commerce', '2867 Dryden Pass', '1170', '63.593219', '53.9068532', '15', NULL, '0', NULL),
 	('2022-01-01', '1', 'Praesent blandit. Nam nulla. Integer pede justo, lacinia eget, tincidunt eget, tempus vel, pede.
 Morbi porttitor lorem id ligula. Suspendisse ornare consequat lectus. In est risus, auctor sed, tristique in, tempus sit amet, sem.
 Fusce consequat. Nulla nisl. Nunc nisl.', '2019-11-10', 'benchmark plug-and-play infomediaries', '80 Cambridge Street', '838', '20.5800358', '-75.2435307', '14', '9', '0', '274'), 
