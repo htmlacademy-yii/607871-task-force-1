@@ -143,10 +143,9 @@ class AccountController extends SecuredController
         if (!isset($userSettings)) {
             $userSettings = new UserSettings();
             $userSettings->user_id = $user->id;
-        } else {
-            $userSettings->deactivateAll();
         }
 
+        $userSettings->deactivateAll();
         $userSettings->load(\Yii::$app->request->post());
         $userSettings->validate();
         return $userSettings;

@@ -18,5 +18,4 @@ class TaskMapWidget extends Widget
             'task' => $task,
         ]);
     }
-
 }
