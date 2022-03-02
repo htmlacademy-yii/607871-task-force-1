@@ -26,7 +26,7 @@ use yii\web\IdentityInterface;
  * @property Task[] $executorTasks
  * @property Category[] $categories
  * @property User[] $favorites
- * @property UserSettings[] $userSettings
+ * @property UserSettings $userSettings
  * @property Recall[] $recalls
  */
 class User extends \yii\db\ActiveRecord implements IdentityInterface
@@ -222,6 +222,11 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         return City::findOne(['id' => $this->profile->city_id]);
     }
 
+    public function getUserMessage()
+    {
+        return $this->hasMany(UserMessage::class, ['user_id' => 'id'])
+            ->with('task')->orderBy('creation_date DESC');
+    }
 
     public function getExecutorTasksFinished()
     {
@@ -257,11 +262,37 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             ->execute();
     }
 
+    /**
+     * @throws \yii\db\Exception
+     */
+
     public function deleteUserPortfolio()
     {
         Yii::$app->db
             ->createCommand('DELETE FROM user_portfolio WHERE user_id=:user_id', ['user_id' => $this->id])
             ->execute();
+    }
+
+    public function createUserMessage(string $messageType, Task $task)
+    {
+        $message = new UserMessage([
+            'user_id' => $this->id,
+            'task_id' => $task->id,
+            'type' => $messageType,
+        ]);
+        return $message->save();
+    }
+
+    public function sendEmail(string $template, int $typeMessage, Task $task)
+    {
+        $message = Yii::$app->mailer->compose($template, [
+            'user' => $this,
+            'task' => $task,
+        ]);
+
+        $message->setTo($this->email)->setFrom('yii-taskforce@mail.ru')
+            ->setSubject(UserMessage::TYPE_MESSAGE_MAP[$typeMessage] . ' "' . $task->title . '"');
+        return $message->send();
     }
 
     public static function findIdentity($id)

@@ -7,6 +7,7 @@ use \frontend\models\Task;
 use \frontend\models\Respond;
 use frontend\assets\TaskViewAsset;
 use yii\helpers\Html;
+use \frontend\widgets\UserRatingWidget;
 
 /**
  * @var \yii\web\View $this
@@ -90,8 +91,7 @@ YandexMapAsset::register($this);
                                     <div class="feedback-card__top--name">
                                         <p><a href="<?= Url::to("/user/view/{$respond->volunteer->id}"); ?>"
                                               class="link-regular"><?= Html::encode($respond->volunteer->name); ?></a></p>
-                                        <span></span><span></span><span></span><span></span><span
-                                                class="star-disabled"></span>
+                                        <?= UserRatingWidget::widget(['userRating' => $respond->volunteer->rating]); ?>
                                         <b><?= $respond->volunteer->rating; ?></b>
                                     </div>
                                     <span class="new-task__time"><?= DataFormatter::getRelativeTime($respond->creation_date); ?></span>

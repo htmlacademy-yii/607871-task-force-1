@@ -28,10 +28,10 @@ return [
             'transport' => [
                 'class' => 'Swift_SmtpTransport',
                 'encryption' => 'tls',
-                'host' => 'phpdemo.ru',
-                'port' => '25',
-                'username' => 'keks@phpdemo.ru',
-                'password' => 'htmlacademy',
+                'host' => 'smtp.mailtrap.io',
+                'port' => '2525',
+                'username' => '9440786d7c0c96',
+                'password' => 'ff990d4b699398',
             ]
         ],
         'cache' => [

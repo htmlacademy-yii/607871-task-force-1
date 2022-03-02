@@ -13,7 +13,7 @@ use Yii;
  * @property string $message
  * @property string $published_at
  *
- * @property Task $tasks
+ * @property Task $task
  * @property User $user
  */
 class Correspondence extends \yii\db\ActiveRecord

@@ -54,15 +54,15 @@ use yii\helpers\Html;
         'action' => ['task-finish'],
         'method' => 'post',
         'fieldConfig' => [
-            'template' => "{label}\n{input}",
+            'template' => "{label}\n{input}\n{error}",
+            'errorOptions' => ['tag' => 'span', 'class' => 'registration__text-error'],
             'options' => [
-                'tag' => false,
+                //'tag' => false,
             ]],
         'enableAjaxValidation' => false,
     ]); ?>
     <?=$form->field($recall, 'status', [
-        'template' => "{input}",
-        'options' => ['tag' => false]
+        'template' => "{input}\n{error}",
     ])
         ->radioList($recall::COMPLETION,
             [
@@ -95,6 +95,7 @@ use yii\helpers\Html;
         ])->textarea([
             'class' => 'input textarea',
             'rows' => 4,
+            'style' => 'display: block; width: 300px;',
             'placeholder' => 'Place your text',
         ]); ?>
     </p>

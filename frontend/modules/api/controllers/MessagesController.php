@@ -1,7 +1,10 @@
 <?php
-namespace  frontend\modules\api\controllers;
+
+namespace frontend\modules\api\controllers;
 
 use frontend\models\Correspondence;
+use frontend\models\Task;
+use frontend\models\UserMessage;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Json;
 use yii\rest\ActiveController;
@@ -28,7 +31,12 @@ class MessagesController extends ActiveController
         ]);
     }
 
-    public function actionCreate()
+    /**
+     * @return array
+     * @throws BadRequestHttpException
+     */
+
+    public function actionCreate(): array
     {
         $data = Json::decode(\Yii::$app->request->getRawBody());
 
@@ -38,6 +46,20 @@ class MessagesController extends ActiveController
         $model->user_id = \Yii::$app->user->getId();
         if (!$model->save()) {
             throw new BadRequestHttpException();
+        }
+        $task = $model->task;
+        $client = $model->task->client;
+        $executor = $model->task->executor;
+
+        if (\Yii::$app->user->getId() === $executor->id) {
+            $user = $client;
+        } else {
+            $user = $executor;
+        }
+
+        if ($user->userSettings && $user->userSettings->new_message) {
+            $user->createUserMessage(UserMessage::TYPE_NEW_MESSAGE, $task);
+            $user->sendEmail('taskCorrespondence-html', UserMessage::TYPE_NEW_MESSAGE, $task);
         }
 
         \Yii::$app->response->statusCode = 201;

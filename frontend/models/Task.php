@@ -35,7 +35,7 @@ use yii\web\Response;
  * @property User $client
  * @property Correspondence[] $correspondences
  * @property User $executor
- * @property Recall[] $recalls
+ * @property Recall $recall
  * @property Respond[] $responses
  */
 class Task extends ActiveRecord
@@ -172,9 +172,9 @@ class Task extends ActiveRecord
      *
      * @return \yii\db\ActiveQuery
      */
-    public function getRecalls()
+    public function getRecall()
     {
-        return $this->hasMany(Recall::class, ['task_id' => 'id']);
+        return $this->hasOne(Recall::class, ['task_id' => 'id']);
     }
 
     /**

@@ -20,5 +20,8 @@ class m220203_085915_add_district_column_to_task_table extends Migration
      */
     public function safeDown()
     {
+        echo "m220203_085915_add_district_column_to_task_table cannot be reverted.\n";
+
+        return false;
     }
 }
