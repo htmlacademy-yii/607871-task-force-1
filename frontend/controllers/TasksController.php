@@ -130,11 +130,13 @@ class TasksController extends SecuredController
             $task->save();
             $respond->save();
 
+            $transaction->commit();
+
             if ($executor->userSettings && $executor->userSettings->task_actions) {
                 $executor->createUserMessage(UserMessage::TYPE_TASK_CONFIRMED, $task);
                 $executor->sendEmail('taskConfirmed-html', UserMessage::TYPE_TASK_CONFIRMED, $task);
             }
-            $transaction->commit();
+
         } catch (\Throwable $e) {
             $transaction->rollBack();
         }
@@ -160,15 +162,17 @@ class TasksController extends SecuredController
             $task = Task::findOne(Yii::$app->request->post('Task')['id']);
             if ($task && RefuseAction::getUserRightsCheck($task)) {
                 $transaction = Yii::$app->db->beginTransaction();
-                try{
+                try {
                     $task->status = Task::STATUS_FAILED;
                     $task->save();
                     $client = $task->client;
+                    $transaction->commit();
+
                     if ($client->userSettings && $client->userSettings->task_actions) {
                         $client->createUserMessage(UserMessage::TYPE_TASK_FAILED, $task);
                         $client->sendEmail('taskFailed-html', UserMessage::TYPE_TASK_FAILED, $task);
                     }
-                    $transaction->commit();
+
                     return $this->redirect("/task/view/{$task->id}");
                 } catch (\Throwable $e) {
                     $transaction->rollBack();
@@ -215,9 +219,9 @@ class TasksController extends SecuredController
 
     public function actionTaskFinish()
     {
-        if (Yii::$app->request->getIsPost()) {
+        $recall = new Recall();
 
-            $recall = new Recall();
+        if (Yii::$app->request->getIsPost()) {
 
             if (!$recall->load(Yii::$app->request->post()) || !$recall->validate()) {
                 throw new DataException('Данный отзыв не может быть размещен');
@@ -235,6 +239,9 @@ class TasksController extends SecuredController
                 $task->save();
                 $recall->save();
                 $executor = $task->executor;
+
+                $transaction->commit();
+
                 if ($executor->userSettings && $executor->userSettings->task_actions) {
                     $executor->createUserMessage(UserMessage::TYPE_TASK_CLOSED, $task);
                     $executor->sendEmail('taskClosed-html', UserMessage::TYPE_TASK_CLOSED, $task);
@@ -242,15 +249,20 @@ class TasksController extends SecuredController
 
                 if ($executor->userSettings && $executor->userSettings->new_recall) {
                     $executor->createUserMessage(UserMessage::TYPE_TASK_RECALLED, $task);
-                    $executor->sendEmail('taskRecalled-html',UserMessage::TYPE_TASK_RECALLED, $task);
+                    $executor->sendEmail('taskRecalled-html', UserMessage::TYPE_TASK_RECALLED, $task);
                 }
-
-                $transaction->commit();
                 return $this->redirect("/task/view/{$recall->task_id}");
             } catch (\Throwable $e) {
                 $transaction->rollBack();
             }
 
+        }
+        if (\Yii::$app->request->isAjax) {
+            \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
+
+            if (!$recall->load(Yii::$app->request->post())) {
+                return \yii\widgets\ActiveForm::validate($recall);
+            }
         }
         return $this->redirect("/tasks");
     }
