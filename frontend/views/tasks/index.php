@@ -33,7 +33,7 @@ TaskIndexAsset::register($this);
                     <?= Html::encode($newTask->description); ?>
                 </p>
                 <b class="new-task__price new-task__price--<?= $newTask->category->icon; ?>">
-                    <?= $newTask->budget ? "{$newTask->budget} <b>₽</b>" : ''; ?></b>
+                    <?= $newTask->budget ? "{$newTask->budget}&nbsp;₽" : ''; ?></b>
                 <p class="new-task__place"><?= $newTask->city->name ?? ''; ?><?= $newTask->district ? ", {$newTask->district}" : ''; ?></p>
                 <span class="new-task__time"><?= DataFormatter::getRelativeTime($newTask->creation_date); ?></span>
             </div>

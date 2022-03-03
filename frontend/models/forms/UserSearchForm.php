@@ -37,8 +37,7 @@ class UserSearchForm extends \yii\base\Model
     public function getDataProvider()
     {
         $query = User::find()
-            ->joinWith(['profile', 'categories'], true, 'RIGHT JOIN')
-            ->orderBy(['last_visit_date' => SORT_DESC]);
+            ->joinWith(['profile', 'categories'], true, 'RIGHT JOIN');
 
         if ($this->nameSearch) {
             $this->categories = [];
@@ -69,8 +68,10 @@ class UserSearchForm extends \yii\base\Model
         }
 
         if ($this->favorite) {
-            $query->andWhere(['in', 'user.id', User::findOne(10)->favorites]);
+            $query->andWhere(['in', 'user.id', \Yii::$app->user->identity->getFavoriteExecutorsId()]);
         }
+
+        $query->distinct();
 
         return new ActiveDataProvider([
             'query' => $query,

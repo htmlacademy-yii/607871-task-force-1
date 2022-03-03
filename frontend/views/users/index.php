@@ -28,7 +28,6 @@ TaskIndexAsset::register($this);
                     <p class="link-name"><a href="<?= Url::to(
                             "/user/view/{$user->id}"); ?>" class="link-regular"><?= Html::encode($user->name); ?></a></p>
                     <?= UserRatingWidget::widget(['userRating' => $user->rating]); ?>
-                    <b><?= $user->rating; ?></b>
                     <p class="user__search-content">
                         <?= Html::encode($user->profile->description); ?>
                     </p>

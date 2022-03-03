@@ -44,7 +44,7 @@ class TaskSearchForm extends \yii\base\Model
 
     public function getDataProvider()
     {
-        $query = Task::find()->joinWith('category')->orderBy(['creation_date' => SORT_DESC]);
+        $query = Task::find()->joinWith('category');
 
         if ($this->categories) {
             $query->andWhere(['category_id' => $this->categories]);
@@ -67,8 +67,8 @@ class TaskSearchForm extends \yii\base\Model
 
         }
 
-        $query->andWhere(['<>', 'status', Task::STATUS_CANCELED]);
-        $query->andWhere(['or', 'city_id IS NULL',  'city_id=:city_id' ])
+        $query->andWhere(['<>', 'status', Task::STATUS_CANCELED])
+            ->andWhere(['or', 'city_id IS NULL',  'city_id=:city_id' ])
             ->addParams([':city_id' => \Yii::$app->session->get('city_id')]);
 
         return new ActiveDataProvider([

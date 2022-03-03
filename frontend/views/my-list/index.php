@@ -133,7 +133,6 @@ use \frontend\widgets\UserRatingWidget;
                                 </a>
                             </p>
                             <?= UserRatingWidget::widget(['userRating' => $myTask->executor->rating]); ?>
-                            <b><?= $myTask->executor->rating; ?></b>
                         </div>
                     </div>
                 <?php endif; ?>

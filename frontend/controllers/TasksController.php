@@ -35,9 +35,15 @@ class TasksController extends SecuredController
     {
         /** @var Task $task */
         $task = Task::find()
-            ->with('client')
+            ->with('client', 'executor')
             ->where('task.id =:id', ['id' => $id])
             ->one();
+
+        $userCard = $task->client;
+
+        if (isset($task->executor_id) && Yii::$app->user->identity->id === $task->client_id) {
+            $userCard = $task->executor;
+        }
 
         if (!$task) {
             throw new NotFoundHttpException("Задача не найдена!");
@@ -53,6 +59,7 @@ class TasksController extends SecuredController
         return $this->render('view', [
             'task' => $task,
             'model' => $searchForm,
+            'userCard' => $userCard,
             'actions' => $actions,
         ]);
     }

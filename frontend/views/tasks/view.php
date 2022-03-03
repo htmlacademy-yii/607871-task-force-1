@@ -12,6 +12,7 @@ use \frontend\widgets\UserRatingWidget;
 /**
  * @var \yii\web\View $this
  * @var \frontend\models\Task $task
+ * @var \frontend\models\User $userCard
  * @var \frontend\models\forms\TaskSearchForm $model
  * @var array $actions
  */
@@ -35,7 +36,9 @@ YandexMapAsset::register($this);
                                     ]); ?>" class="link-regular"><?= $task->category->name; ?></a>
                                     <?= DataFormatter::getRelativeTime($task->creation_date); ?></span>
                 </div>
-                <b class="new-task__price new-task__price--clean content-view-price"><?= $task->budget; ?><b> ₽</b></b>
+                <b class="new-task__price new-task__price--clean content-view-price">
+                        <?= $task->budget ? "{$task->budget}&nbsp;₽" : ''; ?>
+                    </b></b>
                 <div class="new-task__icon new-task__icon--<?= $task->category->icon; ?> content-view-icon"></div>
             </div>
             <div class="content-view__description">
@@ -92,7 +95,6 @@ YandexMapAsset::register($this);
                                         <p><a href="<?= Url::to("/user/view/{$respond->volunteer->id}"); ?>"
                                               class="link-regular"><?= Html::encode($respond->volunteer->name); ?></a></p>
                                         <?= UserRatingWidget::widget(['userRating' => $respond->volunteer->rating]); ?>
-                                        <b><?= $respond->volunteer->rating; ?></b>
                                     </div>
                                     <span class="new-task__time"><?= DataFormatter::getRelativeTime($respond->creation_date); ?></span>
                                 </div>
@@ -123,16 +125,16 @@ YandexMapAsset::register($this);
 <section class="connect-desk">
     <div class="connect-desk__profile-mini">
         <div class="profile-mini__wrapper">
-            <h3>Заказчик</h3>
+            <h3><?= ($userCard->id === $task->client_id) ?  'Заказчик' : 'Исполнитель'?></h3>
             <div class="profile-mini__top">
-                <img src="<?= Html::encode($task->client->avatar); ?>" width="62" height="62" alt="Аватар заказчика">
+                <img src="<?= Html::encode($userCard->avatar); ?>" width="62" height="62" alt="Аватар заказчика">
                 <div class="profile-mini__name five-stars__rate">
-                    <p><?= Html::encode($task->client->name); ?></p>
+                    <p><?= Html::encode($userCard->name); ?></p>
                 </div>
             </div>
             <p class="info-customer">
-                <span><?= DataFormatter::declensionOfNouns(count($task->client->clientTasks), ['задание', 'задания', 'заданий']); ?></span><span
-                        class="last-"><?= DataFormatter::formatTimeDistance($task->client->reg_date); ?> на сайте</span></p>
+                <span><?= DataFormatter::declensionOfNouns(count($userCard->clientTasks), ['задание', 'задания', 'заданий']); ?></span><span
+                        class="last-"><?= DataFormatter::formatTimeDistance($userCard->reg_date); ?> на сайте</span></p>
             <a href="#" class="link-regular">Смотреть профиль</a>
         </div>
     </div>
