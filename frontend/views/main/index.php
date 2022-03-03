@@ -6,6 +6,8 @@ use yii\helpers\Html;
 
 /**
  * @var \frontend\models\forms\TaskSearchForm $model
+ * @var array $tasks
+ * @var \frontend\models\Task $task
  */
 
 ?>
@@ -117,7 +119,7 @@ use yii\helpers\Html;
                         ]); ?>" class="link-regular"><?= $task->category->name; ?></a></p>
                     <p><?= DataFormatter::getRelativeTime($task->creation_date); ?></p>
                 </div>
-                <span><?= $task->budget; ?>&nbsp;<b>₽</b></span>
+                <span><?= $task->budget ? "{$task->budget}&nbsp;<b>₽</b>" : ''; ?></span>
             </div>
         </div>
         <?php endforeach; ?>

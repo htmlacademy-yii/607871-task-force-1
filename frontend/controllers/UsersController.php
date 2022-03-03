@@ -4,6 +4,7 @@
 namespace frontend\controllers;
 
 
+use app\models\UserFavorite;
 use frontend\models\forms\TaskSearchForm;
 use frontend\models\forms\UserSearchForm;
 use frontend\models\User;
@@ -30,7 +31,7 @@ class UsersController extends SecuredController
         }
 
         $searchForm = new TaskSearchForm();
-        
+
         return $this->render('view', [
             'user' => $user,
             'model' => $searchForm,
@@ -49,5 +50,13 @@ class UsersController extends SecuredController
             \Yii::$app->session->set('city_id', \Yii::$app->request->get('city'));
         }
         $this->redirect(\Yii::$app->request->referrer);
+    }
+
+    public function actionSwitchFavorite(int $chosenUserId)
+    {
+        if (\Yii::$app->user->identity->id !== $chosenUserId) {
+            \Yii::$app->user->identity->switchUserFavorite($chosenUserId);
+        }
+        return $this->redirect(\Yii::$app->request->referrer);
     }
 }

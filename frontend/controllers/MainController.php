@@ -44,7 +44,7 @@ class MainController extends SecuredController
             if ($loginForm->validate()) {
                 $user = $loginForm->getUser();
                 \Yii::$app->user->login($user);
-                \Yii::$app->session->set('city_id', \Yii::$app->user->city->id);
+                \Yii::$app->session->set('city_id', \Yii::$app->user->identity->profile->city_id);
                 return $this->redirect('/tasks');
             }
         }
@@ -96,6 +96,8 @@ class MainController extends SecuredController
                         $auth->save();
                         $transaction->commit();
                         \Yii::$app->user->login($user);
+                        \Yii::$app->session->set('city_id', \Yii::$app->user->identity->profile->city_id);
+                        return $this->redirect('/tasks');
                     } catch (\Throwable $e) {
                         $transaction->rollBack();
                     }

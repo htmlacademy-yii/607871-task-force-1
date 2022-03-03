@@ -145,10 +145,18 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
             ->where(['>=', 'last_visit_date', (new Expression("NOW() - INTERVAL 30 MINUTE"))])->column();
     }
 
+    public function getFavoriteExecutorsId()
+    {
+        return UserFavorite::find()
+            ->select('chosen_id')
+            ->where('chooser_id=:chooser_id', ['chooser_id' => $this->id])
+            ->andWhere('active=1')
+            ->column();
+    }
+
     /**
-     * Gets query for [[Categories]].
-     *
      * @return \yii\db\ActiveQuery
+     * @throws \yii\base\InvalidConfigException
      */
 
     public function getCategories()
@@ -161,14 +169,17 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Gets query for [[Favorites]].
-     *
      * @return \yii\db\ActiveQuery
+     * @throws \yii\base\InvalidConfigException
      */
+
     public function getFavorites()
     {
         return $this->hasMany(User::class, ['id' => 'chosen_id'])
-            ->viaTable('user_favorite', ['chooser_id' => 'id']);
+            ->viaTable('user_favorite', ['chooser_id' => 'id'],
+                function ($query) {
+                return $query->andWhere(['active' => 1]);
+            });
     }
 
     /**
@@ -205,6 +216,11 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     {
         return $this->hasOne(UserSettings::class, ['user_id' => 'id'])->inverseOf('user');
     }
+
+    /**
+     * @return float
+     * @throws \yii\base\InvalidConfigException
+     */
 
     public function getRating()
     {
@@ -250,6 +266,38 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     public function getUserCategory(int $categoryId)
     {
         return UserCategory::find()->where(['user_id' => $this->id, 'category_id' => $categoryId])->one();
+    }
+
+    public function checkIsUserFavorite(int $chosenUserId)
+    {
+        return UserFavorite::find()
+            ->where('chooser_id =:chooser_id', [':chooser_id' => Yii::$app->user->identity->id])
+            ->andWhere('chosen_id =:chosen_id', [':chosen_id' => $chosenUserId])
+            ->andWhere('active=1')
+            ->exists();
+    }
+
+    public function switchUserFavorite(int $chosenUserId)
+    {
+        $userFavorite = UserFavorite::find()
+            ->where('chooser_id =:chooser_id', [':chooser_id' => $this->id])
+            ->andWhere('chosen_id =:chosen_id', [':chosen_id' => $chosenUserId])->one();
+
+        if ($userFavorite && $userFavorite->active === 1) {
+            $userFavorite->active = 0;
+        } elseif ($userFavorite && $userFavorite->active === 0) {
+            $userFavorite->active = 1;
+        }
+
+         if(!$userFavorite) {
+             $userFavorite = new UserFavorite([
+                 'chooser_id' => $this->id,
+                 'chosen_id' => $chosenUserId,
+                 'active' => '1'
+             ]);
+         }
+
+        return $userFavorite->save();
     }
 
     /**

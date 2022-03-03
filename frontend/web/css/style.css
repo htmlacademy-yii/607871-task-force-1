@@ -539,9 +539,10 @@ footer {
   margin-top: 0;
   overflow: hidden;
   display: -webkit-box;
-  -moz-line-clamp: 2;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical; }
+  -moz-line-clamp: 3;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  -ms-flex-item-align: center;}
 
 .new-task__time {
   font-family: "Myriad Pro", sans-serif;
@@ -1709,7 +1710,7 @@ label {
 .three-rate {
   color: #c71d1d; }
 .three-rate span {
-  background-image: url("../img/three-rate.png"); }
+  background-image: url("../img/three-rate.png");}
 
 .registration__user {
   margin-right: auto;

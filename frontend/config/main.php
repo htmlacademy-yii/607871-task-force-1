@@ -90,6 +90,7 @@ return [
                 'tasks' => 'tasks/index',
                 'users' => 'users/index',
                 'mylist' => 'my-list/index',
+                'favorite/<chosenUserId:\d+>' =>'users/switch-favorite',
                 'task/view/<id:\d+>' => 'tasks/view',
                 'task/create' => 'tasks/create',
                 'task/confirm/<taskId:\d+>/<messageId:\d+>' => 'tasks/confirm',

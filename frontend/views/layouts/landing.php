@@ -17,7 +17,7 @@ AppAsset::register($this);
     <meta charset="UTF-8">
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
-    <link rel="stylesheet" href="/css/normalize.css">
+    <link rel="stylesheet" href="<?= Url::to('/css/normalize.css'); ?>">
     <?php $this->head() ?>
 </head>
 <body class="landing">
@@ -58,7 +58,7 @@ AppAsset::register($this);
                 <a href="#" class="header__account-enter open-modal" data-for="enter-form">
                     <span>Вход</span></a>
                 или
-                <a href="<?=Url::to('/signup')?>" class="header__account-registration">
+                <a href="<?= Url::to('/signup'); ?>" class="header__account-registration">
                     Регистрация
                 </a>
             </div>
@@ -66,7 +66,7 @@ AppAsset::register($this);
     </header>
     <main>
         <div class="landing-container">
-            <?= $content ?>
+            <?= $content; ?>
         </div>
     </main>
     <footer class="page-footer">
@@ -87,7 +87,7 @@ AppAsset::register($this);
                         <a href="<?= Url::to('/tasks'); ?>">Задания</a>
                     </li>
                     <li class="links__item">
-                        <a href="">Мой профиль</a>
+                        <a href="<?= Url::to('/account'); ?>">Мой профиль</a>
                     </li>
                     <li class="links__item">
                         <a href="<?= Url::to('/users'); ?>">Исполнители</a>
