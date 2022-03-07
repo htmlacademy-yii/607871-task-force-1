@@ -82,7 +82,7 @@ YandexMapAsset::register($this);
     <?php if ($task->getResponds()->count()): ?>
         <?php if (Yii::$app->user->id === $task->client->id || $task->isVolunteer(Yii::$app->user->id)): ?>
             <div class="content-view__feedback">
-                <h2>Отклики <span>(<?= count($task->responds) ?>)</span></h2>
+                <h2>Отклики <span>(<?= count($task->responds); ?>)</span></h2>
                 <div class="content-view__feedback-wrapper">
 
                     <?php foreach ($task->responds as $respond): ?>

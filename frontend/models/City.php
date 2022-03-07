@@ -55,7 +55,7 @@ class City extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Profiles]].
+     * Метод возвращает список всех пользовательских профилей, привязанных к конкретному городу.
      *
      * @return \yii\db\ActiveQuery
      */
@@ -65,7 +65,7 @@ class City extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Tasks]].
+     * Метод возвращает список всех заданий, привязанных к конкретному городу.
      *
      * @return \yii\db\ActiveQuery
      */
@@ -74,7 +74,12 @@ class City extends \yii\db\ActiveRecord
         return $this->hasMany(Task::class, ['city_id' => 'id']);
     }
 
-    public static function getCityMap()
+    /**
+     * Метод возвращает список всех городов в виде двумерного массива,
+     * каждый элемент которого состоит из идентификатора и названия города.
+     * @return array
+     */
+    public static function getCityMap(): array
     {
         return ArrayHelper::map(self::find()->all(), 'id', 'name');
     }

@@ -39,15 +39,10 @@ class TasksController extends SecuredController
             ->where('task.id =:id', ['id' => $id])
             ->one();
 
-        $userCard = $task->client;
-
-        if (isset($task->executor_id) && Yii::$app->user->identity->id === $task->client_id) {
-            $userCard = $task->executor;
-        }
-
         if (!$task) {
             throw new NotFoundHttpException("Задача не найдена!");
         }
+
         try {
             $actions = \App\business\Task::getPossibleActions($task);
         } catch (DataException $e) {
@@ -55,6 +50,11 @@ class TasksController extends SecuredController
         }
 
         $searchForm = new TaskSearchForm();
+        $userCard = $task->client;
+
+        if (isset($task->executor_id) && Yii::$app->user->identity->id === $task->client_id) {
+            $userCard = $task->executor;
+        }
 
         return $this->render('view', [
             'task' => $task,
@@ -130,20 +130,15 @@ class TasksController extends SecuredController
         }
 
         $transaction = Yii::$app->db->beginTransaction();
+
         try {
             $task->status = Task::STATUS_IN_PROGRESS;
             $task->executor_id = $executor->id;
             $respond->status = Respond::STATUS_CONFIRMED;
             $task->save();
             $respond->save();
-
             $transaction->commit();
-
-            if ($executor->userSettings && $executor->userSettings->task_actions) {
-                $executor->createUserMessage(UserMessage::TYPE_TASK_CONFIRMED, $task);
-                $executor->sendEmail('taskConfirmed-html', UserMessage::TYPE_TASK_CONFIRMED, $task);
-            }
-
+            $executor->inform(UserMessage::TYPE_TASK_CONFIRMED, $task);
         } catch (\Throwable $e) {
             $transaction->rollBack();
         }
@@ -169,22 +164,17 @@ class TasksController extends SecuredController
             $task = Task::findOne(Yii::$app->request->post('Task')['id']);
             if ($task && RefuseAction::getUserRightsCheck($task)) {
                 $transaction = Yii::$app->db->beginTransaction();
+
                 try {
                     $task->status = Task::STATUS_FAILED;
                     $task->save();
                     $client = $task->client;
                     $transaction->commit();
-
-                    if ($client->userSettings && $client->userSettings->task_actions) {
-                        $client->createUserMessage(UserMessage::TYPE_TASK_FAILED, $task);
-                        $client->sendEmail('taskFailed-html', UserMessage::TYPE_TASK_FAILED, $task);
-                    }
-
+                    $client->inform(UserMessage::TYPE_TASK_FAILED, $task);
                     return $this->redirect("/task/view/{$task->id}");
                 } catch (\Throwable $e) {
                     $transaction->rollBack();
                 }
-
             }
         }
         return $this->redirect("/tasks");
@@ -246,18 +236,9 @@ class TasksController extends SecuredController
                 $task->save();
                 $recall->save();
                 $executor = $task->executor;
-
                 $transaction->commit();
-
-                if ($executor->userSettings && $executor->userSettings->task_actions) {
-                    $executor->createUserMessage(UserMessage::TYPE_TASK_CLOSED, $task);
-                    $executor->sendEmail('taskClosed-html', UserMessage::TYPE_TASK_CLOSED, $task);
-                }
-
-                if ($executor->userSettings && $executor->userSettings->new_recall) {
-                    $executor->createUserMessage(UserMessage::TYPE_TASK_RECALLED, $task);
-                    $executor->sendEmail('taskRecalled-html', UserMessage::TYPE_TASK_RECALLED, $task);
-                }
+                $executor->inform(UserMessage::TYPE_TASK_CLOSED, $task);
+                $executor->inform(UserMessage::TYPE_TASK_RECALLED, $task);
                 return $this->redirect("/task/view/{$recall->task_id}");
             } catch (\Throwable $e) {
                 $transaction->rollBack();

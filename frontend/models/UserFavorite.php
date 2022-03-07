@@ -53,7 +53,7 @@ class UserFavorite extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Chooser]].
+     * Метод возвращает пользователя, который добавил в избранное конкретного потенциального испольнителя.
      *
      * @return \yii\db\ActiveQuery
      */
@@ -63,7 +63,7 @@ class UserFavorite extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Chosen]].
+     * Метод возвращает пользователя, которого добавили в избранное как потенциального исполнителя.
      *
      * @return \yii\db\ActiveQuery
      */

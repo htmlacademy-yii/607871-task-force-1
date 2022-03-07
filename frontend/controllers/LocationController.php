@@ -5,7 +5,7 @@ namespace frontend\controllers;
 
 
 use App\Exception\DataException;
-use frontend\models\YandexGeo;
+use frontend\models\forms\YandexGeo;
 use yii\web\Response;
 
 class LocationController extends SecuredController

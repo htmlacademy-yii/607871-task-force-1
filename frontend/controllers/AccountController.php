@@ -32,7 +32,6 @@ class AccountController extends SecuredController
 
             $userUpdated = $this->updateUser($user);
             $userSettings = $this->updateUserSettings($user);
-
             $uploadFilesModel->files = UploadedFile::getInstances($uploadFilesModel, 'files');
             $uploadFilesModel->avatar = UploadedFile::getInstance($uploadFilesModel, 'avatar');
             $uploadFilesModel->validate();
@@ -144,7 +143,6 @@ class AccountController extends SecuredController
             $userSettings = new UserSettings();
             $userSettings->user_id = $user->id;
         }
-
         $userSettings->deactivateAll();
         $userSettings->load(\Yii::$app->request->post());
         $userSettings->validate();

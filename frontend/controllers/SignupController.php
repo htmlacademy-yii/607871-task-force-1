@@ -5,7 +5,6 @@ namespace frontend\controllers;
 
 
 use frontend\models\Profile;
-use frontend\models\Task;
 use frontend\models\User;
 
 class SignupController extends SecuredController
@@ -21,14 +20,14 @@ class SignupController extends SecuredController
                 $profile->validate();
 
                 if (!$user->errors && !$profile->errors) {
-                    $passwordHash = \Yii::$app->security->generatePasswordHash($user->getAttribute('password'));
-                    $user->setAttribute('password', $passwordHash);
+                    $passwordHash = \Yii::$app->security->generatePasswordHash($user->password);
+                    $user->password_hash = $passwordHash;
                      $transaction = \Yii::$app->db->beginTransaction();
 
                     try {
                         $user->save();
                         $userId = $user->getId();
-                        $profile->setAttribute('user_id', $userId);
+                        $profile->user_id = $userId;
                         $profile->save();
                         $transaction->commit();
                         $this->redirect('/');

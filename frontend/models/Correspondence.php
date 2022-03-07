@@ -56,7 +56,7 @@ class Correspondence extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Task]].
+     * Метод возвращает задание, к которму относится сообщение в блоке "Переписка".
      *
      * @return \yii\db\ActiveQuery
      */
@@ -66,7 +66,7 @@ class Correspondence extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[User]].
+     * Метод возвращает пользователя, создавшего сообщение в блоке "Переписка".
      *
      * @return \yii\db\ActiveQuery
      */

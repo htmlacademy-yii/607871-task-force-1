@@ -55,7 +55,7 @@ class UserSettings extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[User]].
+     * Метод возварщает пользователя, которому принадлежат конкретные настройки.
      *
      * @return \yii\db\ActiveQuery
      */
@@ -64,6 +64,9 @@ class UserSettings extends \yii\db\ActiveRecord
         return $this->hasOne(User::class, ['id' => 'user_id'])->inverseOf('userSettings');
     }
 
+    /**
+     * Метод деактивирует все настройки конкретного пользователя на таблице user_settings.
+     */
     public function deactivateAll()
     {
         $this->new_recall = 0;

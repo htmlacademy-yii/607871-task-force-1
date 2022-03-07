@@ -24,6 +24,7 @@ use Yii;
 class Profile extends \yii\db\ActiveRecord
 {
     const SCENARIO_ACCOUNT_INPUT_RULES = 'account_input_rules';
+
     /**
      * {@inheritdoc}
      */
@@ -38,12 +39,12 @@ class Profile extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['description','birth_date', 'avatar', 'city_id', 'phone', 'skype', 'telegram'], 'safe'],
+            [['description', 'birth_date', 'avatar', 'city_id', 'phone', 'skype', 'telegram'], 'safe'],
             ['birth_date', 'datetime', 'format' => 'yyyy-MM-dd',
-                'max' => date('Y-m-d', strtotime('-14 years', time())), 'strictDateFormat'=> true,
+                'max' => date('Y-m-d', strtotime('-14 years', time())), 'strictDateFormat' => true,
                 'on' => Profile::SCENARIO_DEFAULT, 'message' => 'Введите дату в формате ГГГГ-ММ-ДД'],
             ['birth_date', 'datetime', 'format' => 'dd.MM.yyyy',
-                'max' => date('d.m.Y', strtotime('-14 years', time())), 'strictDateFormat'=> true,
+                'max' => date('d.m.Y', strtotime('-14 years', time())), 'strictDateFormat' => true,
                 'on' => Profile::SCENARIO_ACCOUNT_INPUT_RULES, 'message' => 'Введите дату в формате ДД.ММ.ГГГГ'],
             [['user_id', 'city_id'], 'integer'],
             ['city_id', 'required'],
@@ -79,7 +80,7 @@ class Profile extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[City]].
+     * Метод возвращает город, к которому привязан профиль пользователя.
      *
      * @return \yii\db\ActiveQuery
      */
@@ -89,7 +90,7 @@ class Profile extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[User]].
+     * Метод возвращает пользователя, к которому относится конкретный пользовательский профиль.
      *
      * @return \yii\db\ActiveQuery
      */

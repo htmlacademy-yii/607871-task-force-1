@@ -13,6 +13,7 @@ class LoginForm extends Model
     public $email;
     public $password;
 
+
     private $_user;
 
     public function rules()
@@ -39,12 +40,12 @@ class LoginForm extends Model
         ];
     }
 
-    public function validatePassword($attribute, $params)
+    public function validatePassword()
     {
         if (!$this->hasErrors()) {
             $user = $this->getUser();
             if (!$user ||  !$user->validatePassword($this->password)) {
-                $this->addError($attribute, 'Неправильный email или пароль!');
+                $this->addError('password', 'Неправильный email или пароль!');
             }
         }
     }

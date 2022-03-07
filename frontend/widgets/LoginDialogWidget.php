@@ -11,8 +11,8 @@ class LoginDialogWidget extends Widget
 {
     public function run()
     {
-        $model = new LoginForm();
+        $loginForm = new LoginForm();
 
-        return $this->render('login-form-widget', ['model' => $model]);
+        return $this->render('login-form-widget', ['loginForm' => $loginForm]);
     }
 }

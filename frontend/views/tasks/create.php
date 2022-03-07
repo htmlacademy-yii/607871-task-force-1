@@ -110,18 +110,18 @@ AutoCompleteAsset::register($this);
                 <div class="warning-item warning-item--error">
                     <h2>Ошибки заполнения формы</h2>
                     <?php foreach ($task->errors as $label => $errors): ?>
-                        <h3> <?= $task->getAttributeLabel($label) ?></h3>
+                        <h3> <?= $task->getAttributeLabel($label); ?></h3>
 
                         <p><?php foreach ($errors as $error): ?>
-                                <?= $error ?><br>
+                                <?= $error; ?><br>
                             <?php endforeach; ?>
                         </p>
                     <?php endforeach; ?>
                     <?php foreach ($uploadFiles->errors as $label => $errors): ?>
-                        <h3> <?= $uploadFiles->getAttributeLabel($label) ?></h3>
+                        <h3> <?= $uploadFiles->getAttributeLabel($label); ?></h3>
 
                         <p><?php foreach ($errors as $error): ?>
-                                <?= $error ?><br>
+                                <?= $error; ?><br>
                             <?php endforeach; ?>
                         </p>
                     <?php endforeach; ?>

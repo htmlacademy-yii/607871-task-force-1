@@ -1,26 +1,34 @@
 <?php
 
-
 namespace frontend\controllers;
-
 
 use frontend\models\Auth;
 use frontend\models\City;
-use frontend\models\forms\LoginForm;
 use frontend\models\forms\TaskSearchForm;
 use frontend\models\Profile;
 use frontend\models\Task;
 use frontend\models\User;
-use GuzzleHttp\Client;
-use yii\authclient\clients\VKontakte;
+use Yii;
+use yii\web\BadRequestHttpException;
+use frontend\models\forms\LoginForm;
 
-class MainController extends SecuredController
+
+/**
+ * Site controller
+ */
+class SiteController extends SecuredController
 {
     public $layout = 'landing';
 
+    /**
+     * {@inheritdoc}
+     */
     public function actions()
     {
         return [
+            'error' => [
+                'class' => 'yii\web\ErrorAction',
+            ],
             'auth' => [
                 'class' => 'yii\authclient\AuthAction',
                 'successCallback' => [$this, 'onAuthSuccess'],
@@ -37,12 +45,15 @@ class MainController extends SecuredController
 
     public function actionLogin()
     {
+
         $loginForm = new LoginForm();
 
         if (\Yii::$app->request->getIsPost()) {
             $loginForm->load(\Yii::$app->request->post());
+            $user = $loginForm->getUser();
+
             if ($loginForm->validate()) {
-                $user = $loginForm->getUser();
+
                 \Yii::$app->user->login($user);
                 \Yii::$app->session->set('city_id', \Yii::$app->user->identity->profile->city_id);
                 return $this->redirect('/tasks');
@@ -50,13 +61,15 @@ class MainController extends SecuredController
         }
 
         if (\Yii::$app->request->isAjax) {
+
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
             if ($loginForm->load(\Yii::$app->request->post())) {
+
                 return \yii\widgets\ActiveForm::validate($loginForm);
             }
         }
-        throw new \yii\web\BadRequestHttpException('Неверный запрос!');
+        throw new BadRequestHttpException('Неверный запрос!');
     }
 
     public function onAuthSuccess($client)
@@ -134,7 +147,8 @@ class MainController extends SecuredController
         $password = \Yii::$app->security->generateRandomString(15);
         $user = new User([
             'scenario' => User::SCENARIO_CREATE_USER,
-            'password' => \Yii::$app->security->generatePasswordHash($password),
+            'password' => $password,
+            'password_hash' => \Yii::$app->security->generatePasswordHash($password),
         ]);
 
         if (isset($attributes['email'])) {
@@ -148,4 +162,5 @@ class MainController extends SecuredController
         $user->validate();
         return $user;
     }
+
 }

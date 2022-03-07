@@ -57,10 +57,7 @@ class MessagesController extends ActiveController
             $user = $executor;
         }
 
-        if ($user->userSettings && $user->userSettings->new_message) {
-            $user->createUserMessage(UserMessage::TYPE_NEW_MESSAGE, $task);
-            $user->sendEmail('taskCorrespondence-html', UserMessage::TYPE_NEW_MESSAGE, $task);
-        }
+        $user->inform(UserMessage::TYPE_NEW_MESSAGE, $task);
 
         \Yii::$app->response->statusCode = 201;
         \Yii::$app->response->format = Response::FORMAT_JSON;

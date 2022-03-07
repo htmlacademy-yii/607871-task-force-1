@@ -30,23 +30,23 @@ class TaskFiles extends ActiveRecord
         return [
             [['name', 'url', 'task_id'], 'safe'],
             ['name', 'string', 'min' => 1, 'max' => 100,
-               'tooShort' => "Имя файла не менее {min} символов", 'tooLong' => 'Имя файла не более {max} символов' ],
+                'tooShort' => "Имя файла не менее {min} символов", 'tooLong' => 'Имя файла не более {max} символов'],
             ['url', 'string', 'min' => 1, 'max' => 255,
-                'tooShort' => "Путь к файлу не менее {min} символов", 'tooLong' => 'Путь к файлу не более {max} символов' ],
+                'tooShort' => "Путь к файлу не менее {min} символов", 'tooLong' => 'Путь к файлу не более {max} символов'],
         ];
     }
 
-
-
+    /**
+     * Для всех привязанных к заданию файлов данный метод формирует новое название файла и
+     * сохраняет этот файл в папке upload.
+     */
     public function upload()
     {
         foreach ($this->files as $file) {
-                $taskFile = new TaskFiles();
-                $newName = uniqid(date('Y-m-d-')) . '.' . $file->getExtension();
-                $file->saveAs('@webroot/uploads/' . $newName);
-                $taskFile->task_id = $this->task_id;
-
-            }
+            $taskFile = new TaskFiles();
+            $newName = uniqid(date('Y-m-d-')) . '.' . $file->getExtension();
+            $file->saveAs('@webroot/uploads/' . $newName);
+            $taskFile->task_id = $this->task_id;
+        }
     }
-
 }

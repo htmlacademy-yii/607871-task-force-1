@@ -4,9 +4,10 @@ namespace frontend\models;
 
 
 use App\Exception\DataException;
+use frontend\models\forms\YandexGeo;
 use yii\db\ActiveRecord;
 use yii\db\Query;
-use yii\web\Response;
+
 
 /**
  * This is the model class for table "tasks".
@@ -118,7 +119,7 @@ class Task extends ActiveRecord
     }
 
     /**
-     * Gets query for [[Category]].
+     * Метод возвращает категорию, к которой относится конкретное задание.
      *
      * @return \yii\db\ActiveQuery
      */
@@ -128,7 +129,7 @@ class Task extends ActiveRecord
     }
 
     /**
-     * Gets query for [[City]].
+     * Метод возвращает город, к которому относится конкретное задание.
      *
      * @return \yii\db\ActiveQuery
      */
@@ -138,7 +139,7 @@ class Task extends ActiveRecord
     }
 
     /**
-     * Gets query for [[Client]].
+     * Метод возвращает клинета, создавшего конкретное задание.
      *
      * @return \yii\db\ActiveQuery
      */
@@ -148,7 +149,7 @@ class Task extends ActiveRecord
     }
 
     /**
-     * Gets query for [[Correspondences]].
+     * Метод возвращает список всех сообщений в блоке "Переписка", оставленных по конкретному заданию.
      *
      * @return \yii\db\ActiveQuery
      */
@@ -158,7 +159,7 @@ class Task extends ActiveRecord
     }
 
     /**
-     * Gets query for [[Executor]].
+     * Метод возвращает пользователя, указанного в конкретном задании в качестве исполнителя.
      *
      * @return \yii\db\ActiveQuery
      */
@@ -168,7 +169,7 @@ class Task extends ActiveRecord
     }
 
     /**
-     * Gets query for [[Recalls]].
+     * Метод возвращает отзыв, оставленный клинетом по конкретному заданию.
      *
      * @return \yii\db\ActiveQuery
      */
@@ -178,7 +179,7 @@ class Task extends ActiveRecord
     }
 
     /**
-     * Gets query for [[Responds]].
+     * Метод возвращает список всех откликов, относящихся к конкретному заданию.
      *
      * @return \yii\db\ActiveQuery
      */
@@ -188,7 +189,7 @@ class Task extends ActiveRecord
     }
 
     /**
-     * Gets query for [[TaskFiles]].
+     * Метод возвращает список всех файлов, прикрепленных к конкретному заданию.
      *
      * @return array
      */
@@ -199,16 +200,29 @@ class Task extends ActiveRecord
         return $query->all();
     }
 
-    public function isVolunteer(int $id): bool
+    /**
+     * Метод проверяет, оставлял ли пользователь с указанным в параметрах id отклик по конкретному заданию.
+     * @param int $user_id
+     * @return bool
+     */
+    public function isVolunteer(int $user_id): bool
     {
-        return isset($id) ? !!$this->getResponds()->andWhere(['respond.user_id' => $id])->count() : false;
+        return isset($user_id) ? !!$this->getResponds()->andWhere(['respond.user_id' => $user_id])->count() : false;
     }
 
+    /**
+     * Метод возвращает человекопонятный статус задания, соответствующий коду статуса в базе данных.
+     * @return mixed
+     */
     public function getBusinessStatus()
     {
         return self::BUSINESS_STATUS_MAP[$this->status];
     }
 
+    /**
+     * Метод отправляет запрос в Геокодер API Яндекс.Карт на поиск района города по координатам долготы и широты,
+     * переданным в конкретном задании. Если район найден, он записывается в соответствующее свойство задания.
+     */
     public function searchDistrict()
     {
         if ($this->latitude && $this->longitude) {
@@ -224,7 +238,6 @@ class Task extends ActiveRecord
                     } catch (DataException $e) {
                         continue;
                     }
-
                 }
                 if (!empty($districts)) {
                     $this->district = array_shift($districts);

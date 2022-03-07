@@ -53,7 +53,7 @@ class UserCategory extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Category]].
+     * Метод возвращает категорию, относящуюся к конкретной связи между пользователем и категорией.
      *
      * @return \yii\db\ActiveQuery
      */
@@ -63,7 +63,7 @@ class UserCategory extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[User]].
+     * Метод возвращает пользователя, относящегося к конкретной связи между пользователем и категорией.
      *
      * @return \yii\db\ActiveQuery
      */

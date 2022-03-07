@@ -13,7 +13,7 @@ return [
     'timeZone' =>'Europe/Moscow',
     'bootstrap' => ['log'],
     'controllerNamespace' => 'frontend\controllers',
-    'defaultRoute' => 'main/index',
+    'defaultRoute' => 'site/index',
     'on beforeAction' => function ($event) {
         if (!Yii::$app->user->isGuest) {
             $user = \frontend\models\User::findOne(Yii::$app->user->id);

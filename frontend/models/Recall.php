@@ -31,6 +31,7 @@ class Recall extends \yii\db\ActiveRecord
         self::COMPLETION_YES => Task::STATUS_FINISHED,
         self::COMPLETION_PROBLEMS => Task::STATUS_FAILED
     ];
+
     /**
      * {@inheritdoc}
      */
@@ -70,7 +71,7 @@ class Recall extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Task]].
+     * Метод возвращает задание, по которому был оставлен конкретный отзыв.
      *
      * @return \yii\db\ActiveQuery
      */
@@ -79,6 +80,11 @@ class Recall extends \yii\db\ActiveRecord
         return $this->hasOne(Task::class, ['id' => 'task_id'])->with('client');
     }
 
+    /**
+     * Метод возвращает пользователя, который оставил отзыв по заданию, и его профиль.
+     * @return \yii\db\ActiveQuery
+     * @throws \yii\base\InvalidConfigException
+     */
     public function getReviewer()
     {
         return $this->hasOne(User::class, ['id' => 'client_id'])
@@ -86,9 +92,14 @@ class Recall extends \yii\db\ActiveRecord
             ->with('profile');
     }
 
+    /**
+     * В зависимости от того, с каким признаком клиент завершает задание ("Да" или "Возникли проблемы"),
+     * данный метод выбирает статус, который будет присвоен заданию ("Выполнено" или "Провалено").
+     * @return mixed
+     */
+
     public function getTaskStatus()
     {
         return self::TASK_STATUS_MAP[$this->status];
     }
-
 }

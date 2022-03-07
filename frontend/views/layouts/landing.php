@@ -17,7 +17,7 @@ AppAsset::register($this);
     <meta charset="UTF-8">
     <?php $this->registerCsrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
-    <link rel="stylesheet" href="<?= Url::to('/css/normalize.css'); ?>">
+    <link rel="stylesheet" href="/css/normalize.css">
     <?php $this->head() ?>
 </head>
 <body class="landing">

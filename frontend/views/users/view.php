@@ -16,7 +16,7 @@ use \frontend\widgets\UserRatingWidget;
             <img src="<?= $user->avatar; ?>" width="120" height="120" alt="Аватар пользователя">
             <div class="content-view__headline">
                 <h1><?= $user->name; ?></h1>
-                <p><?= $user->city->name; ?>
+                <p><?= $user->profile->city->name; ?>
                     <?= $user->profile->birth_date ? ', ' . DataFormatter::formatTimeDistance($user->profile->birth_date) : ''; ?>
                 </p>
                 <div class="profile-mini__name five-stars__rate">

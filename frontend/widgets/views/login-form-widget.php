@@ -5,7 +5,7 @@ use \yii\widgets\ActiveForm;
 use \yii\helpers\Url;
 
 /**
- * @var \frontend\models\forms\LoginForm $model
+ * @var \frontend\models\forms\LoginForm $loginForm
  */
 
 ?>
@@ -27,11 +27,11 @@ use \yii\helpers\Url;
     ]); ?>
 
     <?= yii\authclient\widgets\AuthChoice::widget([
-        'baseAuthUrl' => ['main/auth'],
+        'baseAuthUrl' => ['site/auth'],
         'popupMode' => false,
     ]); ?>
-    <?= $form->field($model, 'email')->textInput(); ?>
-    <?= $form->field($model, 'password')->passwordInput(); ?>
+    <?= $form->field($loginForm, 'email')->textInput(); ?>
+    <?= $form->field($loginForm, 'password')->passwordInput(); ?>
 
     <?= Html::submitButton('Войти', ['class' => 'button']); ?>
     <?php ActiveForm::end(); ?>

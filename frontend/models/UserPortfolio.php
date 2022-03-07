@@ -49,12 +49,12 @@ class UserPortfolio extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[User]].
+     * Метод возвращает пользователя, которому принадлежит портфолио (примеры работ).
      *
      * @return \yii\db\ActiveQuery
      */
     public function getUser()
     {
-        return $this->hasOne(User::className(), ['id' => 'user_id']);
+        return $this->hasOne(User::class, ['id' => 'user_id']);
     }
 }

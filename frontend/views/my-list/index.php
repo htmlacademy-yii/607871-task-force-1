@@ -23,7 +23,7 @@ use \frontend\widgets\UserRatingWidget;
                     />
                 </svg>
             </div>
-            <a href="<?= Url::to(['my-list/index/', 'status' => 'completed']); ?>">
+            <a href="<?= Url::to(['/my-list/index/', 'status' => 'completed']); ?>">
                 Завершённые
             </a>
         </li>
@@ -61,7 +61,7 @@ use \frontend\widgets\UserRatingWidget;
                     />
                 </svg>
             </div>
-            <a href="<?= Url::to(['my-list/index/', 'status' => 'new']); ?>">
+            <a href="<?= Url::to(['/my-list/index/', 'status' => 'new']); ?>">
                 Новые
             </a>
         </li>
@@ -73,7 +73,7 @@ use \frontend\widgets\UserRatingWidget;
                     />
                 </svg>
             </div>
-            <a href="<?= Url::to(['my-list/index/', 'status' => 'active']); ?>">
+            <a href="<?= Url::to(['/my-list/index/', 'status' => 'active']); ?>">
                 Активные
             </a>
         </li>
@@ -85,7 +85,7 @@ use \frontend\widgets\UserRatingWidget;
                     />
                 </svg>
             </div>
-            <a href="<?= Url::to(['my-list/index/', 'status' => 'canceled']); ?>">
+            <a href="<?= Url::to(['/my-list/index/', 'status' => 'canceled']); ?>">
                 Отменённые
             </a>
         </li>
@@ -98,7 +98,7 @@ use \frontend\widgets\UserRatingWidget;
                     />
                 </svg>
             </div>
-            <a href="<?= Url::to(['my-list/index/', 'status' => 'hidden']); ?>">
+            <a href="<?= Url::to(['/my-list/index/', 'status' => 'hidden']); ?>">
                 Просроченные
             </a>
         </li>
