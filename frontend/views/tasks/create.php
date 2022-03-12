@@ -7,9 +7,8 @@ use frontend\assets\AutoCompleteAsset;
 
 /**
  * @var \yii\web\View $this
- * @var \frontend\models\Task $task
  * @var \frontend\models\forms\UploadFilesForm $uploadFiles
- * @var \frontend\models\City $city
+ * @var \frontend\models\forms\CreateTaskForm $createTaskForm
  */
 
 AutoCompleteAsset::register($this);
@@ -36,22 +35,22 @@ AutoCompleteAsset::register($this);
                 ],
             ],
             'enableAjaxValidation' => false,
-            'enableClientValidation' => false,
+            'enableClientValidation' => true,
             'validateOnSubmit' => true
         ]); ?>
 
-        <?= $form->field($task, 'title')->textInput([
+        <?= $form->field($createTaskForm, 'title')->textInput([
             'class' => 'input textarea',
             'placeholder' => 'Повесить полку',
         ])->hint('Кратко опишите суть работы'); ?>
 
-        <?= $form->field($task, 'description')->textarea([
+        <?= $form->field($createTaskForm, 'description')->textarea([
             'class' => 'input textarea',
             'placeholder' => 'Place your text',
             'rows' => 7,
         ])->hint('Укажите все пожелания и детали, чтобы исполнителям было проще соориентироваться'); ?>
 
-        <?= $form->field($task, 'category_id')->dropDownList(Category::getCategoryMap(), [
+        <?= $form->field($createTaskForm, 'category_id')->dropDownList(Category::getCategoryMap(), [
             'prompt' => '',
             'class' => 'multiple-select input multiple-select-big',
             'size' => 1
@@ -66,25 +65,25 @@ AutoCompleteAsset::register($this);
         ])
             ->hint('Загрузите файлы, которые помогут исполнителю лучше выполнить или оценить работу'); ?>
 
-        <?= $form->field($task, 'full_address')
+        <?= $form->field($createTaskForm, 'full_address')
             ->input('search', [
                 'class' => 'input-navigation input-middle input',
                 'placeholder' => 'Санкт-Петербург, Калининский район',
                 'id' => 'autoComplete'
             ])->hint('Укажите адрес исполнения, если задание требует присутствия'); ?>
 
-        <?= $form->field($task, 'latitude')->hiddenInput()->label(false); ?>
-        <?= $form->field($task, 'longitude')->hiddenInput()->label(false); ?>
-        <?= $form->field($city, 'name')->hiddenInput()->label(false); ?>
-        <?= $form->field($task, 'address')->hiddenInput()->label(false); ?>
+        <?= $form->field($createTaskForm, 'latitude')->hiddenInput()->label(false); ?>
+        <?= $form->field($createTaskForm, 'longitude')->hiddenInput()->label(false); ?>
+        <?= $form->field($createTaskForm, 'city_name')->hiddenInput()->label(false); ?>
+        <?= $form->field($createTaskForm, 'address')->hiddenInput()->label(false); ?>
 
         <div class="create__price-time">
-                <?= $form->field($task, 'budget',['options'=>['class' => 'field-container create__price-time--wrapper']])->textInput([
+                <?= $form->field($createTaskForm, 'budget',['options'=>['class' => 'field-container create__price-time--wrapper']])->textInput([
                     'class' => 'input textarea input-money',
                     'placeholder' => 1000,
                 ])->hint('Не заполняйте для оценки исполнителем'); ?>
 
-                <?= $form->field($task, 'due_date', ['options'=>['class' => 'field-container create__price-time--wrapper']])->textInput([
+                <?= $form->field($createTaskForm, 'due_date', ['options'=>['class' => 'field-container create__price-time--wrapper']])->textInput([
                     'class' => 'input-middle input input-date',
                     'placeholder' => 'ГГГГ-ММ-ДД',
                 ])->hint('Укажите крайний срок исполнения'); ?>
@@ -106,22 +105,20 @@ AutoCompleteAsset::register($this);
                     ракурсов.</p>
             </div>
 
-            <?php if ($task->errors || $uploadFiles->errors): ?>
+            <?php if ($createTaskForm->errors || $uploadFiles->errors): ?>
                 <div class="warning-item warning-item--error">
                     <h2>Ошибки заполнения формы</h2>
-                    <?php foreach ($task->errors as $label => $errors): ?>
-                        <h3> <?= $task->getAttributeLabel($label) ?></h3>
-
+                    <?php foreach ($createTaskForm->errors as $label => $errors): ?>
+                        <h3> <?= $createTaskForm->getAttributeLabel($label); ?></h3>
                         <p><?php foreach ($errors as $error): ?>
-                                <?= $error ?><br>
+                                <?= $error; ?><br>
                             <?php endforeach; ?>
                         </p>
                     <?php endforeach; ?>
                     <?php foreach ($uploadFiles->errors as $label => $errors): ?>
-                        <h3> <?= $uploadFiles->getAttributeLabel($label) ?></h3>
-
+                        <h3> <?= $uploadFiles->getAttributeLabel($label); ?></h3>
                         <p><?php foreach ($errors as $error): ?>
-                                <?= $error ?><br>
+                                <?= $error; ?><br>
                             <?php endforeach; ?>
                         </p>
                     <?php endforeach; ?>

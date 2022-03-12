@@ -11,11 +11,13 @@ class TaskMapWidget extends Widget
 {
     public $taskId;
 
+    /**
+     * Виджет отображает карту, сгенерированную по координатам задания.
+     * @return string
+     */
     public function run()
     {
         $task = Task::findOne($this->taskId);
-        return $this->render('task-map-widget', [
-            'task' => $task,
-        ]);
+        return $this->render('task-map-widget', ['task' => $task]);
     }
 }

@@ -16,7 +16,7 @@ use yii\web\IdentityInterface;
  * @property string $email
  * @property string $reg_date
  * @property string $last_visit_date
- * @property string $password
+ * @property string $password_hash
  * @property array $portfolios
  *
  * @property Correspondence[] $correspondences
@@ -31,9 +31,6 @@ use yii\web\IdentityInterface;
  */
 class User extends \yii\db\ActiveRecord implements IdentityInterface
 {
-    public $password_repeat;
-    public $new_categories_list = [];
-
     const SCENARIO_CREATE_USER = 'create_user';
     const SCENARIO_UPDATE_USER = 'update_user';
 
@@ -51,18 +48,15 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     public function rules()
     {
         return [
-            [['email', 'name', 'password'], 'safe', 'on' => self::SCENARIO_CREATE_USER],
-            [['email', 'name', 'password', 'password_repeat'], 'trim'],
-            [['email', 'password', 'name'], 'required', 'on' => self::SCENARIO_CREATE_USER, 'message' => 'Поле должно быть заполнено'],
+            [['email', 'name'], 'safe', 'on' => self::SCENARIO_CREATE_USER],
+            [['email', 'name', 'password_hash'], 'trim'],
+            [['email', 'name', 'password_hash'], 'required', 'on' => self::SCENARIO_CREATE_USER, 'message' => 'Поле должно быть заполнено'],
             ['name', 'required', 'on' => self::SCENARIO_CREATE_USER, 'message' => 'Введите ваше имя и фамилию'],
             [['name', 'email'], 'string', 'min' => 5, 'max' => 50, 'tooShort' => "Не меньше {min} символов", 'tooLong' => 'Не больше {max} символов'],
-            [['password', 'password_repeat'], 'string', 'min' => 8, 'max' => 64, 'tooShort' => "Длина пароля от {min} символов", 'tooLong' => 'Длина пароля до {max} символов'],
             [['name'], 'unique', 'message' => 'Пользователь с таким именем уже существует'],
             [['email'], 'unique', 'message' => 'Пользователь с таким email уже существует'],
             ['email', 'email', 'message' => 'Введите валидный адрес электронной почты'],
-            [['email', 'password', 'password_repeat', 'new_categories_list'], 'safe', 'on' => self::SCENARIO_UPDATE_USER],
             [['email', 'name'], 'required', 'on' => self::SCENARIO_UPDATE_USER, 'message' => 'Поле должно быть заполнено'],
-            ['password', 'compare', 'compareAttribute' => 'password_repeat', 'on' => self::SCENARIO_UPDATE_USER, 'message' => 'Пароли должны совпадать']
         ];
     }
 
@@ -80,8 +74,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Gets query for [[Correspondences]].
-     *
+     * Метод возвращает все сообщения пользователя из блока "Переписка" по всем задачам.
      * @return \yii\db\ActiveQuery
      */
     public function getCorrespondences()
@@ -90,8 +83,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Gets query for [[Profiles]].
-     *
+     * Метод возвращает соответствующий профиль пользователя.
      * @return \yii\db\ActiveQuery
      */
     public function getProfile()
@@ -100,8 +92,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Gets query for [[Responds]].
-     *
+     * Метод возвращает все отклики пользователя по задачам.
      * @return \yii\db\ActiveQuery
      */
     public function getResponds()
@@ -110,8 +101,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Gets query for [[Tasks]].
-     *
+     * Метод возвращает список всех задач, в которых пользователь является заказчиком.
      * @return \yii\db\ActiveQuery
      */
     public function getClientTasks()
@@ -120,8 +110,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Gets query for [[Tasks0]].
-     *
+     * Метод возвращает список всех задач, в которых пользователь является исполнителем.
      * @return \yii\db\ActiveQuery
      */
     public function getExecutorTasks()
@@ -129,7 +118,12 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         return $this->hasMany(Task::class, ['executor_id' => 'id']);
     }
 
-    public static function getExecutorsWithRecallsId()
+    /**
+     * Метод возвращает список идентификаторов всех потенциальных пользователей, у которых
+     * есть отзывы от заказчиков.
+     * @return array|null
+     */
+    public static function getExecutorsWithRecallsId(): ?array
     {
         $query = new Query();
         $query->select('executor_id')
@@ -139,52 +133,61 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
         return ArrayHelper::getColumn($query->all(), 'executor_id');
     }
 
-    public static function getOnlineExecutorsId()
+    /**
+     * Метод возвращает список всех потенциальных исполнителей, которые были на
+     * сайте в течение последних 30 минут.
+     * @return array|null
+     */
+    public static function getOnlineExecutorsId(): ?array
     {
         return self::find()->select('id')
             ->where(['>=', 'last_visit_date', (new Expression("NOW() - INTERVAL 30 MINUTE"))])->column();
     }
 
-    public function getFavoriteExecutorsId()
+    /**
+     * Метод возвращает список идентификаторов всех потенциальных исполнителей,
+     * которые добавлены в избранное у отдельно взятого пользователя.
+     * @return array|null
+     */
+    public function getFavoriteExecutorsId(): ?array
     {
         return UserFavorite::find()
             ->select('chosen_id')
             ->where('chooser_id=:chooser_id', ['chooser_id' => $this->id])
-            ->andWhere('active=1')
+            ->andWhere(['active' => UserFavorite::STATUS_ACTIVE])
             ->column();
     }
 
     /**
+     * Метод возвращает список всех активных категорий-специализаций, которые есть у отдельно взятого пользователя.
      * @return \yii\db\ActiveQuery
      * @throws \yii\base\InvalidConfigException
      */
-
     public function getCategories()
     {
         return $this->hasMany(Category::class, ['id' => 'category_id'])
             ->viaTable('user_category', ['user_id' => 'id'],
                 function ($query) {
-                    return $query->andWhere(['active' => 1]);
+                    return $query->andWhere(['active' => UserCategory::STATUS_ACTIVE]);
                 });
     }
 
     /**
+     * Метод возвращает список всех потенциальных исполнителей, которых пользователь добавлен в избранное.
      * @return \yii\db\ActiveQuery
      * @throws \yii\base\InvalidConfigException
      */
-
     public function getFavorites()
     {
         return $this->hasMany(User::class, ['id' => 'chosen_id'])
             ->viaTable('user_favorite', ['chooser_id' => 'id'],
                 function ($query) {
-                return $query->andWhere(['active' => 1]);
-            });
+                    return $query->andWhere(['active' => UserFavorite::STATUS_ACTIVE]);
+                });
     }
 
     /**
-     * Gets query for [[Portfolios]].
-     *
+     * Метод возвращает список фотографий-примеров работ пользователя.
      * @return array
      */
     public function getPortfolios()
@@ -195,12 +198,10 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Gets query for [[Recalls]].
-     *
+     * Метод возвращает список отзывов по работе пользователя-исполнителя.
      * @return \yii\db\ActiveQuery
      * @throws \yii\base\InvalidConfigException
      */
-
     public function getRecalls()
     {
         return $this->hasMany(Recall::class, ['task_id' => 'id'])
@@ -208,8 +209,7 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     }
 
     /**
-     * Gets query for [[UserSettings]].
-     *
+     * Метод возвращает перечень настроек пользователя, указанных им в профиле.
      * @return \yii\db\ActiveQuery
      */
     public function getUserSettings()
@@ -218,158 +218,73 @@ class User extends \yii\db\ActiveRecord implements IdentityInterface
     }
 
     /**
+     * Метод возвращает рейтинг пользователя-исполнителя, рассчитанный на основании оценок заказчиков.
      * @return float
      * @throws \yii\base\InvalidConfigException
      */
-
-    public function getRating()
+    public function getRating(): ?float
     {
         return round($this->getRecalls()->average('rating'), 2);
     }
 
-    public function getAvatar()
-    {
-        $defaultAvatar = Yii::$app->params['defaultAvatarPath'] ?? '';
-        return ($this->profile->avatar) ?: $defaultAvatar;
-    }
-
-    public function getCity()
-    {
-        return City::findOne(['id' => $this->profile->city_id]);
-    }
-
-    public function getUserMessage()
+    /**
+     * Метод возвращает все уведомления, сгенерированные для пользователя.
+     * @return \yii\db\ActiveQuery
+     */
+    public function getUserMessages()
     {
         return $this->hasMany(UserMessage::class, ['user_id' => 'id'])
             ->with('task')->orderBy('creation_date DESC');
     }
 
+    /**
+     * Метод возвращает количество всех задач, завершенных пользователем в качестве исполнителя.
+     *
+     * @return bool|int|string|null
+     */
     public function getExecutorTasksFinished()
     {
         return $this->getExecutorTasks()
             ->where(['task.status' => Task::STATUS_FINISHED])->count();
     }
 
-    public function checkUserSetting(string $setting)
-    {
-        if (isset($this->userSettings)) {
-            return isset($this->userSettings->$setting) ? !!$this->userSettings->$setting : false;
-        }
-        return false;
-    }
-
-    public function checkUserCategory(int $categoryId)
-    {
-        return $this->getCategories()->where(['category.id' => $categoryId])->exists();
-    }
-
-    public function getUserCategory(int $categoryId)
-    {
-        return UserCategory::find()->where(['user_id' => $this->id, 'category_id' => $categoryId])->one();
-    }
-
-    public function checkIsUserFavorite(int $chosenUserId)
-    {
-        return UserFavorite::find()
-            ->where('chooser_id =:chooser_id', [':chooser_id' => Yii::$app->user->identity->id])
-            ->andWhere('chosen_id =:chosen_id', [':chosen_id' => $chosenUserId])
-            ->andWhere('active=1')
-            ->exists();
-    }
-
-    public function switchUserFavorite(int $chosenUserId)
-    {
-        $userFavorite = UserFavorite::find()
-            ->where('chooser_id =:chooser_id', [':chooser_id' => $this->id])
-            ->andWhere('chosen_id =:chosen_id', [':chosen_id' => $chosenUserId])->one();
-
-        if ($userFavorite && $userFavorite->active === 1) {
-            $userFavorite->active = 0;
-        } elseif ($userFavorite && $userFavorite->active === 0) {
-            $userFavorite->active = 1;
-        }
-
-         if(!$userFavorite) {
-             $userFavorite = new UserFavorite([
-                 'chooser_id' => $this->id,
-                 'chosen_id' => $chosenUserId,
-                 'active' => '1'
-             ]);
-         }
-
-        return $userFavorite->save();
-    }
-
     /**
-     * @throws \yii\db\Exception
+     * {@inheritdoc}
      */
-    public function deactivateAllUserCategories()
-    {
-        Yii::$app->db
-            ->createCommand('UPDATE user_category SET active = 0 WHERE user_id=:user_id', ['user_id' => $this->id])
-            ->execute();
-    }
-
-    /**
-     * @throws \yii\db\Exception
-     */
-
-    public function deleteUserPortfolio()
-    {
-        Yii::$app->db
-            ->createCommand('DELETE FROM user_portfolio WHERE user_id=:user_id', ['user_id' => $this->id])
-            ->execute();
-    }
-
-    public function createUserMessage(string $messageType, Task $task)
-    {
-        $message = new UserMessage([
-            'user_id' => $this->id,
-            'task_id' => $task->id,
-            'type' => $messageType,
-        ]);
-        return $message->save();
-    }
-
-    public function sendEmail(string $template, int $typeMessage, Task $task)
-    {
-        $message = Yii::$app->mailer->compose($template, [
-            'user' => $this,
-            'task' => $task,
-        ]);
-
-        $message->setTo($this->email)->setFrom('yii-taskforce@mail.ru')
-            ->setSubject(UserMessage::TYPE_MESSAGE_MAP[$typeMessage] . ' "' . $task->title . '"');
-        return $message->send();
-    }
-
     public static function findIdentity($id)
     {
         return self::findOne($id);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public static function findIdentityByAccessToken($token, $type = null)
     {
         // TODO: Implement findIdentityByAccessToken() method.
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getId()
     {
         return $this->getPrimaryKey();
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getAuthKey()
     {
         // TODO: Implement getAuthKey() method.
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function validateAuthKey($authKey)
     {
         // TODO: Implement validateAuthKey() method.
-    }
-
-    public function validatePassword($password)
-    {
-        return Yii::$app->security->validatePassword($password, $this->password);
     }
 }

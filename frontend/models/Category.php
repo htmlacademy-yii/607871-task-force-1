@@ -51,8 +51,7 @@ class Category extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Tasks]].
-     *
+     * Метод возвращает список всех задач, относящихся к определенной категории.
      * @return \yii\db\ActiveQuery
      */
     public function getTasks()
@@ -61,19 +60,22 @@ class Category extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[UserCategories]].
-     *
+     * Метод возвращает список всех пользователей, у которых активирована определенная категория.
      * @return \yii\db\ActiveQuery
+     * @throws \yii\base\InvalidConfigException
      */
     public function getUsers()
     {
         return $this->hasMany(User::class, ['id' => 'user_id'])->viaTable('user_category', ['category_id' => 'id']);
     }
 
-    public static function getCategoryMap()
+    /**
+     * Метод возвращает список всех категорий в виде двумерного массива, каждый элемент которого состоит из id и
+     * названия категории.
+     * @return array
+     */
+    public static function getCategoryMap(): array
     {
         return ArrayHelper::map(self::find()->all(), 'id', 'name');
     }
-
-
 }

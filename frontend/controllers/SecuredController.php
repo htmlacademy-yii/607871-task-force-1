@@ -7,6 +7,10 @@ use yii\web\Controller;
 
 class SecuredController extends Controller
 {
+    /**
+     * Метод, определяющий уровень доступа для залогиненных и незалогиненных пользователей.
+     * @return array|array[]
+     */
     public function behaviors()
     {
         return [
@@ -15,7 +19,7 @@ class SecuredController extends Controller
                 'rules' => [
                     [
                         'allow' => false,
-                        'controllers' => ['main', 'signup'],
+                        'controllers' => ['site', 'signup'],
                         'actions' => ['login', 'index'],
                         'roles' => ['@'],
                         'denyCallback' => function ($rule, $action) {
@@ -24,7 +28,7 @@ class SecuredController extends Controller
                     ],
                     [
                         'allow' => true,
-                        'controllers' => ['main', 'signup'],
+                        'controllers' => ['site', 'signup'],
                         'roles' => ['?']
                     ],
                     [

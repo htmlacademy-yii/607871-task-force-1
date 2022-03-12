@@ -24,6 +24,7 @@ use Yii;
 class Profile extends \yii\db\ActiveRecord
 {
     const SCENARIO_ACCOUNT_INPUT_RULES = 'account_input_rules';
+
     /**
      * {@inheritdoc}
      */
@@ -38,13 +39,10 @@ class Profile extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['description','birth_date', 'avatar', 'city_id', 'phone', 'skype', 'telegram'], 'safe'],
+            [['description', 'birth_date', 'avatar', 'city_id', 'phone', 'skype', 'telegram'], 'safe'],
             ['birth_date', 'datetime', 'format' => 'yyyy-MM-dd',
-                'max' => date('Y-m-d', strtotime('-14 years', time())), 'strictDateFormat'=> true,
-                'on' => Profile::SCENARIO_DEFAULT, 'message' => 'Введите дату в формате ГГГГ-ММ-ДД'],
-            ['birth_date', 'datetime', 'format' => 'dd.MM.yyyy',
-                'max' => date('d.m.Y', strtotime('-14 years', time())), 'strictDateFormat'=> true,
-                'on' => Profile::SCENARIO_ACCOUNT_INPUT_RULES, 'message' => 'Введите дату в формате ДД.ММ.ГГГГ'],
+                'max' => date('Y-m-d', strtotime('-14 years', time())), 'strictDateFormat' => true,
+                'message' => 'Введите дату в формате ГГГГ-ММ-ДД'],
             [['user_id', 'city_id'], 'integer'],
             ['city_id', 'required'],
             [['description'], 'string'],
@@ -53,9 +51,10 @@ class Profile extends \yii\db\ActiveRecord
             [['skype', 'telegram'], 'string', 'max' => 50],
             [['phone'], 'unique', 'message' => 'Пользователь с таким номером телефона уже существует'],
             [['skype'], 'unique', 'message' => 'Пользователь с таким Skype уже существует'],
-            [['telegram'], 'unique', 'message' => 'Пользователь с таким Skype уже существует'],
+            [['telegram'], 'unique', 'message' => 'Пользователь с таким Телеграм уже существует'],
             [['user_id'], 'exist', 'skipOnError' => false, 'targetClass' => User::class, 'targetAttribute' => ['user_id' => 'id']],
-            [['city_id'], 'exist', 'skipOnError' => false, 'targetClass' => City::class, 'targetAttribute' => ['city_id' => 'id'], 'message' => 'Укажите город, чтобы находить подходящие задачи'],
+            [['city_id'], 'exist', 'skipOnError' => false, 'targetClass' => City::class, 'targetAttribute' => ['city_id' => 'id'],
+                'message' => 'Укажите город, чтобы находить подходящие задачи'],
         ];
     }
 
@@ -79,8 +78,7 @@ class Profile extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[City]].
-     *
+     * Метод возвращает город, к которому привязан профиль пользователя.
      * @return \yii\db\ActiveQuery
      */
     public function getCity()
@@ -89,13 +87,11 @@ class Profile extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[User]].
-     *
+     * Метод возвращает пользователя, к которому относится конкретный пользовательский профиль.
      * @return \yii\db\ActiveQuery
      */
     public function getUser()
     {
         return $this->hasOne(User::class, ['id' => 'user_id'])->inverseOf('profile');
     }
-
 }

@@ -3,13 +3,16 @@
 
 namespace frontend\controllers;
 
-
-use App\Exception\DataException;
-use frontend\models\YandexGeo;
+use frontend\service\TaskService;
+use frontend\service\YandexGeo;
 use yii\web\Response;
 
 class LocationController extends SecuredController
 {
+    /**
+     * Метод, отвечающий за отправку запроса в геокодер API Яндекс.Карт и обработку ответа.
+     * @return array|mixed
+     */
     public function actionIndex()
     {
         $this->layout = false;
@@ -19,27 +22,14 @@ class LocationController extends SecuredController
         $addressInCache = \Yii::$app->cache->get($addressQueryModified);
 
          if ($addressInCache) {
-             return $addressInCache;
+            return $addressInCache;
          }
 
         $responseData = YandexGeo::sendQuery(\Yii::$app->request->get('search'));
-        if ($responseData) {
-            $GeoObjects = $responseData['response']['GeoObjectCollection']['featureMember'];
-            $result = [];
-            foreach ($GeoObjects as $value) {
-                try {
-                    $yandexGeo = new YandexGeo();
-                    $yandexGeo->setParameters($value['GeoObject']);
-                } catch (DataException $e) {
-                    continue;
-                }
 
-                if (\Yii::$app->user->identity->city->name === $yandexGeo->city) {
-                    $result [] = $yandexGeo->getAttributes();
-                } else {
-                    continue;
-                }
-            }
+
+         if ($responseData) {
+            $result = TaskService::createAutocompleteAddress($responseData);
             \Yii::$app->cache->set($addressQueryModified, $result, 86400);
             return $result;
         }

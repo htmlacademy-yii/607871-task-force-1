@@ -4,41 +4,27 @@
 namespace frontend\controllers;
 
 
-use frontend\models\Profile;
-use frontend\models\Task;
-use frontend\models\User;
+use frontend\models\forms\CreateUserForm;
 
 class SignupController extends SecuredController
 {
+    /** Метод отображает страницу "Регистрация", и выполняет обработку данных, полученных с этой формы.
+     * @return string
+     * @throws \yii\base\Exception
+     */
     public function actionIndex()
     {
-        $user = new User(['scenario' => User::SCENARIO_CREATE_USER]);
-        $profile = new Profile();
+        $createUserForm = new CreateUserForm();
+
         if (\Yii::$app->request->getIsPost()) {
-
-            if ($user->load(\Yii::$app->request->post()) && $profile->load(\Yii::$app->request->post())) {
-                $user->validate();
-                $profile->validate();
-
-                if (!$user->errors && !$profile->errors) {
-                    $passwordHash = \Yii::$app->security->generatePasswordHash($user->getAttribute('password'));
-                    $user->setAttribute('password', $passwordHash);
-                     $transaction = \Yii::$app->db->beginTransaction();
-
-                    try {
-                        $user->save();
-                        $userId = $user->getId();
-                        $profile->setAttribute('user_id', $userId);
-                        $profile->save();
-                        $transaction->commit();
-                        $this->redirect('/');
-                    } catch (\Throwable $e) {
-                        $transaction->rollBack();
-                    }
-                }
+            $createUserForm->load(\Yii::$app->request->post());
+            $createUserForm->validate();
+            if (!$createUserForm->errors && $createUserForm->saveFields()) {
+                $this->redirect('/');
             }
         }
-        return $this->render('index', ['user' => $user, 'profile' => $profile]);
-    }
+        if(\Yii::$app)
 
+        return $this->render('index', ['createUserForm' => $createUserForm]);
+    }
 }

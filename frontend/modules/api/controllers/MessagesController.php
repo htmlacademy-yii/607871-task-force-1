@@ -3,8 +3,9 @@
 namespace frontend\modules\api\controllers;
 
 use frontend\models\Correspondence;
-use frontend\models\Task;
+
 use frontend\models\UserMessage;
+use frontend\service\NotificationService;
 use yii\data\ActiveDataProvider;
 use yii\helpers\Json;
 use yii\rest\ActiveController;
@@ -15,6 +16,10 @@ class MessagesController extends ActiveController
 {
     public $modelClass = Correspondence::class;
 
+    /**
+     * Переопределение методов
+     * @return array
+     */
     public function actions()
     {
         $actions = parent::actions();
@@ -24,6 +29,10 @@ class MessagesController extends ActiveController
         return $actions;
     }
 
+    /**
+     * Переопределение prepareDataProvider
+     * @return ActiveDataProvider
+     */
     public function prepareDataProvider()
     {
         return new ActiveDataProvider([
@@ -32,10 +41,10 @@ class MessagesController extends ActiveController
     }
 
     /**
+     * Метод создает сообщение в блоке "Переписка" по заданию.
      * @return array
      * @throws BadRequestHttpException
      */
-
     public function actionCreate(): array
     {
         $data = Json::decode(\Yii::$app->request->getRawBody());
@@ -45,22 +54,16 @@ class MessagesController extends ActiveController
         $model->message = $data['message'];
         $model->user_id = \Yii::$app->user->getId();
         if (!$model->save()) {
-            throw new BadRequestHttpException();
+            throw new BadRequestHttpException('Не удалось создать сообщение в блоке "Переписка"');
         }
         $task = $model->task;
         $client = $model->task->client;
         $executor = $model->task->executor;
 
-        if (\Yii::$app->user->getId() === $executor->id) {
-            $user = $client;
-        } else {
-            $user = $executor;
-        }
+        $user = (\Yii::$app->user->getId() === $executor->id) ? $client : $executor;
 
-        if ($user->userSettings && $user->userSettings->new_message) {
-            $user->createUserMessage(UserMessage::TYPE_NEW_MESSAGE, $task);
-            $user->sendEmail('taskCorrespondence-html', UserMessage::TYPE_NEW_MESSAGE, $task);
-        }
+        $notification = new NotificationService($task, $user);
+        $notification->inform(UserMessage::TYPE_NEW_MESSAGE);
 
         \Yii::$app->response->statusCode = 201;
         \Yii::$app->response->format = Response::FORMAT_JSON;

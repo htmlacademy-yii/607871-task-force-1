@@ -62,13 +62,13 @@
         const selection = feedback.selection.value[feedback.selection.key];
         // Replace Input value with the selected value
         autoCompleteJS.input.value = selection;
-        const latitude = document.getElementById('task-latitude');
+        const latitude = document.getElementById('createtaskform-latitude');
         latitude.value = feedback.selection.value.latitude;
-        const longitude = document.getElementById('task-longitude');
+        const longitude = document.getElementById('createtaskform-longitude');
         longitude.value = feedback.selection.value.longitude;
-        const city = document.getElementById('city-name');
+        const city = document.getElementById('createtaskform-city_name');
         city.value = feedback.selection.value.city;
-        const address = document.getElementById('task-address');
+        const address = document.getElementById('createtaskform-address');
         address.value = feedback.selection.value.short_address;
     });
 

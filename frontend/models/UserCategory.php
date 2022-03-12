@@ -16,8 +16,9 @@ use Yii;
  */
 class UserCategory extends \yii\db\ActiveRecord
 {
-    const USER_CATEGORY_ACTIVE_SET = 1;
-    const USER_CATEGORY_ACTIVE_UNSET = 0;
+    const STATUS_ACTIVE = 1;
+    const STATUS_INACTIVE = 0;
+
     /**
      * {@inheritdoc}
      */
@@ -53,8 +54,7 @@ class UserCategory extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Category]].
-     *
+     * Метод возвращает категорию, относящуюся к конкретной связи между пользователем и категорией.
      * @return \yii\db\ActiveQuery
      */
     public function getCategory()
@@ -63,8 +63,7 @@ class UserCategory extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[User]].
-     *
+     * Метод возвращает пользователя, относящегося к конкретной связи между пользователем и категорией.
      * @return \yii\db\ActiveQuery
      */
     public function getUser()

@@ -3,10 +3,9 @@
 namespace frontend\models;
 
 
-use App\Exception\DataException;
 use yii\db\ActiveRecord;
 use yii\db\Query;
-use yii\web\Response;
+
 
 /**
  * This is the model class for table "tasks".
@@ -18,7 +17,7 @@ use yii\web\Response;
  * @property int $client_id
  * @property int|null $executor_id
  * @property int $budget
- * @property int $status (0 - new, 1 - canceled, 2 - in progress, 3 - finished, 4 - failed)
+ * @property int $status (1 - new, 2 - canceled, 3 - in progress, 4 - finished, 5 - failed)
  * @property string $due_date
  * @property string $creation_date
  * @property int|null $city_id
@@ -40,21 +39,11 @@ use yii\web\Response;
  */
 class Task extends ActiveRecord
 {
-    public $full_address;
-
-    const STATUS_NEW = 0;
-    const STATUS_CANCELED = 1;
-    const STATUS_IN_PROGRESS = 2;
-    const STATUS_FINISHED = 3;
-    const STATUS_FAILED = 4;
-
-    const BUSINESS_STATUS_MAP = [
-        self::STATUS_NEW => \App\business\Task::STATUS_NEW,
-        self::STATUS_CANCELED => \App\business\Task::STATUS_CANCELED,
-        self::STATUS_IN_PROGRESS => \App\business\Task::STATUS_IN_PROGRESS,
-        self::STATUS_FINISHED => \App\business\Task::STATUS_FINISHED,
-        self::STATUS_FAILED => \App\business\Task::STATUS_FAILED
-        ];
+    const STATUS_NEW = 1;
+    const STATUS_CANCELED = 2;
+    const STATUS_IN_PROGRESS = 3;
+    const STATUS_FINISHED = 4;
+    const STATUS_FAILED = 5;
 
     const SCENARIO_CREATE_TASK = 'create_task';
 
@@ -72,11 +61,11 @@ class Task extends ActiveRecord
     public function rules()
     {
         return [
-            [['title', 'description', 'category_id', 'budget', 'due_date', 'creation_date', 'latitude', 'longitude', 'address','district'], 'safe'],
+            [['title', 'description', 'category_id', 'budget', 'due_date', 'creation_date', 'latitude', 'longitude', 'address', 'district'], 'safe'],
             [['title', 'description', 'category_id', 'client_id', 'due_date'], 'required',
                 'message' => 'Поле должно быть заполнено'],
-            [['title', 'description', 'address', 'district'],'trim'],
-            ['due_date', 'datetime', 'format' => 'yyyy-MM-dd', 'min' => date('Y-m-d', strtotime('+1 days', time())) , 'strictDateFormat'=> true,
+            [['title', 'description', 'address', 'district'], 'trim'],
+            ['due_date', 'datetime', 'format' => 'yyyy-MM-dd', 'min' => date('Y-m-d', strtotime('+1 days', time())), 'strictDateFormat' => true,
                 'message' => 'Введите дату в формате ГГГГ-ММ-ДД', 'on' => self::SCENARIO_CREATE_TASK],
             ['description', 'string', 'min' => 15, 'max' => 1500,
                 'tooShort' => "Не менее {min} символов", 'tooLong' => 'Не более {max} символов'],
@@ -118,8 +107,7 @@ class Task extends ActiveRecord
     }
 
     /**
-     * Gets query for [[Category]].
-     *
+     * Метод возвращает категорию, к которой относится конкретное задание.
      * @return \yii\db\ActiveQuery
      */
     public function getCategory()
@@ -128,8 +116,7 @@ class Task extends ActiveRecord
     }
 
     /**
-     * Gets query for [[City]].
-     *
+     * Метод возвращает город, к которому относится конкретное задание.
      * @return \yii\db\ActiveQuery
      */
     public function getCity()
@@ -138,8 +125,7 @@ class Task extends ActiveRecord
     }
 
     /**
-     * Gets query for [[Client]].
-     *
+     * Метод возвращает клинета, создавшего конкретное задание.
      * @return \yii\db\ActiveQuery
      */
     public function getClient()
@@ -148,8 +134,7 @@ class Task extends ActiveRecord
     }
 
     /**
-     * Gets query for [[Correspondences]].
-     *
+     * Метод возвращает список всех сообщений в блоке "Переписка", оставленных по конкретному заданию.
      * @return \yii\db\ActiveQuery
      */
     public function getCorrespondences()
@@ -158,8 +143,7 @@ class Task extends ActiveRecord
     }
 
     /**
-     * Gets query for [[Executor]].
-     *
+     * Метод возвращает пользователя, указанного в конкретном задании в качестве исполнителя.
      * @return \yii\db\ActiveQuery
      */
     public function getExecutor()
@@ -168,8 +152,7 @@ class Task extends ActiveRecord
     }
 
     /**
-     * Gets query for [[Recalls]].
-     *
+     * Метод возвращает отзыв, оставленный клинетом по конкретному заданию.
      * @return \yii\db\ActiveQuery
      */
     public function getRecall()
@@ -178,8 +161,7 @@ class Task extends ActiveRecord
     }
 
     /**
-     * Gets query for [[Responds]].
-     *
+     * Метод возвращает список всех откликов, относящихся к конкретному заданию.
      * @return \yii\db\ActiveQuery
      */
     public function getResponds()
@@ -188,48 +170,13 @@ class Task extends ActiveRecord
     }
 
     /**
-     * Gets query for [[TaskFiles]].
-     *
+     * Метод возвращает список всех файлов, прикрепленных к конкретному заданию.
      * @return array
      */
     public function getTaskFiles()
     {
         $query = new Query();
-        $query->from('task_files')->where('task_id =:task_id', [':task_id'=> $this->id]);
+        $query->from('task_files')->where('task_id =:task_id', [':task_id' => $this->id]);
         return $query->all();
-    }
-
-    public function isVolunteer(int $id): bool
-    {
-        return isset($id) ? !!$this->getResponds()->andWhere(['respond.user_id' => $id])->count() : false;
-    }
-
-    public function getBusinessStatus()
-    {
-        return self::BUSINESS_STATUS_MAP[$this->status];
-    }
-
-    public function searchDistrict()
-    {
-        if ($this->latitude && $this->longitude) {
-            $geoCode = "{$this->longitude},{$this->latitude}";
-            $responseData = YandexGeo::sendQuery($geoCode, 'district');
-            if ($responseData) {
-                $districts = [];
-                $geoObjects = $responseData['response']['GeoObjectCollection']['featureMember'];
-                foreach ($geoObjects as $value) {
-                    try {
-                        $yandexGeo = new YandexGeo();
-                        $districts[] = $yandexGeo->searchDistrict($value['GeoObject']);
-                    } catch (DataException $e) {
-                        continue;
-                    }
-
-                }
-                if (!empty($districts)) {
-                    $this->district = array_shift($districts);
-                }
-            }
-        }
     }
 }

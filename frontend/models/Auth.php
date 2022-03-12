@@ -51,8 +51,7 @@ class Auth extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[User]].
-     *
+     * Метод возвращает пользователя, относящегося к конкретной записи на таблице авторизации через соцсети.
      * @return \yii\db\ActiveQuery
      */
     public function getUser()

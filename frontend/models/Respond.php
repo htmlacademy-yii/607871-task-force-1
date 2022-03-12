@@ -23,6 +23,7 @@ class Respond extends \yii\db\ActiveRecord
     const STATUS_NEW = 1;
     const STATUS_CONFIRMED = 2;
     const STATUS_REFUSED = 3;
+
     /**
      * {@inheritdoc}
      */
@@ -65,8 +66,7 @@ class Respond extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Task]].
-     *
+     * Метод возвращает задание, к которому относится конкретный отклик.
      * @return \yii\db\ActiveQuery
      */
     public function getTask()
@@ -74,10 +74,8 @@ class Respond extends \yii\db\ActiveRecord
         return $this->hasOne(Task::class, ['id' => 'task_id'])->inverseOf('responds');
     }
 
-
     /**
-     * Gets query for [[User]].
-     *
+     * Метод возвращает пользователя, оставившего конкретный отклик к заданию.
      * @return \yii\db\ActiveQuery
      */
     public function getVolunteer()

@@ -14,6 +14,9 @@ class UploadFilesForm extends Model
     const SCENARIO_CREATE_TASK = 'create_task';
     const SCENARIO_UPDATE_ACCOUNT = 'update_account';
 
+    /**
+     * {@inheritdoc}
+     */
     public function rules()
     {
         return [
@@ -29,11 +32,17 @@ class UploadFilesForm extends Model
         ];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function attributeLabels()
     {
         return ['files' => 'Файлы', 'avatar' => 'Сменить аватар'];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public static function uploadFile(UploadedFile $file)
     {
         $newName = uniqid(date('Y-m-d-')) . '.' . $file->getExtension();

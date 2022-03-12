@@ -8,6 +8,8 @@ use \frontend\models\Respond;
 use frontend\assets\TaskViewAsset;
 use yii\helpers\Html;
 use \frontend\widgets\UserRatingWidget;
+use \frontend\service\TaskService;
+use \frontend\service\UserService;
 
 /**
  * @var \yii\web\View $this
@@ -80,9 +82,9 @@ YandexMapAsset::register($this);
     </div>
 
     <?php if ($task->getResponds()->count()): ?>
-        <?php if (Yii::$app->user->id === $task->client->id || $task->isVolunteer(Yii::$app->user->id)): ?>
+        <?php if (Yii::$app->user->id === $task->client->id || TaskService::isVolunteer($task, Yii::$app->user->id)): ?>
             <div class="content-view__feedback">
-                <h2>Отклики <span>(<?= count($task->responds) ?>)</span></h2>
+                <h2>Отклики <span>(<?= count($task->responds); ?>)</span></h2>
                 <div class="content-view__feedback-wrapper">
 
                     <?php foreach ($task->responds as $respond): ?>
@@ -90,7 +92,7 @@ YandexMapAsset::register($this);
                             <div class="content-view__feedback-card">
                                 <div class="feedback-card__top">
                                     <a href="<?= Url::to("/user/view/{$respond->volunteer->id}"); ?>"><img
-                                                src="<?= $respond->volunteer->avatar; ?>" width="55" height="55"></a>
+                                                src="<?= UserService::getAvatar($respond->volunteer); ?>" width="55" height="55"></a>
                                     <div class="feedback-card__top--name">
                                         <p><a href="<?= Url::to("/user/view/{$respond->volunteer->id}"); ?>"
                                               class="link-regular"><?= Html::encode($respond->volunteer->name); ?></a></p>
@@ -127,7 +129,7 @@ YandexMapAsset::register($this);
         <div class="profile-mini__wrapper">
             <h3><?= ($userCard->id === $task->client_id) ?  'Заказчик' : 'Исполнитель'?></h3>
             <div class="profile-mini__top">
-                <img src="<?= Html::encode($userCard->avatar); ?>" width="62" height="62" alt="Аватар заказчика">
+                <img src="<?= UserService::getAvatar($userCard); ?>" width="62" height="62" alt="Аватар заказчика">
                 <div class="profile-mini__name five-stars__rate">
                     <p><?= Html::encode($userCard->name); ?></p>
                 </div>
@@ -135,7 +137,7 @@ YandexMapAsset::register($this);
             <p class="info-customer">
                 <span><?= DataFormatter::declensionOfNouns(count($userCard->clientTasks), ['задание', 'задания', 'заданий']); ?></span><span
                         class="last-"><?= DataFormatter::formatTimeDistance($userCard->reg_date); ?> на сайте</span></p>
-            <a href="#" class="link-regular">Смотреть профиль</a>
+            <a href="<?= Url::to("/user/view/{$userCard->id}") ;?>" class="link-regular">Смотреть профиль</a>
         </div>
     </div>
     <?php if ($task->status === Task::STATUS_IN_PROGRESS  && (Yii::$app->user->id === $task->client_id || Yii::$app->user->id === $task->executor_id)): ?>

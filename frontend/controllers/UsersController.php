@@ -8,6 +8,7 @@ use app\models\UserFavorite;
 use frontend\models\forms\TaskSearchForm;
 use frontend\models\forms\UserSearchForm;
 use frontend\models\User;
+use frontend\service\UserService;
 use yii\web\NotFoundHttpException;
 
 class UsersController extends SecuredController
@@ -55,7 +56,7 @@ class UsersController extends SecuredController
     public function actionSwitchFavorite(int $chosenUserId)
     {
         if (\Yii::$app->user->identity->id !== $chosenUserId) {
-            \Yii::$app->user->identity->switchUserFavorite($chosenUserId);
+            UserService::switchUserFavorite($chosenUserId);
         }
         return $this->redirect(\Yii::$app->request->referrer);
     }

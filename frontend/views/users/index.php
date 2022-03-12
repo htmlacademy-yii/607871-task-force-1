@@ -5,6 +5,7 @@ use \frontend\widgets\UserRatingWidget;
 use \yii\helpers\Html;
 use yii\widgets\LinkPager;
 use \frontend\assets\TaskIndexAsset;
+use \frontend\service\UserService;
 
 /**
  * @var \yii\web\View $this
@@ -20,7 +21,7 @@ TaskIndexAsset::register($this);
             <div class="feedback-card__top">
                 <div class="user__search-icon">
                     <a href="<?= Url::to(
-                        "/user/view/{$user->id}"); ?>"><img src="<?= $user->avatar; ?>" width="65" height="65"></a>
+                        "/user/view/{$user->id}"); ?>"><img src="<?= UserService::getAvatar($user); ?>" width="65" height="65"></a>
                     <span><?= DataFormatter::declensionOfNouns($user->executorTasksFinished, ['задание', 'задания', 'заданий']); ?></span>
                     <span><?= DataFormatter::declensionOfNouns(count($user->recalls), ['отзыв', 'отзыва', 'отзывов']); ?></span>
                 </div>

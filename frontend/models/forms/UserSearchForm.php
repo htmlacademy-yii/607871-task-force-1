@@ -5,6 +5,7 @@ namespace frontend\models\forms;
 
 
 use frontend\models\User;
+use frontend\models\UserSettings;
 use yii\data\ActiveDataProvider;
 
 class UserSearchForm extends \yii\base\Model
@@ -16,6 +17,9 @@ class UserSearchForm extends \yii\base\Model
     public $favorite;
     public $nameSearch;
 
+    /**
+     * {@inheritdoc}
+     */
     public function attributeLabels()
     {
         return [
@@ -27,6 +31,9 @@ class UserSearchForm extends \yii\base\Model
         ];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function rules()
     {
         return [
@@ -34,10 +41,14 @@ class UserSearchForm extends \yii\base\Model
         ];
     }
 
+    /**
+     * Метод возвращает ActiveDataProvider для отображения данных на странице "Исполнители".
+     * @return ActiveDataProvider
+     */
     public function getDataProvider()
     {
         $query = User::find()
-            ->joinWith(['profile', 'categories'], true, 'RIGHT JOIN');
+            ->joinWith(['profile', 'categories', 'userSettings'], true, 'RIGHT JOIN');
 
         if ($this->nameSearch) {
             $this->categories = [];
@@ -71,6 +82,7 @@ class UserSearchForm extends \yii\base\Model
             $query->andWhere(['in', 'user.id', \Yii::$app->user->identity->getFavoriteExecutorsId()]);
         }
 
+        $query->andWhere(['=', 'user_settings.hide_profile', UserSettings::SETTING_INACTIVE]);
         $query->distinct();
 
         return new ActiveDataProvider([

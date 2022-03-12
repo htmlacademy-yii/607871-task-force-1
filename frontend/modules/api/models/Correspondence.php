@@ -6,6 +6,10 @@ use \frontend\models\Correspondence as BaseCorrespondence;
 
 class Correspondence extends BaseCorrespondence
 {
+    /**
+     * Определение перечня полей для возврата на фронтэнд
+     * @return array
+     */
     public function fields()
     {
         return [

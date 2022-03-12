@@ -12,25 +12,11 @@ use Yii;
  * @property string $description
  * @property int $rating
  * @property string $creation_date
- * @property int $taskStatus
  *
  * @property Task $tasks
  */
 class Recall extends \yii\db\ActiveRecord
 {
-    public $status;
-    const COMPLETION_YES = 'yes';
-    const COMPLETION_PROBLEMS = 'difficult';
-
-    const COMPLETION = [
-        self::COMPLETION_YES => 'да',
-        self::COMPLETION_PROBLEMS => 'Возникли проблемы'
-    ];
-
-    const TASK_STATUS_MAP = [
-        self::COMPLETION_YES => Task::STATUS_FINISHED,
-        self::COMPLETION_PROBLEMS => Task::STATUS_FAILED
-    ];
     /**
      * {@inheritdoc}
      */
@@ -45,10 +31,10 @@ class Recall extends \yii\db\ActiveRecord
     public function rules()
     {
         return [
-            [['status', 'task_id', 'description', 'rating'], 'safe'],
-            [['status', 'description', 'rating'], 'required', 'message' => 'Поле должно быть заполнено'],
+            [['task_id', 'description', 'rating'], 'safe'],
+            [['description', 'rating'], 'required', 'message' => 'Поле должно быть заполнено'],
             ['description', 'trim'],
-            [['status', 'description'], 'string'],
+            ['description', 'string'],
             ['rating', 'integer', 'min' => 1, 'max' => 5, 'message' => "Поставьте оценку от 1 до 5"],
             [['task_id'], 'exist', 'skipOnError' => true, 'targetClass' => Task::class, 'targetAttribute' => ['task_id' => 'id']],
 
@@ -70,8 +56,7 @@ class Recall extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Task]].
-     *
+     * Метод возвращает задание, по которому был оставлен конкретный отзыв.
      * @return \yii\db\ActiveQuery
      */
     public function getTask()
@@ -79,16 +64,15 @@ class Recall extends \yii\db\ActiveRecord
         return $this->hasOne(Task::class, ['id' => 'task_id'])->with('client');
     }
 
+    /**
+     * Метод возвращает пользователя, который оставил отзыв по заданию, и его профиль.
+     * @return \yii\db\ActiveQuery
+     * @throws \yii\base\InvalidConfigException
+     */
     public function getReviewer()
     {
         return $this->hasOne(User::class, ['id' => 'client_id'])
             ->viaTable('task', ['id' => 'task_id'])
             ->with('profile');
     }
-
-    public function getTaskStatus()
-    {
-        return self::TASK_STATUS_MAP[$this->status];
-    }
-
 }
