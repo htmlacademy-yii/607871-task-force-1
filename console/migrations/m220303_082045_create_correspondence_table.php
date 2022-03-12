@@ -36,6 +36,8 @@ class m220303_082045_create_correspondence_table extends Migration
             'user_id',
             'user',
             'id',
+            'CASCADE',
+            'CASCADE'
         );
     }
 

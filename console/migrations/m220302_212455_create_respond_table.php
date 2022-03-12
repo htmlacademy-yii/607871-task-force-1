@@ -29,6 +29,8 @@ class m220302_212455_create_respond_table extends Migration
             'user_id',
             'user',
             'id',
+            'CASCADE',
+            'CASCADE'
         );
 
         $this->addForeignKey(

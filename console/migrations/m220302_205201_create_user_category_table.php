@@ -19,6 +19,13 @@ class m220302_205201_create_user_category_table extends Migration
             'active' => $this->tinyInteger(1)->unsigned()->notNull()->defaultValue(0),
         ]);
 
+        $this->createIndex(
+            'unique_category_id_user_id',
+            'user_category',
+            ['user_id', 'category_id'],
+            true
+        );
+
         $this->addForeignKey(
             'fk-user_category-category_id-category-id',
             'user_category',
@@ -50,6 +57,10 @@ class m220302_205201_create_user_category_table extends Migration
         );
         $this->dropForeignKey(
             'fk-user_category-user_id-user-id',
+            'user_category'
+        );
+        $this->dropIndex(
+            'unique_category_id_user_id',
             'user_category'
         );
         $this->dropTable('{{%user_category}}');

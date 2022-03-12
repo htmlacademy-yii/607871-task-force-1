@@ -4,11 +4,15 @@ use yii\helpers\Url;
 use \frontend\models\Task;
 use \yii\helpers\Html;
 use \frontend\widgets\UserRatingWidget;
+use \frontend\service\TaskService;
+use \yii\widgets\LinkPager;
+use \frontend\service\UserService;
 
 /**
  * @var \yii\web\View $this
  * @var string $status
  * @var Task $myTask
+ * @var \yii\data\ActiveDataProvider $dataProvider
  */
 
 
@@ -107,7 +111,7 @@ use \frontend\widgets\UserRatingWidget;
 <section class="my-list">
     <div class="my-list__wrapper">
         <h1>Мои задания</h1>
-        <?php foreach ($myTasks as $myTask): ?>
+        <?php foreach ($dataProvider->getModels() as $myTask): ?>
             <div class="new-task__card">
                 <div class="new-task__title">
                     <a href="<?= Url::to("/task/view/{$myTask->id}"); ?>" class="link-regular">
@@ -117,14 +121,15 @@ use \frontend\widgets\UserRatingWidget;
                         <p><?= $myTask->category->name; ?></p>
                     </a>
                 </div>
-                <div class="task-status done-status"><?=\App\business\Task::getStatusMapping()[$myTask->getBusinessStatus($myTask->status)]; ?></div>
+                <div class="task-status done-status">
+                    <?=\App\business\Task::getStatusMapping()[TaskService::getBusinessStatus($myTask)]; ?></div>
                 <p class="new-task_description">
                     <?= Html::encode($myTask->description); ?>
                 </p>
                 <?php if ($myTask->executor): ?>
                     <div class="feedback-card__top ">
                         <a href="<?= Url::to("/user/view/{$myTask->executor_id}"); ?>">
-                            <img src="<?= $myTask->executor->avatar; ?>" width="36" height="36">
+                            <img src="<?= UserService::getAvatar($myTask->executor); ?>" width="36" height="36">
                         </a>
                         <div class="feedback-card__top--name my-list__bottom">
                             <p class="link-name">
@@ -138,5 +143,17 @@ use \frontend\widgets\UserRatingWidget;
                 <?php endif; ?>
             </div>
         <?php endforeach; ?>
+    </div>
+    <div class="new-task__pagination">
+        <?= LinkPager::widget([
+            'pagination' => $dataProvider->getPagination(),
+            'options' => ['class' => 'new-task__pagination-list'],
+            'activePageCssClass' => 'pagination__item--current',
+            'pageCssClass' => 'pagination__item',
+            'nextPageCssClass' => 'pagination__item',
+            'prevPageCssClass' => 'pagination__item',
+            'nextPageLabel' => '',
+            'prevPageLabel' => '',
+        ]); ?>
     </div>
 </section>

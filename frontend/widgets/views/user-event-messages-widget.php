@@ -1,6 +1,7 @@
 <?php
 
 use frontend\models\UserMessage;
+use frontend\service\NotificationService;
 use \yii\helpers\Url;
 
 /**
@@ -14,7 +15,7 @@ use \yii\helpers\Url;
     <h3>Новые события</h3>
     <?php foreach ($userMessages as $userMessage): ?>
         <p class="lightbulb__new-task <?= UserMessage::CSS_ICON_CLASS_MAP[$userMessage->type]; ?>">
-            <?= UserMessage::TYPE_MESSAGE_MAP[$userMessage->type]; ?>
+            <?= NotificationService::TYPE_MESSAGE_MAP[$userMessage->type]; ?>
             <a href="<?= Url::to("/task/view/{$userMessage->task->id}")?>" class="link-regular">«<?= $userMessage->task->title; ?>»</a>
         </p>
     <?php endforeach; ?>

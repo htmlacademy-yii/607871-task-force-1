@@ -50,7 +50,6 @@ class UserPortfolio extends \yii\db\ActiveRecord
 
     /**
      * Метод возвращает пользователя, которому принадлежит портфолио (примеры работ).
-     *
      * @return \yii\db\ActiveQuery
      */
     public function getUser()

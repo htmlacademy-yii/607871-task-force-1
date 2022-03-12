@@ -1,9 +1,4 @@
 <?php
-/**
- * @var \frontend\models\Task $task
- * @var \yii\web\View $this
- * @var string $content
- */
 
 use frontend\assets\AppAsset;
 use yii\bootstrap4\Html;
@@ -11,6 +6,13 @@ use yii\helpers\Url;
 use \frontend\widgets\TaskActionWidget;
 use \frontend\widgets\CityWidget;
 use \frontend\widgets\UserEventMessagesWidget;
+use \frontend\service\UserService;
+
+/**
+ * @var \frontend\models\Task $task
+ * @var \yii\web\View $this
+ * @var string $content
+ */
 
 AppAsset::register($this);
 ?>
@@ -108,7 +110,7 @@ AppAsset::register($this);
                     <div class="header__account">
                         <a class="header__account-photo">
 
-                            <img src="<?= Html::encode(Yii::$app->user->identity->avatar); ?>"
+                            <img src="<?= UserService::getAvatar(Yii::$app->user->identity); ?>"
                                  width="43" height="44"
                                  alt="Аватар пользователя">
                         </a>

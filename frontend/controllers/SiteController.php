@@ -3,22 +3,25 @@
 namespace frontend\controllers;
 
 use frontend\models\Auth;
-use frontend\models\City;
 use frontend\models\forms\TaskSearchForm;
-use frontend\models\Profile;
+use frontend\models\ResendVerificationEmailForm;
 use frontend\models\Task;
-use frontend\models\User;
+use frontend\models\VerifyEmailForm;
+use frontend\service\VKontakteAuthService;
+use TaskForce\components\AuthHandler;
 use Yii;
 use yii\web\BadRequestHttpException;
-use frontend\models\forms\LoginForm;
+use yii\web\Controller;
+use \frontend\models\forms\LoginForm;
 
 
 /**
  * Site controller
  */
-class SiteController extends SecuredController
+class SiteController extends Controller
 {
     public $layout = 'landing';
+
 
     /**
      * {@inheritdoc}
@@ -36,6 +39,10 @@ class SiteController extends SecuredController
         ];
     }
 
+    /**
+     * Метод отвечает за отобажение главной страницы сайта.
+     * @return string
+     */
     public function actionIndex()
     {
         $tasks = Task::find()->joinWith('category')->orderBy(['creation_date' => SORT_DESC])->limit(4)->all();
@@ -43,17 +50,19 @@ class SiteController extends SecuredController
         return $this->render('index', ['tasks' => $tasks, 'model' => $model]);
     }
 
+    /**
+     * Метод отвечает за аутентификацию клиента
+     * @return array|\yii\web\Response
+     * @throws BadRequestHttpException
+     */
     public function actionLogin()
     {
-
         $loginForm = new LoginForm();
-
         if (\Yii::$app->request->getIsPost()) {
             $loginForm->load(\Yii::$app->request->post());
             $user = $loginForm->getUser();
 
             if ($loginForm->validate()) {
-
                 \Yii::$app->user->login($user);
                 \Yii::$app->session->set('city_id', \Yii::$app->user->identity->profile->city_id);
                 return $this->redirect('/tasks');
@@ -61,19 +70,26 @@ class SiteController extends SecuredController
         }
 
         if (\Yii::$app->request->isAjax) {
-
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
 
             if ($loginForm->load(\Yii::$app->request->post())) {
-
                 return \yii\widgets\ActiveForm::validate($loginForm);
             }
         }
         throw new BadRequestHttpException('Неверный запрос!');
     }
 
+    /**
+     * Метод авторизации пользователя через соц. сеть Вконтакте, если соц. сеть прислала положительный ответ.
+     * @param $client
+     * @return \yii\web\Response
+     */
     public function onAuthSuccess($client)
     {
+        if (!\Yii::$app->user->isGuest) {
+            $this->redirect('/tasks');
+        }
+
         $attributes = $client->getUserAttributes();
 
         /* @var $auth Auth */
@@ -82,85 +98,16 @@ class SiteController extends SecuredController
             'source_id' => $attributes['id'],
         ])->one();
 
-        if (!\Yii::$app->user->isGuest) {
-            $this->redirect('/tasks');
-        }
-
-        if ($auth) { // авторизация
+        // авторизация
+        if ($auth) {
             $user = $auth->user;
             \Yii::$app->user->login($user);
-        } else { // регистрация
-            if (isset($attributes['email']) && !User::find()->where(['email' => $attributes['email']])->exists()) {
-
-                $user = $this->loadUserVkAttributes($attributes);
-                $profile = $this->loadProfileVKAttributes($attributes);
-
-                if (!$user->errors && !$profile->errors) {
-                    $transaction = \Yii::$app->db->beginTransaction();
-                    try {
-                        $user->save();
-                        $profile->user_id = $user->getPrimaryKey();
-                        $profile->save();
-                        $auth = new Auth([
-                            'user_id' => $user->getPrimaryKey(),
-                            'source' => $client->getId(),
-                            'source_id' => (string)$attributes['id'],
-                        ]);
-                        $auth->save();
-                        $transaction->commit();
-                        \Yii::$app->user->login($user);
-                        \Yii::$app->session->set('city_id', \Yii::$app->user->identity->profile->city_id);
-                        return $this->redirect('/tasks');
-                    } catch (\Throwable $e) {
-                        $transaction->rollBack();
-                    }
-                }
-            }
+            \Yii::$app->session->set('city_id', \Yii::$app->user->identity->profile->city_id);
+        } else {
+            //регистрация
+            $vKontakteService = new VKontakteAuthService($client);
+            $vKontakteService->register();
         }
+        return $this->redirect('/tasks');
     }
-
-    private function loadProfileVKAttributes(array $attributes): Profile
-    {
-        $profile = new Profile(['scenario' => Profile::SCENARIO_DEFAULT]);
-
-        if (isset($attributes['city']['title'])) {
-            $city = City::find()->where(['name' => $attributes['city']['title']])->one();
-            if ($city) {
-                $profile->city_id = $city->id;
-            }
-        }
-
-        if (isset($attributes['photo'])) {
-            $profile->avatar = $attributes['photo'];
-        }
-
-        if (isset($attributes['bdate'])) {
-            $profile->birth_date = date('Y-m-d', strtotime($attributes['bdate']));
-        }
-
-        $profile->validate();
-        return $profile;
-    }
-
-    private function loadUserVkAttributes(array $attributes): User
-    {
-        $password = \Yii::$app->security->generateRandomString(15);
-        $user = new User([
-            'scenario' => User::SCENARIO_CREATE_USER,
-            'password' => $password,
-            'password_hash' => \Yii::$app->security->generatePasswordHash($password),
-        ]);
-
-        if (isset($attributes['email'])) {
-            $user->email = $attributes['email'];
-        }
-
-        if (isset($attributes['last_name'], $attributes['first_name'])) {
-            $user->name = implode(' ', array($attributes['last_name'], $attributes['first_name']));
-        }
-
-        $user->validate();
-        return $user;
-    }
-
 }

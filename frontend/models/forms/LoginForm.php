@@ -5,6 +5,7 @@ namespace frontend\models\forms;
 
 
 use frontend\models\User;
+use frontend\service\UserService;
 use yii\base\Model;
 
 
@@ -12,10 +13,11 @@ class LoginForm extends Model
 {
     public $email;
     public $password;
-
-
     private $_user;
 
+    /**
+     * {@inheritdoc}
+     */
     public function rules()
     {
         return [
@@ -27,11 +29,14 @@ class LoginForm extends Model
             ['email', 'exist', 'skipOnError' => false, 'targetClass' => User::class,
                 'targetAttribute' => 'email', 'message' => 'Пользвателя с таким email не существует'],
             [['password'], 'string', 'min' => 8, 'max' => 64, 'tooShort' => "Длина пароля от {min} символов", 'tooLong' => 'Длина пароля до {max} символов'],
-            ['password', 'validatePassword'],
+            ['password', 'validateUser'],
 
         ];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function attributeLabels()
     {
         return [
@@ -40,16 +45,23 @@ class LoginForm extends Model
         ];
     }
 
-    public function validatePassword()
+    /**
+     * Метод отвечает за проверку данных пользователя, пытающегося залогиниться.
+     */
+    public function validateUser()
     {
         if (!$this->hasErrors()) {
             $user = $this->getUser();
-            if (!$user ||  !$user->validatePassword($this->password)) {
+            if (!$user ||  !UserService::validatePassword($user, $this->password)) {
                 $this->addError('password', 'Неправильный email или пароль!');
             }
         }
     }
 
+    /**
+     * Метод проверяет, существует ли пользователь с указанным email.
+     * @return User|null
+     */
     public function getUser()
     {
         if ($this->_user === null) {

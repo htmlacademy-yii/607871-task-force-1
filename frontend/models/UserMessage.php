@@ -22,22 +22,14 @@ class UserMessage extends \yii\db\ActiveRecord
     const TYPE_TASK_CONFIRMED = 2;
     const TYPE_TASK_CLOSED = 3;
     const TYPE_TASK_FAILED = 4;
-    const TYPE_TASK_RECALLED = 5;
-
-    const TYPE_MESSAGE_MAP = [
-        self::TYPE_NEW_MESSAGE => 'Новое сообщение в чате',
-        self::TYPE_TASK_CONFIRMED => 'Выбран исполнитель для',
-        self::TYPE_TASK_CLOSED => 'Завершено задание',
-        self::TYPE_TASK_FAILED => 'Провалено задание',
-        self::TYPE_TASK_RECALLED => 'Получен отзыв по заданию',
-    ];
+    const TYPE_TASK_RESPONDED = 5;
 
     const CSS_ICON_CLASS_MAP = [
         self::TYPE_NEW_MESSAGE => 'lightbulb__new-task--message',
         self::TYPE_TASK_CONFIRMED => 'lightbulb__new-task--executor',
         self::TYPE_TASK_CLOSED => 'lightbulb__new-task--close',
         self::TYPE_TASK_FAILED => 'lightbulb__new-task--close',
-        self::TYPE_TASK_RECALLED => 'lightbulb__new-task--close',
+        self::TYPE_TASK_RESPONDED => 'lightbulb__new-task--close',
     ];
 
     /**
@@ -77,8 +69,7 @@ class UserMessage extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[Task]].
-     *
+     * Метод возвращает задание, по которому было сгенерировано сообщение для пользователя.
      * @return \yii\db\ActiveQuery
      */
     public function getTask()
@@ -87,8 +78,7 @@ class UserMessage extends \yii\db\ActiveRecord
     }
 
     /**
-     * Gets query for [[User]].
-     *
+     * Метод возвращает пользователя, для которого было создано сообщение.
      * @return \yii\db\ActiveQuery
      */
     public function getUser()

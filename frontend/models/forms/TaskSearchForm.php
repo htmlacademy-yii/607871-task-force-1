@@ -25,6 +25,9 @@ class TaskSearchForm extends \yii\base\Model
     public $titleSearch;
     public $period;
 
+    /**
+     * {@inheritdoc}
+     */
     public function attributeLabels()
     {
         return [
@@ -35,6 +38,9 @@ class TaskSearchForm extends \yii\base\Model
         ];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function rules()
     {
         return [
@@ -42,6 +48,10 @@ class TaskSearchForm extends \yii\base\Model
         ];
     }
 
+    /**
+     * Метод возвращает ActiveDataProvider для отображения данных на странице "Задания".
+     * @return ActiveDataProvider
+     */
     public function getDataProvider()
     {
         $query = Task::find()->joinWith('category');
@@ -68,7 +78,7 @@ class TaskSearchForm extends \yii\base\Model
         }
 
         $query->andWhere(['<>', 'status', Task::STATUS_CANCELED])
-            ->andWhere(['or', 'city_id IS NULL',  'city_id=:city_id' ])
+            ->andWhere(['or', 'city_id IS NULL', 'city_id=:city_id'])
             ->addParams([':city_id' => \Yii::$app->session->get('city_id')]);
 
         return new ActiveDataProvider([

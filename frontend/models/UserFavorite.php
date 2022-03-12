@@ -17,6 +17,9 @@ use Yii;
  */
 class UserFavorite extends \yii\db\ActiveRecord
 {
+    const STATUS_ACTIVE = 1;
+    const STATUS_INACTIVE = 0;
+
     /**
      * {@inheritdoc}
      */
@@ -54,7 +57,6 @@ class UserFavorite extends \yii\db\ActiveRecord
 
     /**
      * Метод возвращает пользователя, который добавил в избранное конкретного потенциального испольнителя.
-     *
      * @return \yii\db\ActiveQuery
      */
     public function getChooser()
@@ -64,7 +66,6 @@ class UserFavorite extends \yii\db\ActiveRecord
 
     /**
      * Метод возвращает пользователя, которого добавили в избранное как потенциального исполнителя.
-     *
      * @return \yii\db\ActiveQuery
      */
     public function getChosen()

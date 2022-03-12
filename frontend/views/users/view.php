@@ -3,6 +3,7 @@
 use App\Service\DataFormatter;
 use yii\helpers\Url;
 use \frontend\widgets\UserRatingWidget;
+use \frontend\service\UserService;
 
 /**
  * @var \frontend\models\User $user
@@ -13,7 +14,7 @@ use \frontend\widgets\UserRatingWidget;
 <section class="content-view">
     <div class="user__card-wrapper">
         <div class="user__card">
-            <img src="<?= $user->avatar; ?>" width="120" height="120" alt="Аватар пользователя">
+            <img src="<?= UserService::getAvatar($user); ?>" width="120" height="120" alt="Аватар пользователя">
             <div class="content-view__headline">
                 <h1><?= $user->name; ?></h1>
                 <p><?= $user->profile->city->name; ?>
@@ -28,7 +29,7 @@ use \frontend\widgets\UserRatingWidget;
                     <?= DataFormatter::declensionOfNouns(count($user->recalls), ['отзыв', 'отзыва', 'отзывов']); ?></b>
             </div>
             <div class="content-view__headline user__card-bookmark
-            <?= Yii::$app->user->identity->checkIsUserFavorite($user->id) ? 'user__card-bookmark--current' : 'user__card-bookmark'; ?>">
+            <?= UserService::checkIsUserFavorite($user->id) ? 'user__card-bookmark--current' : 'user__card-bookmark'; ?>">
                 <span>Был на сайте <?= DataFormatter::getRelativeTime($user->last_visit_date); ?></span>
                 <a href="<?= Url::to(["/favorite/{$user->id}"]) ?>"><b></b></a>
             </div>
@@ -50,11 +51,13 @@ use \frontend\widgets\UserRatingWidget;
                     <? endforeach; ?>
                 </div>
                 <h3 class="content-view__h3">Контакты</h3>
+                <?php if (!$user->userSettings->contacts_only_for_client): ?>
                 <div class="user__card-link">
                     <a class="user__card-link--tel link-regular" href="#"><?= $user->profile->phone; ?></a>
                     <a class="user__card-link--email link-regular" href="#"><?= $user->email; ?></a>
                     <a class="user__card-link--skype link-regular" href="#"><?= $user->profile->skype; ?></a>
                 </div>
+                <?php endif; ?>
             </div>
             <div class="user__card-photo">
                 <h3 class="content-view__h3">Фото работ</h3>
@@ -75,7 +78,7 @@ use \frontend\widgets\UserRatingWidget;
                                                          class="link-regular">«<?= $recall->task->title; ?>»</a></p>
                     <div class="card__review">
                         <a href="<?= Url::to("/user/view/{$recall->task->client->id}"); ?>"><img
-                                    src="<?= $recall->task->client->avatar; ?>" width="55" height="54"></a>
+                                    src="<?= UserService::getAvatar($recall->task->client); ?>" width="55" height="54"></a>
                         <div class="feedback-card__reviews-content">
                             <p class="link-name link"><a
                                         href="<?= Url::to("/user/view/{$recall->task->client->id}"); ?>"

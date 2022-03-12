@@ -5,8 +5,7 @@ use frontend\models\City;
 use \yii\helpers\Html;
 
 /**
- * @var \frontend\models\User $user
- * @var \frontend\models\Profile $profile
+ * @var \frontend\models\forms\CreateUserForm $createUserForm
  */
 
 ?>
@@ -19,6 +18,7 @@ use \yii\helpers\Html;
             'options' => ['class' => 'registration__user-form form-create'],
             'fieldConfig' => [
                 'enableAjaxValidation' => false,
+                'enableClientValidation' => true,
                 'template' => "{label}\n{input}\n{error}",
                 'inputOptions' => ['class' => 'input textarea'],
                 'errorOptions' => ['tag' => 'span', 'class' => 'registration__text-error'],
@@ -29,15 +29,15 @@ use \yii\helpers\Html;
 
         ]); ?>
 
-        <?= $form->field($user, 'email')->textInput(['placeholder' => 'kumarm@mail.ru']); ?>
-        <?= $form->field($user, 'name')->textInput(['placeholder' => 'Мамедов Кумар']); ?>
+        <?= $form->field($createUserForm, 'email')->textInput(['placeholder' => 'kumarm@mail.ru']); ?>
+        <?= $form->field($createUserForm, 'name')->textInput(['placeholder' => 'Мамедов Кумар']); ?>
 
-        <?= $form->field($profile, 'city_id')->dropDownList(City::getCityMap(), [
+        <?= $form->field($createUserForm, 'city_id')->dropDownList(City::getCityMap(), [
             'class' => 'multiple-select input town-select registration-town',
             'prompt' => ''
         ]) ?>
 
-        <?= $form->field($user, 'password')->passwordInput(); ?>
+        <?= $form->field($createUserForm, 'password')->passwordInput(); ?>
         <?= Html::submitButton('Создать аккаунт', ['class' => "button button__registration"]) ?>
         <?php ActiveForm::end(); ?>
     </div>

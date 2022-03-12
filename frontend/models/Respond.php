@@ -67,7 +67,6 @@ class Respond extends \yii\db\ActiveRecord
 
     /**
      * Метод возвращает задание, к которому относится конкретный отклик.
-     *
      * @return \yii\db\ActiveQuery
      */
     public function getTask()
@@ -77,7 +76,6 @@ class Respond extends \yii\db\ActiveRecord
 
     /**
      * Метод возвращает пользователя, оставившего конкретный отклик к заданию.
-     *
      * @return \yii\db\ActiveQuery
      */
     public function getVolunteer()

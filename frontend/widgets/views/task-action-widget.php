@@ -5,7 +5,7 @@ use yii\helpers\Html;
 
 /**
  * @var \frontend\models\Respond $respond
- * @var \frontend\models\Recall $recall
+ * @var \frontend\models\forms\FinishTaskForm $finishTaskForm
  * @var \frontend\models\Task $taskModel
  * @var int $taskId
  */
@@ -57,14 +57,13 @@ use yii\helpers\Html;
             'template' => "{label}\n{input}\n{error}",
             'errorOptions' => ['tag' => 'span', 'class' => 'registration__text-error'],
             'options' => [
-                //'tag' => false,
             ]],
         'enableAjaxValidation' => false,
     ]); ?>
-    <?=$form->field($recall, 'status', [
+    <?=$form->field($finishTaskForm, 'status', [
         'template' => "{input}\n{error}",
     ])
-        ->radioList($recall::COMPLETION,
+        ->radioList($finishTaskForm::COMPLETION,
             [
                 'item' => function ($index, $label, $name, $checked, $value) {
                     $radio = Html::radio(
@@ -90,7 +89,7 @@ use yii\helpers\Html;
             ]); ?>
 
     <p>
-        <?= $form->field($recall, 'description', [
+        <?= $form->field($finishTaskForm, 'description', [
             'labelOptions' => ['class' => 'form-modal-description']
         ])->textarea([
             'class' => 'input textarea',
@@ -101,7 +100,7 @@ use yii\helpers\Html;
     </p>
 
     <?= $form->field(
-        $recall,
+        $finishTaskForm,
         'rating',
         [
             'template' => "<p class='form-modal-description'>{label}
@@ -115,7 +114,7 @@ use yii\helpers\Html;
                     {input}</p>{error}"
         ]
     )->hiddenInput(['id' => 'rating']); ?>
-    <?= $form->field($recall, 'task_id')->hiddenInput(['value' => $taskId])->label(false); ?>
+    <?= $form->field($finishTaskForm, 'taskId')->hiddenInput(['value' => $taskId])->label(false); ?>
     <?= Html::submitButton('Отправить', ['class' => "button modal-button"]); ?>
     <?php ActiveForm::end(); ?>
     <button class="form-modal-close" type="button">Закрыть</button>

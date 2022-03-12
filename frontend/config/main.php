@@ -64,7 +64,7 @@ return [
             'identityClass' => 'frontend\models\User',
             'enableAutoLogin' => true,
             'identityCookie' => ['name' => '_identity-frontend', 'httpOnly' => true],
-            'loginUrl' => '/',
+            'loginUrl' => 'site/index',
         ],
         'session' => [
             // this is the name of the session cookie used for login on the frontend
@@ -93,8 +93,8 @@ return [
                 'favorite/<chosenUserId:\d+>' =>'users/switch-favorite',
                 'task/view/<id:\d+>' => 'tasks/view',
                 'task/create' => 'tasks/create',
-                'task/confirm/<taskId:\d+>/<messageId:\d+>' => 'tasks/confirm',
-                'task/deny/<taskId:\d+>/<messageId:\d+>' => 'tasks/deny',
+                'task/confirm/<taskId:\d+>/<respondId:\d+>' => 'tasks/confirm',
+                'task/deny/<taskId:\d+>/<respondId:\d+>' => 'tasks/deny',
                 'user/view/<id:\d+>' => 'users/view',
                 ['class' => 'yii\rest\UrlRule', 'controller' => 'api/messages'],
             ],

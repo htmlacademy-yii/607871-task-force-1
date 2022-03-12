@@ -8,6 +8,7 @@ use App\core\action\RefuseAction;
 use App\core\action\VolunteerAction;
 use App\core\TaskActionTemplate;
 use App\Exception\DataException;
+use frontend\service\TaskService;
 
 class Task
 {
@@ -61,7 +62,7 @@ class Task
             self::STATUS_IN_PROGRESS => [new DoneAction(), new RefuseAction()],
         ];
 
-        $status = \frontend\models\Task::BUSINESS_STATUS_MAP[$task->status];
+        $status = TaskService::BUSINESS_STATUS_MAP[$task->status];
 
         if (!isset($actionStatusMap[$status])) {
             throw new DataException("Для статуса задания $status нет подходящих действий");

@@ -52,7 +52,6 @@ class Category extends \yii\db\ActiveRecord
 
     /**
      * Метод возвращает список всех задач, относящихся к определенной категории.
-     *
      * @return \yii\db\ActiveQuery
      */
     public function getTasks()
@@ -62,7 +61,6 @@ class Category extends \yii\db\ActiveRecord
 
     /**
      * Метод возвращает список всех пользователей, у которых активирована определенная категория.
-     *
      * @return \yii\db\ActiveQuery
      * @throws \yii\base\InvalidConfigException
      */
@@ -72,9 +70,8 @@ class Category extends \yii\db\ActiveRecord
     }
 
     /**
-     * Метод возвращает список всех категорий в виде двумерного массива,
-     * каждый элемент которого состоит из идентификатора и названия категории.
-     *
+     * Метод возвращает список всех категорий в виде двумерного массива, каждый элемент которого состоит из id и
+     * названия категории.
      * @return array
      */
     public static function getCategoryMap(): array

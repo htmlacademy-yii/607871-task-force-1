@@ -19,6 +19,7 @@ use yii\helpers\ArrayHelper;
 class City extends \yii\db\ActiveRecord
 {
     const SCENARIO_CREATE_CITY = 'create_city';
+
     /**
      * {@inheritdoc}
      */
@@ -34,7 +35,7 @@ class City extends \yii\db\ActiveRecord
     {
         return [
             [['name', 'latitude', 'longitude'], 'required', 'on' => self::SCENARIO_CREATE_CITY],
-            [['name', 'latitude', 'longitude'],'safe'],
+            [['name', 'latitude', 'longitude'], 'safe'],
             ['name', 'trim'],
             [['latitude', 'longitude'], 'number'],
             [['name'], 'string', 'max' => 100],
@@ -56,7 +57,6 @@ class City extends \yii\db\ActiveRecord
 
     /**
      * Метод возвращает список всех пользовательских профилей, привязанных к конкретному городу.
-     *
      * @return \yii\db\ActiveQuery
      */
     public function getProfiles()
@@ -66,7 +66,6 @@ class City extends \yii\db\ActiveRecord
 
     /**
      * Метод возвращает список всех заданий, привязанных к конкретному городу.
-     *
      * @return \yii\db\ActiveQuery
      */
     public function getTasks()
@@ -75,8 +74,8 @@ class City extends \yii\db\ActiveRecord
     }
 
     /**
-     * Метод возвращает список всех городов в виде двумерного массива,
-     * каждый элемент которого состоит из идентификатора и названия города.
+     * Метод возвращает список всех городов в виде двумерного массива, каждый элемент которого состоит из id
+     * и названия города.
      * @return array
      */
     public static function getCityMap(): array

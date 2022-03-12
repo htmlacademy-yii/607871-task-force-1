@@ -7,22 +7,27 @@ use App\core\action\CancelAction;
 use App\core\action\DoneAction;
 use App\core\action\RefuseAction;
 use App\Exception\DataException;
+use frontend\models\forms\CreateTaskForm;
+use frontend\models\forms\FinishTaskForm;
 use frontend\models\UserMessage;
-use frontend\models\City;
 use frontend\models\forms\TaskSearchForm;
 use frontend\models\forms\UploadFilesForm;
-use frontend\models\Recall;
 use frontend\models\Respond;
 use frontend\models\Task;
 use frontend\models\User;
+use frontend\service\NotificationService;
+use frontend\service\TaskService;
 use Yii;
+use yii\web\BadRequestHttpException;
 use yii\web\NotFoundHttpException;
-use frontend\models\TaskFiles;
 use yii\web\UploadedFile;
 
 class TasksController extends SecuredController
 {
-
+    /**
+     * Метод отвечает за отображение страницы со списком заданий.
+     * @return string
+     */
     public function actionIndex()
     {
         $searchForm = new TaskSearchForm();
@@ -31,6 +36,12 @@ class TasksController extends SecuredController
         return $this->render('index', ['dataProvider' => $searchForm->getDataProvider(), 'model' => $searchForm]);
     }
 
+    /**
+     * Метод отвечает за страницу с отображением конкретного задания.
+     * @param $id - id задания
+     * @return string
+     * @throws NotFoundHttpException
+     */
     public function actionView($id)
     {
         /** @var Task $task */
@@ -50,11 +61,7 @@ class TasksController extends SecuredController
         }
 
         $searchForm = new TaskSearchForm();
-        $userCard = $task->client;
-
-        if (isset($task->executor_id) && Yii::$app->user->identity->id === $task->client_id) {
-            $userCard = $task->executor;
-        }
+        $userCard = TaskService::chooseUser($task);
 
         return $this->render('view', [
             'task' => $task,
@@ -64,92 +71,71 @@ class TasksController extends SecuredController
         ]);
     }
 
+    /**
+     * Метод отвечает за отображение страницы "Создать задание" и за обработку данных, полученных из формы на этой странице.
+     * @return string|\yii\web\Response
+     */
     public function actionCreate()
     {
-        $task = new Task(['scenario' => Task::SCENARIO_CREATE_TASK]);
-        $city = new City();
+        $user = User::findOne(Yii::$app->user->id);
+        if ($user->categories) {
+            return $this->redirect(Yii::$app->request->referrer);
+        }
+
+        $createTaskForm = new CreateTaskForm();
         $uploadFilesModel = new UploadFilesForm(['scenario' => UploadFilesForm::SCENARIO_CREATE_TASK]);
 
         if (\Yii::$app->request->getIsPost()) {
-            $task->load(Yii::$app->request->post());
-            $task->client_id = Yii::$app->user->id;
-            $city->load(Yii::$app->request->post());
-            if ($city->name) {
-                if (!$city->validate()) {
-                    throw new DataException('Данный город не может быть указан в задании');
-                }
-
-                $taskCity = City::find()->where(['name' => $city->name])->one();
-                if ($taskCity) {
-                    $task->city_id = $taskCity->id;
-                    $task->searchDistrict();
-                }
-            }
-
+            $createTaskForm->load(Yii::$app->request->post());
+            $createTaskForm->validate();
             $uploadFilesModel->files = UploadedFile::getInstances($uploadFilesModel, 'files');
-            $isValid = $task->validate();
-            $isValid = $uploadFilesModel->validate() && $isValid;
-
-            if ($isValid) {
-                $transaction = Yii::$app->db->beginTransaction();
-                try {
-                    $task->status = Task::STATUS_NEW;
-                    $task->save();
-
-                    foreach ($uploadFilesModel->files as $file) {
-                        $newFileName = UploadFilesForm::uploadFile($file); //загрузка файла из временной папки в uploads
-                        if ($newFileName) {
-                            $taskFile = new TaskFiles();
-                            $taskFile->task_id = $task->primaryKey;
-                            $taskFile->name = $file->name;
-                            $taskFile->url = \Yii::$app->params['defaultUploadDirectory'] . $newFileName;
-                            $taskFile->save();
-                        }
-                    }
-
-                    $transaction->commit();
-
-                    return $this->redirect("/task/view/{$task->primaryKey}");
-                } catch (\Throwable $e) {
-                    $transaction->rollBack();
-                }
+            $uploadFilesModel->validate();
+            if (!$createTaskForm->errors && !$uploadFilesModel->errors && $task = $createTaskForm->saveFields($uploadFilesModel)) {
+                return $this->redirect("/task/view/{$task->id}");
             }
         }
 
-        return $this->render('create', ['task' => $task, 'uploadFiles' => $uploadFilesModel, 'city' => $city]);
+        return $this->render('create', [
+            'uploadFiles' => $uploadFilesModel,
+            'createTaskForm' => $createTaskForm,
+        ]);
     }
 
-    public function actionConfirm(int $taskId, int $messageId)
+    /**
+     * Метод отвечающий за назначение исполнителя по заданию на основании его отклика.
+     * @param int $taskId - id задания.
+     * @param int $respondId - id отклика.
+     * @return \yii\web\Response
+     * @throws DataException
+     */
+    public function actionConfirm(int $taskId, int $respondId)
     {
         $task = Task::findOne($taskId);
-        $respond = Respond::findOne($messageId);
+        $respond = Respond::findOne($respondId);
         $executor = User::findOne($respond->volunteer->id);
 
         if (!$task || !$executor || !$respond || !CancelAction::getUserRightsCheck($task)) {
             throw new DataException('Данное действие не может быть выполнено!');
         }
 
-        $transaction = Yii::$app->db->beginTransaction();
-
-        try {
-            $task->status = Task::STATUS_IN_PROGRESS;
-            $task->executor_id = $executor->id;
-            $respond->status = Respond::STATUS_CONFIRMED;
-            $task->save();
-            $respond->save();
-            $transaction->commit();
-            $executor->inform(UserMessage::TYPE_TASK_CONFIRMED, $task);
-        } catch (\Throwable $e) {
-            $transaction->rollBack();
-        }
+        if (TaskService::executorConfirm($task, $respond, $executor)) {
+            $notification = new NotificationService($task, $executor);
+            $notification->inform(UserMessage::TYPE_TASK_CONFIRMED);
+        };
 
         return $this->redirect("/task/view/{$taskId}");
     }
 
-    public function actionDeny(int $taskId, int $messageId)
+    /**
+     * Метод отвечает за обработку отказа потенциальному исполнителю со стороны клиента.
+     * @param int $taskId
+     * @param int $respondId
+     * @return \yii\web\Response
+     */
+    public function actionDeny(int $taskId, int $respondId)
     {
         $task = Task::findOne($taskId);
-        $respond = Respond::findOne($messageId);
+        $respond = Respond::findOne($respondId);
         if ($task && $respond && CancelAction::getUserRightsCheck($task)) {
             $respond->status = Respond::STATUS_REFUSED;
             $respond->save();
@@ -158,28 +144,29 @@ class TasksController extends SecuredController
         return $this->redirect("/task/view/{$taskId}");
     }
 
+    /**
+     * Метод отвечает за обработку отказа уже назначенного исполнителя от задания.
+     * @return \yii\web\Response
+     */
     public function actionRefuse()
     {
         if (Yii::$app->request->getIsPost()) {
             $task = Task::findOne(Yii::$app->request->post('Task')['id']);
             if ($task && RefuseAction::getUserRightsCheck($task)) {
-                $transaction = Yii::$app->db->beginTransaction();
-
-                try {
-                    $task->status = Task::STATUS_FAILED;
-                    $task->save();
-                    $client = $task->client;
-                    $transaction->commit();
-                    $client->inform(UserMessage::TYPE_TASK_FAILED, $task);
-                    return $this->redirect("/task/view/{$task->id}");
-                } catch (\Throwable $e) {
-                    $transaction->rollBack();
-                }
+                $task->status = Task::STATUS_FAILED;
+                $task->save();
+                $notification = new NotificationService($task, $task->client);
+                $notification->inform(UserMessage::TYPE_TASK_FAILED);
+                return $this->redirect("/task/view/{$task->id}");
             }
         }
         return $this->redirect("/tasks");
     }
 
+    /**
+     * Метод обрабатывает отмену клиентом еще не взятого в работу задания.
+     * @return \yii\web\Response
+     */
     public function actionCancel()
     {
         if (Yii::$app->request->getIsPost()) {
@@ -193,6 +180,11 @@ class TasksController extends SecuredController
         return $this->redirect("/tasks");
     }
 
+    /**
+     * Метод отвечает за создание откликов по заданию со сторроны потнециальных исполнителей.
+     * @return array|\yii\web\Response
+     * @throws \yii\web\BadRequestHttpException
+     */
     public function actionTaskRespond()
     {
         $respond = new Respond();
@@ -201,55 +193,52 @@ class TasksController extends SecuredController
             $respond->user_id = Yii::$app->user->id;
             $respond->status = Respond::STATUS_NEW;
             $respond->save();
+
+            $task = Task::findOne($respond->task_id);
+            $notification = new NotificationService($task, $task->client);
+            $notification->inform(UserMessage::TYPE_TASK_RESPONDED);
+
             return $this->redirect("/task/view/{$respond->task_id}");
         }
 
         if (\Yii::$app->request->isAjax) {
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
             if ($respond->load(\Yii::$app->request->post())) {
                 return \yii\widgets\ActiveForm::validate($respond);
             }
         }
-        throw new \yii\web\BadRequestHttpException('Неверный запрос!');
+        throw new BadRequestHttpException('Неверный запрос!');
     }
 
+    /**
+     * Метод отвечает за завершение задания со стороны клиента и размещение отзыва о работе исполнителя.
+     * @return array|\yii\web\Response
+     * @throws DataException
+     */
     public function actionTaskFinish()
     {
-        $recall = new Recall();
+        $finishTaskForm = new FinishTaskForm();
 
         if (Yii::$app->request->getIsPost()) {
-
-            if (!$recall->load(Yii::$app->request->post()) || !$recall->validate()) {
+            if (!$finishTaskForm->load(Yii::$app->request->post()) || !$finishTaskForm->validate()) {
                 throw new DataException('Данный отзыв не может быть размещен');
             }
 
-            $task = Task::findOne($recall->task_id);
-
+            $task = Task::findOne($finishTaskForm->taskId);
             if (!$task || !DoneAction::getUserRightsCheck($task)) {
                 throw new DataException('Недостаточно прав для выполнения данного действия');
             }
-
-            $transaction = Yii::$app->db->beginTransaction();
-            try {
-                $task->status = $recall->taskStatus;
-                $task->save();
-                $recall->save();
-                $executor = $task->executor;
-                $transaction->commit();
-                $executor->inform(UserMessage::TYPE_TASK_CLOSED, $task);
-                $executor->inform(UserMessage::TYPE_TASK_RECALLED, $task);
-                return $this->redirect("/task/view/{$recall->task_id}");
-            } catch (\Throwable $e) {
-                $transaction->rollBack();
+            if ($finishTaskForm->saveFields($task)) {
+                $notification = new NotificationService($task, $task->executor);
+                $notification->inform(UserMessage::TYPE_TASK_CLOSED);
+                return $this->redirect("/task/view/{$task->id}");
             }
-
         }
+
         if (\Yii::$app->request->isAjax) {
             \Yii::$app->response->format = \yii\web\Response::FORMAT_JSON;
-
-            if (!$recall->load(Yii::$app->request->post())) {
-                return \yii\widgets\ActiveForm::validate($recall);
+            if (!$finishTaskForm->load(Yii::$app->request->post())) {
+                return \yii\widgets\ActiveForm::validate($finishTaskForm);
             }
         }
         return $this->redirect("/tasks");

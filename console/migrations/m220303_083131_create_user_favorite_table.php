@@ -17,6 +17,12 @@ class m220303_083131_create_user_favorite_table extends Migration
             'chooser_id' => $this->integer()->unsigned()->notNull(),
             'chosen_id' => $this->integer()->unsigned()->notNull(),
         ]);
+        $this->createIndex(
+            'unique_chooser_chosen',
+            'user_favorite',
+            ['chooser_id', 'chosen_id'],
+            true
+        );
 
         $this->addForeignKey(
             'fk-user_favorite-chooser_id-user-id',
@@ -50,6 +56,10 @@ class m220303_083131_create_user_favorite_table extends Migration
         );
         $this->dropForeignKey(
             'fk-user_favorite-chosen_id-user-id',
+            'user_favorite'
+        );
+        $this->dropIndex(
+            'unique_chooser_chosen',
             'user_favorite'
         );
         $this->dropTable('{{%user_favorite}}');

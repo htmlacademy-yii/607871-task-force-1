@@ -5,7 +5,6 @@ namespace frontend\models;
 
 
 use yii\db\ActiveRecord;
-use yii\web\UploadedFile;
 
 
 /**
@@ -20,11 +19,17 @@ class TaskFiles extends ActiveRecord
 {
     public $files = [];
 
+    /**
+     * {@inheritdoc}
+     */
     public static function tableName()
     {
         return 'task_files';
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function rules()
     {
         return [
