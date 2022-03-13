@@ -6,6 +6,8 @@ namespace frontend\models\forms;
 
 use frontend\models\Recall;
 use frontend\models\Task;
+use frontend\models\UserMessage;
+use frontend\service\NotificationService;
 use yii\base\Model;
 
 class FinishTaskForm extends Model
@@ -80,12 +82,17 @@ class FinishTaskForm extends Model
         try {
             $task->status = $this->getTaskStatus();
             $task->save();
+
             if ($this->description || $this->rating) {
+
                 $recall = new Recall();
                 $recall->task_id = $this->taskId;
-                $recall->description = $this->description;
-                $recall->rating = $this->rating;
+                $recall->description = $this->description ?: null;
+                $recall->rating = $this->rating ?: null;
                 $recall->save();
+
+                $notification = new NotificationService($task, $task->executor);
+                $notification->inform(UserMessage::TYPE_TASK_RECALL);
             }
             $transaction->commit();
         } catch (\Throwable $e) {

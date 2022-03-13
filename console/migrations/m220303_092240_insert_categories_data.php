@@ -21,7 +21,7 @@ class m220303_092240_insert_categories_data extends Migration
      */
     public function safeDown()
     {
-        $this->truncateTable('category');
+        $this->delete('category');
     }
 
     /*

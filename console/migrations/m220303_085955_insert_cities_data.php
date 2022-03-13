@@ -21,7 +21,7 @@ class m220303_085955_insert_cities_data extends Migration
      */
     public function safeDown()
     {
-        $this->truncateTable('city');
+        $this->delete('city');
     }
 
     /*

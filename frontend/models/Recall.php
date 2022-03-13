@@ -32,7 +32,6 @@ class Recall extends \yii\db\ActiveRecord
     {
         return [
             [['task_id', 'description', 'rating'], 'safe'],
-            [['description', 'rating'], 'required', 'message' => 'Поле должно быть заполнено'],
             ['description', 'trim'],
             ['description', 'string'],
             ['rating', 'integer', 'min' => 1, 'max' => 5, 'message' => "Поставьте оценку от 1 до 5"],
