@@ -22,14 +22,16 @@ class UserMessage extends \yii\db\ActiveRecord
     const TYPE_TASK_CONFIRMED = 2;
     const TYPE_TASK_CLOSED = 3;
     const TYPE_TASK_FAILED = 4;
-    const TYPE_TASK_RESPONDED = 5;
+    const TYPE_TASK_RECALL = 5;
+    const TYPE_TASK_RESPONDED = 6;
 
     const CSS_ICON_CLASS_MAP = [
         self::TYPE_NEW_MESSAGE => 'lightbulb__new-task--message',
         self::TYPE_TASK_CONFIRMED => 'lightbulb__new-task--executor',
         self::TYPE_TASK_CLOSED => 'lightbulb__new-task--close',
         self::TYPE_TASK_FAILED => 'lightbulb__new-task--close',
-        self::TYPE_TASK_RESPONDED => 'lightbulb__new-task--close',
+        self::TYPE_TASK_RECALL => 'lightbulb__new-task--close',
+        self::TYPE_TASK_RESPONDED => 'lightbulb__new-task--message',
     ];
 
     /**

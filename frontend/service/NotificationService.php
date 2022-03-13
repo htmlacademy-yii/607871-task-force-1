@@ -7,6 +7,7 @@ namespace frontend\service;
 use frontend\models\Task;
 use frontend\models\User;
 use frontend\models\UserMessage;
+use yii\web\TooManyRequestsHttpException;
 
 class NotificationService
 {
@@ -18,6 +19,7 @@ class NotificationService
         UserMessage::TYPE_TASK_CONFIRMED => 'taskConfirmed-html',
         UserMessage::TYPE_TASK_CLOSED => 'taskClosed-html',
         UserMessage::TYPE_TASK_FAILED => 'taskFailed-html',
+        UserMessage::TYPE_TASK_RECALL => 'taskRecalled-html',
         UserMessage::TYPE_TASK_RESPONDED => 'taskResponded-html',
     ];
 
@@ -26,13 +28,15 @@ class NotificationService
         UserMessage::TYPE_TASK_CONFIRMED => 'Выбран исполнитель для',
         UserMessage::TYPE_TASK_CLOSED => 'Завершено задание',
         UserMessage::TYPE_TASK_FAILED => 'Провалено задание',
-        UserMessage::TYPE_TASK_RESPONDED => 'Получен отклик по заданию',
+        UserMessage::TYPE_TASK_RECALL => 'Получен отзыв',
+        UserMessage::TYPE_TASK_RESPONDED => 'Получен отклик по заданию'
     ];
 
     const TASK_ACTIONS = [
         UserMessage::TYPE_TASK_CONFIRMED,
         UserMessage::TYPE_TASK_CLOSED,
         UserMessage::TYPE_TASK_FAILED,
+        UserMessage::TYPE_TASK_RESPONDED,
     ];
 
     public function __construct(Task $task, User $user)
@@ -54,6 +58,7 @@ class NotificationService
 
         $emailTemplate = self::MESSAGE_TYPE_EMAIL_MAP[$messageType];
         $this->createUserMessage($messageType);
+
         $this->sendEmail($emailTemplate, $messageType);
         return true;
     }
@@ -63,7 +68,7 @@ class NotificationService
      * @param $messageType
      * @return bool
      */
-    protected function createUserMessage($messageType): bool
+    protected function createUserMessage($messageType)
     {
         $message = new UserMessage([
             'user_id' => $this->user->id,
@@ -87,6 +92,7 @@ class NotificationService
         ]);
         $message->setTo($this->user->email)->setFrom('yii-taskforce@mail.ru')
             ->setSubject(self::TYPE_MESSAGE_MAP[$messageType] . ' "' . $this->task->title . '"');
+
         return $message->send();
     }
 
@@ -104,8 +110,7 @@ class NotificationService
         }
 
         if ($this->user->userSettings->new_message && $messageType === UserMessage::TYPE_NEW_MESSAGE) return true;
-        if ($this->user->userSettings->new_recall && $messageType === UserMessage::TYPE_TASK_RESPONDED) return true;
-
+        if ($this->user->userSettings->new_recall && $messageType === UserMessage::TYPE_TASK_RECALL) return true;
         return false;
     }
 }

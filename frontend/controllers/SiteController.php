@@ -11,14 +11,14 @@ use frontend\service\VKontakteAuthService;
 use TaskForce\components\AuthHandler;
 use Yii;
 use yii\web\BadRequestHttpException;
-use yii\web\Controller;
 use \frontend\models\forms\LoginForm;
 
 
 /**
  * Site controller
  */
-class SiteController extends Controller
+class SiteController extends SecuredController
+
 {
     public $layout = 'landing';
 
